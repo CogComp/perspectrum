@@ -16,6 +16,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from webapp import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('getJson/', views.get_json),
+    path('claims/', views.vis_claims),
 ]
