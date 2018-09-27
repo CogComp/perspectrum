@@ -5,6 +5,6 @@
  
  - Run the app: 
 ```
-$ python3.7 django runserver
+$ python3.7 manage.py runserver
 ```
 

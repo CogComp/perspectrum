@@ -1,3 +1,5 @@
+{% load static %}
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -12,8 +14,8 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
           integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-    <script src="scripts.js"></script>
-    <link rel="stylesheet" href="style.css">
+    <script src="{% static "scripts.js" %}"></script>
+    <link rel="stylesheet" href="{% static "style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <style>
         .table-condensed {
@@ -24,15 +26,9 @@
             font-size: 16px;
         }
     </style>
-    <script>
-        $.getJSON("/Users/daniel/ideaProjects/perspective/data/idebate/idebate.json", function(json) {
-            console.log(json); // this will show the info it in firebug console
-        });
-    </script>
 </head>
 <body>
 <div class="container">
-
     {% for claim in claim_titles %}
         <div class="alert alert-secondary" role="alert">
             <a href="">{{ claim }} </a>
