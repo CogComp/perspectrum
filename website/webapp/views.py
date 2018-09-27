@@ -8,14 +8,17 @@ file_names = {
     "iDebate": '../data/idebate/idebate.json'
 }
 
+
 def load_json(file_name):
     with open(file_name, encoding='utf-8') as data_file:
         data = json.loads(data_file.read())
         return data
 
+
 def get_json(request):
     data = load_json(file_names["iDebate"])
     return JsonResponse({"data": data})
+
 
 def vis_claims(request):
     data = load_json(file_names["iDebate"])
@@ -28,3 +31,7 @@ def vis_claims(request):
         "claim_titles": claim_titles
     }
     return render(request, 'claims.html', context)
+
+
+def vis_persps(request):
+    pass
