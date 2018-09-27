@@ -29,12 +29,19 @@
 <body>
     <div class="container">
         <div class="col-xs-12 persp-claim-title">
-
+            {{ claim["claim_title"] }}
         </div>
-        <div class="col-xs-12 col-sm-6 persps">
-            {% for persp in persps_for %}
-            <div class="persp">
-                
+        <div class="col-xs-12 col-sm-6 persps-for">
+            {% for persp in claim["perspectives_for"] %}
+            <div class="persp-title">
+                {{ persp["title"] }}
+            </div>>
+            {% endfor %}
+        </div>
+        <div class="col-xs-12 col-sm-6 persps-against">
+            {% for persp in claim["perspectives_against"] %}
+            <div class="persp-title">
+                {{ persp["title"] }}
             </div>>
             {% endfor %}
         </div>

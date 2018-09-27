@@ -4,6 +4,7 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
 
+from .util.helper import get_all_claim_title_id, get_claim_given_id
 file_names = {
     "iDebate": '../data/idebate/idebate.json'
 }
@@ -22,9 +23,7 @@ def get_json(request):
 
 def vis_claims(request):
     data = load_json(file_names["iDebate"])
-    claim_titles = []
-    for x in data:
-        claim_titles.append(x["claim_title"])
+    claim_titles = get_all_claim_title_id(data)
 
     # print(len(claim_titles))
     context = {
@@ -33,5 +32,12 @@ def vis_claims(request):
     return render(request, 'claims.html', context)
 
 
-def vis_persps(request):
-    pass
+def vis_persps(request, claim_id):
+    data = load_json(file_names["iDebate"])
+    claim = get_claim_given_id(data, claim_id)
+    context = {
+        "claim": claim
+    }
+
+    return render(request, 'persp.html', context)
+
