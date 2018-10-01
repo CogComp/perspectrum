@@ -1,4 +1,19 @@
 .persp-title {
     text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px !important;
 }
 
+.persp-claim-title {
+    text-align: center;
+}
+
+.persps-container {
+    margin: 20px;
+}
+
+
+
+.persp-arg-desc {
+    text-align: left;
+}

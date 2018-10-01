@@ -1,8 +1,8 @@
 {% load static %}
+{% load claim_filter %}
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
             integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
             crossorigin="anonymous"></script>
@@ -14,8 +14,11 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
           integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
+          integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous" />
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="{% static "js/persp.js" %}"></script>
     <style>
         .table-condensed {
             font-size: 10px;
@@ -27,27 +30,57 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="col-xs-12 persp-claim-title">
-            {{ claim["claim_title"] }}
-        </div>
-        <div class="col-xs-12 col-sm-6 persps-for">
-            {% for persp in claim["perspectives_for"] %}
-            <div class="persp-title">
-                {{ persp["title"] }}
-            </div>>
-            {% endfor %}
-        </div>
-        <div class="col-xs-12 col-sm-6 persps-against">
-            {% for persp in claim["perspectives_against"] %}
-            <div class="persp-title">
-                {{ persp["title"] }}
-            </div>>
-            {% endfor %}
+    <div class="container-fluid">
+        <h4 class="persp-claim-title pallete pallete-peter-river">
+            {{ claim|dict_get_item:"claim_title" }}
+        </h4>
+        <div class="row">
+            <div class="col persps-container tile">
+                <h6>
+                    Perspectives For
+                </h6>
+                {% for persp in claim|dict_get_item:"perspectives_for" %}
+                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
+                        {{ persp|dict_get_item:"perspective_title" }}
+                </a>
+                <div class="persp-arg-container">
+                    <strong>Argument</strong>
+                    {% for para in persp|get_pro_description %}
+                        <p class="persp-arg-desc"> {{ para }}
+                        </p>
+                    {% endfor %}
+                    <strong>Counter-Argument</strong>
+                    {% for para in persp|get_con_description %}
+                        <p class="persp-arg-desc"> {{ para }}
+                        </p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
+            <div class="col persps-container tile">
+                <h6>
+                    Perspectives Against
+                </h6>
+                {% for persp in claim|dict_get_item:"perspectives_against" %}
+                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">
+                    {{ persp|dict_get_item:"perspective_title" }}
+                </a>
+                <div class="persp-arg-container">
+                    <strong>Argument</strong>
+                    {% for para in persp|get_pro_description %}
+                        <p class="persp-arg-desc"> {{ para }}
+                        </p>
+                    {% endfor %}
+                    <strong>Counter-Argument</strong>
+                    {% for para in persp|get_con_description %}
+                        <p class="persp-arg-desc"> {{ para }}
+                        </p>
+                    {% endfor %}
+                </div>
+                {% endfor %}
+            </div>
         </div>
     </div>
-
-    <script src="{% static "js/persp.js" %}">
 
 </body>
 </html>
