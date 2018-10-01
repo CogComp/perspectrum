@@ -31,39 +31,49 @@
                 T O D O
             </p>
         </div>
-        <div class="row">
-            <div class="col-9 form-group">
-                <input id="neg_input" type="text" value="" placeholder="Input negation of claim here" class="form-control">
-            </div>
-            <div class="col-1"></div>
-            <div class="col-2">
-                <a href="" id="neg_input_submit" class="btn btn-block btn-lg btn-primary">Submit</a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-3">
-                <blockquote>
-                <label class="radio neg_option_radio">
-                    <input type="radio" name="optionsRadios" id="neg_option_good" value="neg_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                    Good Negation
-                </label>
-                <label class="radio neg_option_radio">
-                    <input type="radio" name="optionsRadios" id="neg_option_good" value="neg_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                    Bad Negation
-                </label>
-                <label class="radio neg_option_radio">
-                    <input type="radio" name="optionsRadios" id="neg_option_bad" value="neg_option" data-toggle="radio" checked="" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                    Unable to determine
-                </label>
-                </blockquote>
-            </div>
-            <div class="col-9">
-                <div class="neg_option_text">
-                    Apple is better than BANANA!
+        <div class="neg_input_container">
+            <div class="row">
+                <div class="col-9 form-group">
+                    <input id="neg_input" type="text" value="" placeholder="Input negation of claim here" class="form-control">
+                </div>
+                <div class="col-1"></div>
+                <div class="col-2">
+                    <a id="neg_input_submit" class="btn btn-block btn-lg btn-primary">Submit</a>
                 </div>
             </div>
-
-            
+        </div>
+        <div class="neg_option_container">
+            <div class="row">
+                <div class="col-3">
+                    <blockquote>
+                    <label class="radio neg_option_radio">
+                        <input type="radio" name="optionsRadios" id="neg_option_good" value="neg_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                        Good Negation
+                    </label>
+                    <label class="radio neg_option_radio">
+                        <input type="radio" name="optionsRadios" id="neg_option_good" value="neg_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                        Bad Negation
+                    </label>
+                    <label class="radio neg_option_radio">
+                        <input type="radio" name="optionsRadios" id="neg_option_bad" value="neg_option" data-toggle="radio" checked="" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                        Unable to determine
+                    </label>
+                    </blockquote>
+                </div>
+                <div class="col-9">
+                    <div class="neg_option_text">
+                        Apple is better than BANANA!
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <a id="neg_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</a>
+                </div>
+                <div class="col-8">
+                    <a id="neg_option_submit" class="btn btn-block btn-lg btn-primary">Submit</a>
+                </div>
+            </div>
         </div>
     </div>
 </body>

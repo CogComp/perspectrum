@@ -31,3 +31,7 @@
 .neg_option_radio {
     display: block;
 }
+
+.neg_option_container {
+    display: none;
+}
