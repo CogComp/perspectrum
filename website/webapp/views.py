@@ -41,3 +41,7 @@ def vis_persps(request, claim_id):
 
     return render(request, 'persp.html', context)
 
+
+def vis_neg_anno(request, claim_id):
+    return render(request, 'claim_neg_anno.html', {})
+
