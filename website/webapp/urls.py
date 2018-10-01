@@ -22,4 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('getJson/', views.get_json),
     path('claims/', views.vis_claims),
+    path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives")
 ]
