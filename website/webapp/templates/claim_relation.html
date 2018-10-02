@@ -23,41 +23,103 @@
 <body>
     <div class="container">
         <h4 class="rel_claim_title pallete pallete-peter-river">
-            <strong>Claim:</strong> Banana is scientifically proven to be inferior than apple as a fruit.
+            Claim Annotations Interface
         </h4>
         <div class="rel_instr_container">
             <strong>Instructions:</strong>
             <p class="rel_instr_text">
-                T O D O
+                In this task we annotate whether a given evidence <font face="verdana" color="green"><b>supports</b></font>,
+                <font face="verdana" color="red"><b>undermines</b></font> or it is <font face="verdana" color="blue"><b>irrelevant</b></font> to a given claim.
+                <br>
+                <input type='button' id='hideshow' value='Click here to view examples'>
             </p>
         </div>
         <div class="rel_option_container">
-            <div class="row">
-                <div class="col-3">
-                    <blockquote>
-                    <label class="radio rel_option_radio">
-                        <input type="radio" name="optionsRadios" id="rel_option_arg" value="rel_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                        Support
-                    </label>
-                    <label class="radio rel_option_radio">
-                        <input type="radio" name="optionsRadios" id="rel_option_con" value="rel_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                        Undermine
-                    </label>
-                    <label class="radio rel_option_radio">
-                        <input type="radio" name="optionsRadios" id="rel_option_nr" value="rel_option" data-toggle="radio" checked="" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                        Not Related
-                    </label>
-                    </blockquote>
+            <div class="col persps-container tile" id='content' style="display: none">
+                <strong><h6>Claim: Smoking should be restricted. </h6></strong>
+                <hr>
+                <div class="row">
+                    <div class="col-2" style="text-align: left">
+                        <label class="radio rel_option_radio">
+                            <input type="radio" name="optionsRadios2" id="rel_option_sup2" value="rel_option" data-toggle="radio" class="custom-radio" checked><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <font face="verdana" color="green"><b>Supports</b></font>
+                        </label>
+                        <label class="radio rel_option_radio">
+                            <input type="radio" name="optionsRadios2" id="rel_option_und2" value="rel_option" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <font face="verdana" color="red"><b>Undermines</b></font>
+                        </label>
+                        <label class="radio rel_option_radio">
+                            <input type="radio" name="optionsRadios2" id="rel_option_irr2" value="rel_option" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <font face="verdana" color="blue"><b>irrelevant</b></font>
+                        </label>
+                    </div>
+                    <div class="col-10">
+    {#                    {% for persp in claim|dict_get_item:"perspectives_for" %}#}
+                        <strong>
+                            Perspective: Restrictions reach out to the general population
+                        </strong>
+                        <p style="text-align: left">
+                        A ban or high restrictions is a good measure to diminish the effects of smoking in society, because unlike the spreading of information (which is usually done by schools / clubs), governmental restrictions or a total ban will ensure the access of measures to the whole population. Through a ban on advertisement or higher taxation those citizens not involved in active educational structures get educated about the problem.
+                        <br>
+                        Studies on the ban of advertisements show that bans actually contribute great amounts to the reduction of smokers. "The tobacco industry employs predatory marketing strategies to get young people hooked to their addictive drug," said Dr Douglas Bettcher, Director of WHO's Tobacco Free Initiative. "But comprehensive advertising bans do work, reducing tobacco consumption by up to 16% in countries that have already taken this legislative step."
+                        </p>
+    {#                            {{ persp|dict_get_item:"perspective_title" }}#}
+                        <div class="persp-arg-container">
+    {#                        {% for para in persp|get_pro_description %}#}
+    {#                        {% endfor %}#}
+                        </div>
+    {#                {% endfor %}#}
+                        <div class="rel_option_text">
+                        </div>
+                    </div>
                 </div>
-                <div class="col-9">
-                    <div class="rel_option_persp_title">
-                        <strong>Apple is better than BANANA!</strong>
+                <div class="alert alert-danger" role="alert">
+                    Explanation: This paragraph provides a reason to ...
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-2" style="text-align: left">
+                        <label class="radio rel_option_radio">
+                            <input type="radio" name="optionsRadios" id="rel_option_sup1" value="rel_option" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <font face="verdana" color="green"><b>Supports</b></font>
+                        </label>
+                        <label class="radio rel_option_radio">
+                            <input type="radio" name="optionsRadios" id="rel_option_und1" value="rel_option" data-toggle="radio" class="custom-radio" checked><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <font face="verdana" color="red"><b>Undermines</b></font>
+                        </label>
+                        <label class="radio rel_option_radio">
+                            <input type="radio" name="optionsRadios" id="rel_option_irr1" value="rel_option" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <font face="verdana" color="blue"><b>irrelevant</b></font>
+                        </label>
                     </div>
-                    <div class="rel_option_persp_evidence">
-                        Apple is better than BANANA!
+                    <div class="col-10">
+    {#                    {% for persp in claim|dict_get_item:"perspectives_for" %}#}
+                        <strong>
+                            Perspective: Regulation harms safety and the poor population
+                        </strong>
+                        <p style="text-align: left">
+                        Cigarettes are so common that there is hardly any chance all the people will stop. What will happen is that policies, regarding tobacco regulation or banning will mainly restrict the possibilities of the poor.
+                            <br> In 2009, in the US, a law to triple the federal excise tax on cigarettes was signed, which meant that the federal tax on cigarette jumped from 39 cents per pack to $1.01 today. The administration projects, that such a "sin tax" will bring in at least $38 billion over the next five years. Smokers, usually coming from lower socio-economic backgrounds (getting welfare, unemployment or disability checks instead of paychecks) still pay the whole cigarette tax, while they do not get the same amount of funding as others. Anyone concerned about widening income inequality should have second thoughts about this distribution of the tax burden1. Effectively this means, that while a higher financial burden might not cause problems to high and middle class smokers, it will cause the poor smoker, to either limit the freedom of choice by not buying cigarettes or either make sure other necessities, such as food, other supplies will not be provided. In fact researchers estimate that in Bangladesh 10.5 million people are going hungry and 350 children are dying each day due to diversion of money from food to tobacco.
+                        </p>
+    {#                            {{ persp|dict_get_item:"perspective_title" }}#}
+                        <div class="persp-arg-container">
+    {#                        {% for para in persp|get_pro_description %}#}
+    {#                        {% endfor %}#}
+                        </div>
+    {#                {% endfor %}#}
+                        <div class="rel_option_text">
+                        </div>
                     </div>
+                </div>
+                <div class="alert alert-danger" role="alert">
+                    Explanation: This paragraph provides a reason to ...
                 </div>
             </div>
+
+            Now for the given claim, annotate the paragraphs with appropriate labels.
+
+
+
             <div class="row">
                 <div class="col-4">
                     <a id="neg_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</a>
@@ -69,4 +131,10 @@
         </div>
     </div>
 </body>
+    <script>
+        $("#hideshow").click(function() {
+            // assumes element with id='button'
+            $("#content").toggle();
+        });
+    </script>
 </html>

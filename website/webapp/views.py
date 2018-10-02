@@ -20,6 +20,11 @@ def get_json(request):
     data = load_json(file_names["iDebate"])
     return JsonResponse({"data": data})
 
+def main_page(request):
+    context = {
+        "datasets": list(file_names.keys())
+    }
+    return render(request, 'main.html', context)
 
 def vis_claims(request):
     data = load_json(file_names["iDebate"])
