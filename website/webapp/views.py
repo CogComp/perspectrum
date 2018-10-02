@@ -70,11 +70,12 @@ def vis_relation(request, claim_id):
     try:
         claim = Claim.objects.get(id=claim_id)
     except Claim.DoesNotExist:
-        pass  # TODO: Do something?
+        pass  # TODO: Do something? 404?
 
     perspective_pool = get_pool_from_claim_id(claim_id)
 
     return render(request, 'claim_relation.html', {
+        "claim": claim,
         "perspective_pool": perspective_pool
     })
 
