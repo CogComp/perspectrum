@@ -1,0 +1,48 @@
+/* persp.html */
+.persp-title {
+    text-align: center;
+    font-weight: bold;
+    margin-bottom: 10px !important;
+}
+
+.persp-claim-title {
+    text-align: center;
+}
+
+.persps-container {
+    margin: 20px;
+}
+
+.persp-arg-desc {
+    text-align: left;
+}
+
+/* claim_neg_anno.html */
+.neg_claim_title {
+    text-align:center;
+    display: block;
+    margin-top: 1em;
+}
+
+.neg_instr_container {
+
+}
+
+.neg_option_radio {
+    display: block;
+}
+
+.neg_option_container {
+    display: none;
+}
+
+/* claim_relation.html */
+.rel_claim_title {
+    text-align:center;
+    display: block;
+    margin-top: 1em;
+}
+
+.rel_instr_container {
+
+}
