@@ -3,4 +3,8 @@ $(document).ready(function () {
         // assumes element with id='button'
         $("#content").toggle();
     });
+
+    $('#neg_option_clear').click(function() {
+        $('.rel_option').prop('checked', false);
+    });
 });
