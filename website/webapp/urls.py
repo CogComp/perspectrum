@@ -20,6 +20,7 @@ from webapp import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('main/', views.main_page, name="main page"),
     path('getJson/', views.get_json),
     path('claims/', views.vis_claims),
     path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives"),
