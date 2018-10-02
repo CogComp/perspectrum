@@ -24,4 +24,5 @@ urlpatterns = [
     path('claims/', views.vis_claims),
     path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives"),
     path('claim_neg_anno/<slug:claim_id>', views.vis_neg_anno, name="claim_neg_anno"),
+    path('claim_relation/<slug:claim_id>', views.vis_relation, name="claim_relation"),
 ]

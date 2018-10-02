@@ -35,3 +35,14 @@
 .neg_option_container {
     display: none;
 }
+
+/* claim_relation.html */
+.rel_claim_title {
+    text-align:center;
+    display: block;
+    margin-top: 1em;
+}
+
+.rel_instr_container {
+
+}
