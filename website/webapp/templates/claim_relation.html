@@ -128,15 +128,18 @@
                 <div class="row">
                     <div class="col-2" style="text-align: left">
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios2" id="rel_option_sup2" value="rel_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_sup_{{ forloop.counter0 }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="green"><b>Supports</b></font>
                         </label>
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios2" id="rel_option_und2" value="rel_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_und_{{ forloop.counter0 }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="red"><b>Undermines</b></font>
                         </label>
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios2" id="rel_option_irr2" value="rel_option" data-toggle="radio" class="custom-radio"><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_irr_{{ forloop.counter0 }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="blue"><b>irrelevant</b></font>
                         </label>
                     </div>
