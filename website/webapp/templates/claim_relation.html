@@ -3,8 +3,8 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
             integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script src="{% static "js/claim_relation.js" %}"></script>
+    {% csrf_token %}
 </head>
 <body>
     <div class="container">
@@ -39,22 +40,21 @@
                 <strong><h6>Claim: Smoking should be restricted. </h6></strong>
                 <hr>
                 <div class="row">
-                    <div class="col-2" style="text-align: left">
+                    <div class="col-2 rel_radio_tutor_container">
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios2" id="rel_option_sup2" value="rel_option" data-toggle="radio" class="custom-radio" checked><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" id="rel_example_sup2" data-toggle="radio" class="custom-radio" checked><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="green"><b>Supports</b></font>
                         </label>
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios2" id="rel_option_und2" value="rel_option" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" id="rel_example_und2" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="red"><b>Undermines</b></font>
                         </label>
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios2" id="rel_option_irr2" value="rel_option" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" id="rel_example_irr2" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="blue"><b>irrelevant</b></font>
                         </label>
                     </div>
                     <div class="col-10">
-    {#                    {% for persp in claim|dict_get_item:"perspectives_for" %}#}
                         <strong>
                             Perspective: Restrictions reach out to the general population
                         </strong>
@@ -63,12 +63,8 @@
                         <br>
                         Studies on the ban of advertisements show that bans actually contribute great amounts to the reduction of smokers. "The tobacco industry employs predatory marketing strategies to get young people hooked to their addictive drug," said Dr Douglas Bettcher, Director of WHO's Tobacco Free Initiative. "But comprehensive advertising bans do work, reducing tobacco consumption by up to 16% in countries that have already taken this legislative step."
                         </p>
-    {#                            {{ persp|dict_get_item:"perspective_title" }}#}
                         <div class="persp-arg-container">
-    {#                        {% for para in persp|get_pro_description %}#}
-    {#                        {% endfor %}#}
                         </div>
-    {#                {% endfor %}#}
                         <div class="rel_option_text">
                         </div>
                     </div>
@@ -78,22 +74,21 @@
                 </div>
                 <hr>
                 <div class="row">
-                    <div class="col-2" style="text-align: left">
+                    <div class="col-2 rel_radio_tutor_container">
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios" id="rel_option_sup1" value="rel_option" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" id="rel_example_sup1" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="green"><b>Supports</b></font>
                         </label>
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios" id="rel_option_und1" value="rel_option" data-toggle="radio" class="custom-radio" checked><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" id="rel_example_und1" data-toggle="radio" class="custom-radio" checked><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="red"><b>Undermines</b></font>
                         </label>
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios" id="rel_option_irr1" value="rel_option" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                            <input type="radio" id="rel_example_irr1" data-toggle="radio" class="custom-radio" disabled><span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="blue"><b>irrelevant</b></font>
                         </label>
                     </div>
                     <div class="col-10">
-    {#                    {% for persp in claim|dict_get_item:"perspectives_for" %}#}
                         <strong>
                             Perspective: Regulation harms safety and the poor population
                         </strong>
@@ -101,12 +96,8 @@
                         Cigarettes are so common that there is hardly any chance all the people will stop. What will happen is that policies, regarding tobacco regulation or banning will mainly restrict the possibilities of the poor.
                             <br> In 2009, in the US, a law to triple the federal excise tax on cigarettes was signed, which meant that the federal tax on cigarette jumped from 39 cents per pack to $1.01 today. The administration projects, that such a "sin tax" will bring in at least $38 billion over the next five years. Smokers, usually coming from lower socio-economic backgrounds (getting welfare, unemployment or disability checks instead of paychecks) still pay the whole cigarette tax, while they do not get the same amount of funding as others. Anyone concerned about widening income inequality should have second thoughts about this distribution of the tax burden1. Effectively this means, that while a higher financial burden might not cause problems to high and middle class smokers, it will cause the poor smoker, to either limit the freedom of choice by not buying cigarettes or either make sure other necessities, such as food, other supplies will not be provided. In fact researchers estimate that in Bangladesh 10.5 million people are going hungry and 350 children are dying each day due to diversion of money from food to tobacco.
                         </p>
-    {#                            {{ persp|dict_get_item:"perspective_title" }}#}
                         <div class="persp-arg-container">
-    {#                        {% for para in persp|get_pro_description %}#}
-    {#                        {% endfor %}#}
                         </div>
-    {#                {% endfor %}#}
                         <div class="rel_option_text">
                         </div>
                     </div>
@@ -126,19 +117,19 @@
                 {% for persp in perspective_pool %}
 
                 <div class="row">
-                    <div class="col-2" style="text-align: left">
+                    <div class="col-2 rel_radio_container">
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_sup_{{ forloop.counter0 }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_sup_{{ persp.id }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="green"><b>Supports</b></font>
                         </label>
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_und_{{ forloop.counter0 }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_und_{{ persp.id }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="red"><b>Undermines</b></font>
                         </label>
                         <label class="radio rel_option_radio">
-                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_irr_{{ forloop.counter0 }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                            <input type="radio" name="optionsRadios_{{ forloop.counter0 }}" id="rel_option_irr_{{ persp.id }}" value="rel_option_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                             <font face="verdana" color="blue"><b>irrelevant</b></font>
                         </label>
@@ -150,12 +141,8 @@
                         <p style="text-align: left">
                         {{ persp.evidence }}
                         </p>
-    {#                            {{ persp|dict_get_item:"perspective_title" }}#}
                         <div class="persp-arg-container">
-    {#                        {% for para in persp|get_pro_description %}#}
-    {#                        {% endfor %}#}
                         </div>
-    {#                {% endfor %}#}
                         <div class="rel_option_text">
                         </div>
                     </div>
@@ -165,12 +152,13 @@
 
             <div class="row">
                 <div class="col-4">
-                    <a id="neg_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</a>
+                    <a id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</a>
                 </div>
                 <div class="col-8">
-                    <a id="neg_option_submit" class="btn btn-block btn-lg btn-primary">Submit</a>
+                    <a id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</a>
                 </div>
             </div>
+            <br>
         </div>
     </div>
 </body>
