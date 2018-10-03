@@ -88,4 +88,21 @@ def submit_rel_anno(request):
         raise ValueError("submit_rel_anno API only supports POST request")
         # TODO: Actaully not sure what to do here..
     else:
-        return HttpResponse(status=204)
+        claim_id = request.POST.get('claim_id')
+        annos = request.POST.getlist('annotations[]')
+        if claim_id and annos:
+            for a in annos:
+                parts = a.split(',')
+                if len(parts) != 2:
+                    return HttpResponse("Submission Failed! Annotation not valid.", status=400)
+
+                persp_id = parts[0]
+                rel = parts[1]
+                print(persp_id, rel)
+                anno_entry = RelationAnnotation.objects.create(author="TEST", claim_id=claim_id, perspective_id=persp_id, rel=rel)
+                anno_entry.save()
+
+        else:
+            return HttpResponse("Submission Failed! Annotation not valid.", status=400)
+
+        return HttpResponse("Submission Success!", status=200)

@@ -36,9 +36,14 @@ function csrfSetup() {
     });
 }
 
+var rel_mapping = {
+    'sup': 'S',
+    'und': 'U',
+    'irr': 'I',
+};
+
 /**
  * Submit the annotations to backend
- * TODO: If someone forges POST request (CSRF attack), that's going to be problem for us... Not top priority but fix is easy
  */
 function submit() {
 
@@ -49,8 +54,8 @@ function submit() {
         $(this).find('input:checked').each(function() {
             let el_id = $(this).attr('id').split("_");
             let persp_id = el_id.pop();
-            let rel = el_id.pop();
-            annos.push([persp_id, rel]);
+            let rel = rel_mapping[el_id.pop()];
+            annos.push(persp_id + ',' + rel);
         });
     });
 
