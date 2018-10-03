@@ -3,8 +3,8 @@
 
 <!DOCTYPE html>
 <html lang="en">
-    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
-            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
             integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
@@ -19,6 +19,7 @@
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script src="{% static "js/claim_relation.js" %}"></script>
+    {% csrf_token %}
 </head>
 <body>
     <div class="container">
@@ -54,7 +55,6 @@
                         </label>
                     </div>
                     <div class="col-10">
-    {#                    {% for persp in claim|dict_get_item:"perspectives_for" %}#}
                         <strong>
                             Perspective: Restrictions reach out to the general population
                         </strong>
@@ -63,12 +63,8 @@
                         <br>
                         Studies on the ban of advertisements show that bans actually contribute great amounts to the reduction of smokers. "The tobacco industry employs predatory marketing strategies to get young people hooked to their addictive drug," said Dr Douglas Bettcher, Director of WHO's Tobacco Free Initiative. "But comprehensive advertising bans do work, reducing tobacco consumption by up to 16% in countries that have already taken this legislative step."
                         </p>
-    {#                            {{ persp|dict_get_item:"perspective_title" }}#}
                         <div class="persp-arg-container">
-    {#                        {% for para in persp|get_pro_description %}#}
-    {#                        {% endfor %}#}
                         </div>
-    {#                {% endfor %}#}
                         <div class="rel_option_text">
                         </div>
                     </div>
@@ -93,7 +89,6 @@
                         </label>
                     </div>
                     <div class="col-10">
-    {#                    {% for persp in claim|dict_get_item:"perspectives_for" %}#}
                         <strong>
                             Perspective: Regulation harms safety and the poor population
                         </strong>
@@ -101,12 +96,8 @@
                         Cigarettes are so common that there is hardly any chance all the people will stop. What will happen is that policies, regarding tobacco regulation or banning will mainly restrict the possibilities of the poor.
                             <br> In 2009, in the US, a law to triple the federal excise tax on cigarettes was signed, which meant that the federal tax on cigarette jumped from 39 cents per pack to $1.01 today. The administration projects, that such a "sin tax" will bring in at least $38 billion over the next five years. Smokers, usually coming from lower socio-economic backgrounds (getting welfare, unemployment or disability checks instead of paychecks) still pay the whole cigarette tax, while they do not get the same amount of funding as others. Anyone concerned about widening income inequality should have second thoughts about this distribution of the tax burden1. Effectively this means, that while a higher financial burden might not cause problems to high and middle class smokers, it will cause the poor smoker, to either limit the freedom of choice by not buying cigarettes or either make sure other necessities, such as food, other supplies will not be provided. In fact researchers estimate that in Bangladesh 10.5 million people are going hungry and 350 children are dying each day due to diversion of money from food to tobacco.
                         </p>
-    {#                            {{ persp|dict_get_item:"perspective_title" }}#}
                         <div class="persp-arg-container">
-    {#                        {% for para in persp|get_pro_description %}#}
-    {#                        {% endfor %}#}
                         </div>
-    {#                {% endfor %}#}
                         <div class="rel_option_text">
                         </div>
                     </div>
@@ -150,12 +141,8 @@
                         <p style="text-align: left">
                         {{ persp.evidence }}
                         </p>
-    {#                            {{ persp|dict_get_item:"perspective_title" }}#}
                         <div class="persp-arg-container">
-    {#                        {% for para in persp|get_pro_description %}#}
-    {#                        {% endfor %}#}
                         </div>
-    {#                {% endfor %}#}
                         <div class="rel_option_text">
                         </div>
                     </div>

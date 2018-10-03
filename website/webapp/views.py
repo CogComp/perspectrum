@@ -79,3 +79,13 @@ def vis_relation(request, claim_id):
         "perspective_pool": perspective_pool
     })
 
+
+def submit_rel_anno(request):
+    """
+    Accepts POST requests and update the annotations
+    """
+    if request.method != 'POST':
+        raise ValueError("submit_rel_anno API only supports POST request")
+        # TODO: Actaully not sure what to do here..
+    else:
+        return HttpResponse(status=204)
