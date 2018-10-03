@@ -19,8 +19,8 @@ class RelationAnnotation(models.Model):
     GOLD = 'GOLD'
     CLAIM_PERSP_REL = (
         ('S', 'Support'),
-        ('O', 'Oppose'),
-        ('U', 'Unrelated')
+        ('U', 'Undermine'),
+        ('I', 'Irrelevant')
     )
     
     author = models.CharField(max_length=100)
