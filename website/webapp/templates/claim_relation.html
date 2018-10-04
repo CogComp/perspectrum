@@ -3,6 +3,7 @@
 
 <!DOCTYPE html>
 <html lang="en">
+<head>
     <script src="https://code.jquery.com/jquery-3.3.1.min.js"
             integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
             crossorigin="anonymous"></script>
@@ -18,6 +19,7 @@
           integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous" />
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="{% static "js/csrf_util.js" %}"></script>
     <script src="{% static "js/claim_relation.js" %}"></script>
     {% csrf_token %}
 </head>

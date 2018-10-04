@@ -17,8 +17,10 @@ from django.contrib import admin
 from django.urls import path
 
 from webapp import views
+from webapp import auth
 
 urlpatterns = [
+    path('', views.render_login_page, name="login page"),
     path('admin/', admin.site.urls),
     path('main/', views.main_page, name="main page"),
     path('getJson/', views.get_json),
@@ -27,4 +29,6 @@ urlpatterns = [
     path('claim_neg_anno/<slug:claim_id>', views.vis_neg_anno, name="claim_neg_anno"),
     path('claim_relation/<slug:claim_id>', views.vis_relation, name="claim_relation"),
     path('api/submit_rel_anno/', views.submit_rel_anno, name="submit_rel_anno"),
+    path('api/login/', auth.login, name="auth_login"),
+    path('api/register/', auth.register, name="auth_login"),
 ]

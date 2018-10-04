@@ -106,3 +106,11 @@ def submit_rel_anno(request):
             return HttpResponse("Submission Failed! Annotation not valid.", status=400)
 
         return HttpResponse("Submission Success!", status=200)
+
+
+def render_login_page(request):
+    """
+    Renderer for login page
+    """
+    return render(request, "login.html", {})
+
