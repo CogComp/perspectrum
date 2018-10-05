@@ -1,28 +1,20 @@
-def login(user_id, pwd):
+from django.contrib.auth.models import User
+from django.contrib.auth import login
+from django.http import HttpResponse
+
+
+def auth_login(request):
     """
 
-    :param user_id:
-    :param pwd:
+    :param request
     :return:
     """
-    pass
+    print(request.POST)
+    username = request.POST['username']
+    try:
+        user = User.objects.get(username=username)
+    except User.DoesNotExist:
+        user = User.objects.create_user(username)
 
-
-def register(user_id, pwd):
-    """
-
-    :param user_id:
-    :param pwd:
-    :return:
-    """
-    pass
-
-
-def validate_user(user_id, pwd):
-    """
-
-    :param user_id:
-    :param pwd:
-    :return:
-    """
-    pass
+    login(request=request, user=user)
+    return HttpResponse(status=204)
