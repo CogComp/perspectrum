@@ -3,6 +3,7 @@ import json
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from .models import *
 
 from .util.helper import get_all_claim_title_id, get_claim_given_id
@@ -47,12 +48,15 @@ def get_all_persp(claim_id):
 
 
 """ APIs """
+@login_required
 def main_page(request):
     context = {
         "datasets": list(file_names.keys())
     }
     return render(request, 'main.html', context)
 
+
+@login_required
 def vis_claims(request):
     data = load_json(file_names["iDebate"])
     claim_titles = get_all_claim_title_id(data)
@@ -64,6 +68,7 @@ def vis_claims(request):
     return render(request, 'claims.html', context)
 
 
+@login_required
 def vis_persps(request, claim_id):
     data = load_json(file_names["iDebate"])
     claim = get_claim_given_id(data, claim_id)
@@ -74,10 +79,12 @@ def vis_persps(request, claim_id):
     return render(request, 'persp.html', context)
 
 
+@login_required
 def vis_neg_anno(request, claim_id):
     return render(request, 'claim_neg_anno.html', {})
 
 
+@login_required
 def vis_relation(request, claim_id):
     try:
         claim = Claim.objects.get(id=claim_id)
@@ -91,7 +98,7 @@ def vis_relation(request, claim_id):
         "perspective_pool": perspective_pool
     })
 
-
+@login_required
 def submit_rel_anno(request):
     """
     Accepts POST requests and update the annotations
@@ -132,6 +139,7 @@ def render_list_page(request):
     """
     return render(request, "list_tasks.html", {})
 
+@login_required
 def vis_normalize_persp(request, claim_id):
     try:
         claim = Claim.objects.get(id=claim_id)

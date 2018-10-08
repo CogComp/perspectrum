@@ -6,3 +6,4 @@ data/.DS_Store
 website/webapp/__pycache__/
 website/webapp/templatetags/__pycache__/
 website/webapp/util/__pycache__/
+website/db.sqlite3
