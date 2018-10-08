@@ -62,18 +62,15 @@
     margin-top: 1em;
 }
 
-.rel_option_radio{
-    display: block;
-}
-
 .rel_instr_container {
 
 }
 
-.rel_radio_tutor_container {
+.rel_tile {
+    position: relative;
+    padding: 14px;
+    margin-bottom: 20px;
     text-align: left;
-}
-
-.rel_radio_container {
-    text-align: left;
+    background-color: #eff0f2;
+    border-radius: 6px;
 }

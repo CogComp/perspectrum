@@ -27,8 +27,20 @@ def get_pool_from_claim_id(claim_id):
     :param claim_id: id of the claim
     :return:
     """
-    related_persp_anno = RelationAnnotation.objects.filter(author=RelationAnnotation.GOLD, claim_id=claim_id).\
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id).\
         order_by("?")[:2]
+    related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
+
+    return related_persps
+
+
+def get_all_persp(claim_id):
+    """
+    :param claim_id: id of the claim
+    :return: list of perspectives
+    """
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id).\
+        order_by("?")
     related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
 
     return related_persps
@@ -99,7 +111,7 @@ def submit_rel_anno(request):
                 persp_id = parts[0]
                 rel = parts[1]
                 print(persp_id, rel)
-                anno_entry = RelationAnnotation.objects.create(author="TEST", claim_id=claim_id, perspective_id=persp_id, rel=rel)
+                anno_entry = PerspectiveRelation.objects.create(author="TEST", claim_id=claim_id, perspective_id=persp_id, rel=rel)
                 anno_entry.save()
 
         else:
@@ -114,3 +126,16 @@ def render_login_page(request):
     """
     return render(request, "login.html", {})
 
+
+def vis_normalize_persp(request, claim_id):
+    try:
+        claim = Claim.objects.get(id=claim_id)
+    except Claim.DoesNotExist:
+        pass  # TODO: Do something? 404?
+
+    perspective_pool = get_all_persp(claim_id)
+
+    return render(request, 'normalize_persp.html', {
+        "claim": claim,
+        "perspective_pool": perspective_pool
+    })
