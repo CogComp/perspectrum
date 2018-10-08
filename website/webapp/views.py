@@ -126,6 +126,11 @@ def render_login_page(request):
     """
     return render(request, "login.html", {})
 
+def render_list_page(request):
+    """
+    Renderer for login page
+    """
+    return render(request, "list_tasks.html", {})
 
 def vis_normalize_persp(request, claim_id):
     try:
