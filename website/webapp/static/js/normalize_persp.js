@@ -1,14 +1,9 @@
 $(document).ready(function () {
     csrfSetup();
-    // hide q2 - q5
-    // $(".rel-q2").hide();
-    // $(".rel-q3").hide();
-    // $(".rel-q4").hide();
-    // $(".rel-q5").hide();
 
     $("#hideshow").click(function() {
         // assumes element with id='button'
-        $("#content").toggle();
+        $(".rel-demo").toggle();
     });
 
     $('#rel_option_clear').click(function() {
@@ -21,6 +16,7 @@ var rel_mapping = {
     'sup': 'S',
     'und': 'U',
     'irr': 'I',
+    'ns': 'N',
 };
 
 /**
