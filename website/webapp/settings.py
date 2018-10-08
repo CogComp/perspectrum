@@ -25,7 +25,7 @@ SECRET_KEY = 'gt&fjdt5tm$saq55vsh0w52@p&7a7w*lty*sc$w7835i2nf#vc'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -125,3 +125,6 @@ STATIC_URL = '/static/'
 
 # Use user sessions instead of cookies for CSRF token
 CSRF_USE_SESSIONS = True
+
+# login redirect url
+LOGIN_URL = "render_login"
