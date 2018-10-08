@@ -128,7 +128,7 @@ def render_login_page(request):
 
 def render_list_page(request):
     """
-    Renderer for login page
+    Renderer the list of task
     """
     return render(request, "list_tasks.html", {})
 
