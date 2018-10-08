@@ -21,9 +21,10 @@ from webapp import auth
 
 urlpatterns = [
     path('', views.render_login_page, name="render_login"),
+    path('task_list', views.render_list_page, name="task_list"),
     path('admin/', admin.site.urls),
     path('main/', views.main_page, name="main_page"),
-    path('getJson/', views.get_json),
+    path('get_json/', views.get_json),
     path('claims/', views.vis_claims),
     path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives"),
     path('claim_neg_anno/<slug:claim_id>', views.vis_neg_anno, name="claim_neg_anno"),
