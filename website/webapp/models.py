@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.core.validators import int_list_validator
 
 class Perspective(models.Model):
     source = models.CharField(max_length=50)
@@ -44,3 +44,17 @@ class EvidenceRelation(models.Model):
     perspective_id = models.IntegerField()
     evidence_id = models.IntegerField()
     comment = models.TextField(null=True)
+
+
+# User tables
+class HITSession(models.Model):
+    """
+    Record the progress of each HIT session of user
+    """
+    username = models.CharField(max_length=100)
+    instruction_complete = models.BooleanField(default=False)
+    job_complete = models.BooleanField(default=False)
+    jobs = models.TextField()  # a list of integer claim ids
+    finished_jobs = models.TextField()
+    duration = models.DurationField()
+    last_start_time = models.DateTimeField(null=True) # Used to calculate duration

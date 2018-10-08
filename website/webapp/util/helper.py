@@ -1,3 +1,5 @@
+from webapp.models import *
+
 def get_all_claim_title_id(json_data):
     """
     Helper function for claims.html.
@@ -27,3 +29,13 @@ def get_claim_given_id(json_data, claim_id):
     """
     claim_id = int(claim_id)
     return json_data[claim_id]
+
+
+# def get_claims_to_annotate(num_claims):
+#     """
+#     Get the list of ids of least annoatated claims in the database.
+#     Length of the list specified by num_claims.
+#     :param num_claims: number of claims you want
+#     :return: list of claim ids
+#     """
+#     PerspectiveRelation.objects.
