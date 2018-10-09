@@ -34,97 +34,11 @@
                 In this task we annotate whether a given evidence <font face="verdana" color="green"><b>supports</b></font>,
                 <font face="verdana" color="red"><b>undermines</b></font> or it is <font face="verdana" color="blue"><b>irrelevant</b></font> to a given claim.
                 <br>
-                <input type='button' id='hideshow' value='Click here to view examples'>
+                For the given claim, annotate the paragraphs with appropriate labels.
+                <br>
             </p>
         </div>
         <div class="rel_option_container">
-            <div class="col persps-container rel_tile rel-demo" id='content' style="display: none">
-                <strong><h6>Claim:</h6> Smoking should be restricted.</strong>
-                <hr>
-                <strong><h6> Perspective: </h6>Restrictions reach out to the general population</strong>
-                <hr>
-                <div class="rel-example">
-                    <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
-                    <div class="row">
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="example1" type="radio" id="example1_sup" value="example1" data-toggle="radio" class="custom-radio" disabled>
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="green"><b>Supports</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="example1" type="radio" id="example1_und" value="example1" data-toggle="radio" class="custom-radio" disabled>
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="red"><b>Undermines</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="example1" type="radio" id="example1_irr" value="example1" data-toggle="radio" class="custom-radio" checked>
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="blue"><b>Neither</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="example1" type="radio" id="example1_ns" value="example1" data-toggle="radio" class="custom-radio rel_option" disabled>
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="alert alert-danger" role="alert">
-                    Explanation: This paragraph provides a reason to ...
-                </div>
-            </div>
-            <div class="col persps-container rel_tile rel-demo" style="display: none">
-                <strong><h6>Claim:</h6> Smoking should be restricted.</strong>
-                <hr>
-                <strong><h6> Perspective: </h6>Regulation harms safety and the poor population</strong>
-                <hr>
-                <div class="rel-example">
-                    <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
-                    <div class="row">
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="example2" type="radio" id="example2_sup" value="example2" data-toggle="radio" class="custom-radio" disabled>
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="green"><b>Supports</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="example2" type="radio" id="example2_und" value="example2" data-toggle="radio" class="custom-radio" disabled>
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="red"><b>Undermines</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="example2" type="radio" id="example2_irr" value="example2" data-toggle="radio" class="custom-radio" checked>
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="blue"><b>Neither</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="example2" type="radio" id="example2_ns" value="example2" data-toggle="radio" class="custom-radio rel_option" disabled>
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="alert alert-danger" role="alert">
-                    Explanation: This paragraph provides a reason to ...
-                </div>
-
-            </div>
-
-            Now for the given claim, annotate the paragraphs with appropriate labels.
 
             {% for persp in perspective_pool %}
 
