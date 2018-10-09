@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.http import HttpResponse
-from webapp.models import HITSession, PerspectiveRelation
+from webapp.models import HITSession, PerspectiveRelation, Claim
 from django.db.models import Count
 from django.shortcuts import redirect
 
@@ -33,7 +33,7 @@ def get_hit_session(username):
         session = unfinished_sessions[0]
     else:
         claim_ids = generate_jobs(username, 4)
-        time_now = datetime.datetime.now()
+        time_now = datetime.datetime.now(datetime.timezone.utc)
         session = HITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_jobs=json.dumps([]),
                                             instruction_complete=instr_needed(username), duration=datetime.timedelta(),
                                             last_start_time=time_now)
@@ -60,13 +60,17 @@ def generate_jobs(username, num_claims):
     :return: list of claim ids
     """
     PerspectiveRelation.objects.filter(author=username).values("claim_id")
-    group = PerspectiveRelation.objects \
-            .exclude(author="TEST")\
-            .values("claim_id").annotate(count=Count("claim_id"))
+    group = PerspectiveRelation.objects.exclude(author=PerspectiveRelation.GOLD)\
+            .exclude(author="TEST").values("claim_id").annotate(count=Count("claim_id"))
 
-    ranked = sorted(group, key=lambda entry: entry["count"])[:num_claims]
+    ranked = sorted(group, key=lambda entry: entry["count"])
     claim_id_list = [entry["claim_id"] for entry in ranked]
-    return claim_id_list
+
+    ids_list = Claim.objects.all().values_list('id', flat=True)
+    exclude_exist = [x for x in ids_list if x not in claim_id_list]
+    ranked_all = exclude_exist + ranked
+
+    return ranked_all[:num_claims]
 
 
 def generate_code(username, time_now):

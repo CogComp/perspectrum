@@ -73,12 +73,12 @@
 
         {% if task_id > 0%}
         <div class="alert alert-danger" role="alert">
-            Thanks for the annotation task!
-            Please copy the following code and enter it in the Mechanical Turk interface:
+            <p>Thanks for the annotation task! Please copy the following code and enter it in the Mechanical Turk interface:</p>
+            <p>(Note that this is your <strong>ONLY</strong> chance to do so! Don't close the tab until you have saved the code)</p>
 
             <div style="text-align: center; align-content: center">
                 <div style="text-align: center; align-content: center; width: 100pt; margin: 0 auto;">
-                    <input type="email" class="form-control" value="67542" style="text-align: center; font-weight: bold; font-size: larger;">
+                    <input type="email" class="form-control" value= "{{ task_id }}" style="text-align: center; font-weight: bold; font-size: larger;">
                 </div>
             </div>
         </div>
