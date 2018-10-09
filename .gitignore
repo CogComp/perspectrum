@@ -1,7 +1,6 @@
 .idea/
 .ipynb_checkpoints/
 .DS_Store
-README.md
 data/.DS_Store
 website/webapp/__pycache__/
 website/webapp/templatetags/__pycache__/
