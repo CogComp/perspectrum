@@ -132,6 +132,13 @@ def submit_rel_anno(request):
         else:
             return HttpResponse("Submission Failed! Annotation not valid.", status=400)
 
+        # Update finished jobs in user session
+        username = request.user.username
+        session = get_hit_session(username)
+        fj = set(json.loads(session.finished_jobs))
+        fj.add(int(claim_id))
+        session.finished_jobs = json.dumps(list(fj))
+        session.save()
         return HttpResponse("Submission Success!", status=200)
 
 

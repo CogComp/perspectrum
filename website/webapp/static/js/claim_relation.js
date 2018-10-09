@@ -55,8 +55,7 @@ function submit() {
 
 /**
  * Callback for submission
- * TODO: Change according to AMT protocol, maybe load next page in HIT?
  */
 function submit_callback() {
-    alert("Submission success!");
+    window.location.href = '/task_list';
 }
