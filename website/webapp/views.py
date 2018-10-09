@@ -147,43 +147,26 @@ def render_list_page(request):
     """
     Renderer the list of task
     """
+    username = str(request.user)
+    session = get_hit_session(username)
+    instr_complete = session.instruction_complete
+    jobs = json.loads(session.jobs)
+    finished = json.loads(session.finished_jobs)
 
-    # session = get_hit_session(user.id)
-    # instr_complete = session.instruction_complete
-    # jobs = json.loads(session.jobs)
-    # finished = json.loads(session.finished_job)
-    isin_db = False
-    if True: # TODO: change this condition to: if the table has been created for the user
-        isin_db = True
-
-    ## TODO: load up the task list from DB
-    task_list = [
-        {
-            "id": 2,
-            "done": False
-        },
-        {
-            "id": 3,
-            "done": False
-        },
-        {
-            "id": 4,
-            "done": True
-        },
-        {
-            "id": 5,
-            "done": False
-        }
-    ]
+    task_list = []
+    for job in jobs:
+        task_list.append({
+            "id": job,
+            "done": job in finished
+        })
 
     tasks_are_done = all(item["done"] for item in task_list)
 
     task_id = 0
     if tasks_are_done:  # TODO: change this condition to if the user has completed the task
-        task_id = 67542
+        task_id = session.id
 
-    context = {"task_id": task_id, "isin_db": isin_db, "task_list": task_list}
-
+    context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
     return render(request, "list_tasks.html", context)
 
 def render_instructions(request):
