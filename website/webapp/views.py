@@ -8,6 +8,10 @@ from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render, redirect
 from .forms import ContactForm
 
+from webapp.util.helper import *
+from webapp.models import *
+from webapp.auth import get_hit_session
+import datetime
 
 from .util.helper import get_all_claim_title_id, get_claim_given_id
 file_names = {
@@ -19,10 +23,6 @@ def load_json(file_name):
     with open(file_name, encoding='utf-8') as data_file:
         data = json.loads(data_file.read())
         return data
-
-def get_json(request):
-    data = load_json(file_names["iDebate"])
-    return JsonResponse({"data": data})
 
 
 def get_pool_from_claim_id(claim_id):
@@ -51,6 +51,11 @@ def get_all_persp(claim_id):
 
 
 """ APIs """
+def get_json(request):
+    data = load_json(file_names["iDebate"])
+    return JsonResponse({"data": data})
+
+
 @login_required
 def main_page(request):
     context = {
@@ -136,11 +141,17 @@ def render_login_page(request):
     """
     return render(request, "login.html", {})
 
+
+@login_required
 def render_list_page(request):
     """
     Renderer the list of task
     """
 
+    # session = get_hit_session(user.id)
+    # instr_complete = session.instruction_complete
+    # jobs = json.loads(session.jobs)
+    # finished = json.loads(session.finished_job)
     isin_db = False
     if True: # TODO: change this condition to: if the table has been created for the user
         isin_db = True
@@ -196,6 +207,7 @@ def render_contact(request):
 
 def successView(request):
     return HttpResponse('Success! Thank you for your message.')
+
 
 @login_required
 def vis_normalize_persp(request, claim_id):
