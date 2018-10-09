@@ -2,9 +2,12 @@ import json
 
 from django.http import HttpResponse
 from django.http import JsonResponse
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from .models import *
+from django.core.mail import send_mail, BadHeaderError
+from django.shortcuts import render, redirect
+from .forms import ContactForm
+
 
 from .util.helper import get_all_claim_title_id, get_claim_given_id
 file_names = {
@@ -94,7 +97,7 @@ def vis_relation(request, claim_id):
     perspective_pool = get_pool_from_claim_id(claim_id)
 
     return render(request, 'claim_relation.html', {
-        "claim": claim,
+        "claim": "",
         "perspective_pool": perspective_pool
     })
 
@@ -137,7 +140,62 @@ def render_list_page(request):
     """
     Renderer the list of task
     """
-    return render(request, "list_tasks.html", {})
+
+    isin_db = False
+    if True: # TODO: change this condition to: if the table has been created for the user
+        isin_db = True
+
+    ## TODO: load up the task list from DB
+    task_list = [
+        {
+            "id": 2,
+            "done": False
+        },
+        {
+            "id": 3,
+            "done": False
+        },
+        {
+            "id": 4,
+            "done": True
+        },
+        {
+            "id": 5,
+            "done": False
+        }
+    ]
+
+    tasks_are_done = all(item["done"] for item in task_list)
+
+    task_id = 0
+    if tasks_are_done:  # TODO: change this condition to if the user has completed the task
+        task_id = 67542
+
+    context = {"task_id": task_id, "isin_db": isin_db, "task_list": task_list}
+
+    return render(request, "list_tasks.html", context)
+
+def render_instructions(request):
+    return render(request, "instructions.html", {})
+
+def render_contact(request):
+    if request.method == 'GET':
+        form = ContactForm()
+    else:
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            subject = form.cleaned_data['subject']
+            from_email = form.cleaned_data['from_email']
+            message = form.cleaned_data['message']
+            try:
+                send_mail(subject, message, from_email, ['danyal.khashabi@gmail.com'])
+            except BadHeaderError:
+                return HttpResponse('Invalid header found.')
+            return redirect('success')
+    return render(request, "contact.html", {'form': form})
+
+def successView(request):
+    return HttpResponse('Success! Thank you for your message.')
 
 @login_required
 def vis_normalize_persp(request, claim_id):
