@@ -141,6 +141,11 @@ def render_login_page(request):
     """
     return render(request, "login.html", {})
 
+from django.contrib.auth import logout
+
+def logout_request(request):
+    logout(request)
+    return render_login_page(request)
 
 @login_required
 def render_list_page(request):
