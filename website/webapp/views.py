@@ -3,6 +3,8 @@ import json
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+
 from .models import *
 from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render, redirect
@@ -106,7 +108,23 @@ def vis_relation(request, claim_id):
         "perspective_pool": perspective_pool
     })
 
+
 @login_required
+@csrf_protect
+def submit_instr(request):
+    if request.method != 'POST':
+        raise ValueError("submit_instr API only supports POST request")
+        # TODO: Actaully not sure what to do here..
+    else:
+        username = request.user.username
+        session = get_hit_session(username)
+
+        session.instruction_complete = True
+        session.save()
+        return HttpResponse("Submission Success!", status=200)
+
+@login_required
+@csrf_protect
 def submit_rel_anno(request):
     """
     Accepts POST requests and update the annotations

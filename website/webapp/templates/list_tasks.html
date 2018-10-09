@@ -40,10 +40,9 @@
 
             <button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location='/instructions/'">Instructions</button>
 
-            {% if task_list%}
-{#            {% if instr_complete%}#}
+            {% if instr_complete%}
                 {% for item in task_list %}
-                    <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="window.location='/normalize_persp/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
+                    <button type="button" class="btn btn-info btn-lg btn-block" onclick="window.location='/normalize_persp/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
                 {% endfor %}
             {% else %}
                 <br>

@@ -4,12 +4,13 @@ from django.http import HttpResponse
 from webapp.models import HITSession, PerspectiveRelation, Claim
 from django.db.models import Count
 from django.shortcuts import redirect
+from django.views.decorators.csrf import csrf_protect
 
 import json
 import datetime
 import hashlib
 
-
+@csrf_protect
 def auth_login(request):
     """
 
