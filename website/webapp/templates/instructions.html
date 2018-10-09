@@ -20,7 +20,7 @@
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script src="{% static "js/csrf_util.js" %}"></script>
-    <script src="{% static "js/login.js" %}"></script>
+    <script src="{% static "js/instr.js" %}"></script>
     {% csrf_token %}
 </head>
 <body>
@@ -248,7 +248,7 @@
             </div>
 
             <div style="align-self: center; align-content: center; text-align: center">
-                <button type="button" class="btn btn-success">Finish the instructions and go back</button>
+                <button id="instr_submit" type="button" class="btn btn-success">Finish the instructions and go back</button>
             </div>
 
             <br><br>

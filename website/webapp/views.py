@@ -3,6 +3,8 @@ import json
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_protect
+
 from .models import *
 from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render, redirect
@@ -106,7 +108,23 @@ def vis_relation(request, claim_id):
         "perspective_pool": perspective_pool
     })
 
+
 @login_required
+@csrf_protect
+def submit_instr(request):
+    if request.method != 'POST':
+        raise ValueError("submit_instr API only supports POST request")
+        # TODO: Actaully not sure what to do here..
+    else:
+        username = request.user.username
+        session = get_hit_session(username)
+
+        session.instruction_complete = True
+        session.save()
+        return HttpResponse("Submission Success!", status=200)
+
+@login_required
+@csrf_protect
 def submit_rel_anno(request):
     """
     Accepts POST requests and update the annotations
@@ -117,6 +135,10 @@ def submit_rel_anno(request):
     else:
         claim_id = request.POST.get('claim_id')
         annos = request.POST.getlist('annotations[]')
+
+        username = request.user.username
+        session = get_hit_session(username)
+
         if claim_id and annos:
             for a in annos:
                 parts = a.split(',')
@@ -125,19 +147,20 @@ def submit_rel_anno(request):
 
                 persp_id = parts[0]
                 rel = parts[1]
-                print(persp_id, rel)
-                anno_entry = PerspectiveRelation.objects.create(author="TEST", claim_id=claim_id, perspective_id=persp_id, rel=rel)
+                anno_entry = PerspectiveRelation.objects.create(author=username, claim_id=claim_id, perspective_id=persp_id, rel=rel)
                 anno_entry.save()
 
         else:
             return HttpResponse("Submission Failed! Annotation not valid.", status=400)
 
         # Update finished jobs in user session
-        username = request.user.username
-        session = get_hit_session(username)
         fj = set(json.loads(session.finished_jobs))
         fj.add(int(claim_id))
         session.finished_jobs = json.dumps(list(fj))
+
+        # increment duration in database
+        delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
+        session.duration = session.duration + delta
         session.save()
         return HttpResponse("Submission Success!", status=200)
 
@@ -159,7 +182,7 @@ def render_list_page(request):
     """
     Renderer the list of task
     """
-    username = str(request.user)
+    username = request.user.username
     session = get_hit_session(username)
     instr_complete = session.instruction_complete
     jobs = json.loads(session.jobs)
@@ -174,9 +197,11 @@ def render_list_page(request):
 
     tasks_are_done = all(item["done"] for item in task_list)
 
-    task_id = 0
+    task_id = -1
     if tasks_are_done:  # TODO: change this condition to if the user has completed the task
         task_id = session.id
+        session.job_complete = True
+        session.save()
 
     context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
     return render(request, "list_tasks.html", context)
@@ -206,6 +231,10 @@ def successView(request):
 
 @login_required
 def vis_normalize_persp(request, claim_id):
+    username = request.user.username
+    session = get_hit_session(username)
+    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
+    session.save()
     try:
         claim = Claim.objects.get(id=claim_id)
     except Claim.DoesNotExist:
