@@ -34,9 +34,9 @@ def get_hit_session(username):
     else:
         claim_ids = generate_jobs(username, 4)
         time_now = datetime.datetime.now()
-        session = HITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_job=json.dumps([]),
+        session = HITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_jobs=json.dumps([]),
                                             instruction_complete=instr_needed(username), duration=datetime.timedelta(),
-                                            last_start_time=time_now, code=generate_code(username, time_now))
+                                            last_start_time=time_now)
 
     return session
 
