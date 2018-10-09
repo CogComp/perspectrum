@@ -58,4 +58,3 @@ class HITSession(models.Model):
     finished_jobs = models.TextField()
     duration = models.DurationField()
     last_start_time = models.DateTimeField(null=True) # Used to calculate duration
-    code = models.CharField(max_length=100)

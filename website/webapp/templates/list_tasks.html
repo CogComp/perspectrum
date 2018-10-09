@@ -40,7 +40,7 @@
 
             <button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location='/instructions/'">Instructions</button>
 
-            {% if isin_db%}
+            {% if instr_complete%}
                 {% for item in task_list %}
                     <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="window.location='/claim_relation/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
                 {% endfor %}
