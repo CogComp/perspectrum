@@ -1,6 +1,4 @@
 $(document).ready(function() {
-    // csrfSetup();  // see csrf_util.js
-
     $('#btn-login').click(login);
 });
 
@@ -15,12 +13,12 @@ function login() {
         alert("Please enter your name!")
     }
     else {
-            $.post("/api/auth_login/", {
+        $.post("/api/auth_login/", {
             "username": user_id,
         }, login_callback);
     }
 }
 
 function login_callback() {
-    alert("login success!");
+    window.location.href = '/task_list';
 }
