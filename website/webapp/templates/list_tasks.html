@@ -30,7 +30,7 @@
                 Perspective Annotation Interface
             </h5>
             <p>
-                Welcome, Worker ID: [TODO]!  <button type="button" class="btn btn-danger btn-sm" onclick="window.location='/logout/'">Logout</button>
+                Welcome, Worker ID: {{ request.user.username }}!  <button type="button" class="btn btn-danger btn-sm" onclick="window.location='/logout/'">Logout</button>
             </p>
         </div>
 
@@ -40,9 +40,10 @@
 
             <button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location='/instructions/'">Instructions</button>
 
-            {% if instr_complete%}
+            {% if task_list%}
+{#            {% if instr_complete%}#}
                 {% for item in task_list %}
-                    <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="window.location='/claim_relation/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
+                    <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="window.location='/normalize_persp/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
                 {% endfor %}
             {% else %}
                 <br>
