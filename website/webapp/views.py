@@ -188,7 +188,7 @@ def render_contact(request):
             from_email = form.cleaned_data['from_email']
             message = form.cleaned_data['message']
             try:
-                send_mail(subject, message, from_email, ['danyal.khashabi@gmail.com'])
+                send_mail(subject, message, from_email, ['sihaoc@seas.upenn.edu', 'danielkh@cis.upenn.edu'])
             except BadHeaderError:
                 return HttpResponse('Invalid header found.')
             return redirect('success')
