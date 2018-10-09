@@ -21,6 +21,7 @@ from webapp import auth
 
 urlpatterns = [
     path('', views.render_login_page, name="render_login"),
+    path('logout/', views.logout_request, name="logout"),
     path('task_list/', views.render_list_page, name="task_list"),
     path('instructions/', views.render_instructions, name="instructions"),
     path('contact/', views.render_contact, name="contact"),
