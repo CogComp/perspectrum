@@ -166,7 +166,7 @@
 
             <div style="align-self: center; align-content: center; text-align: center">
                 You have to answer the above samples correctly in order for the bottom to be activated. <br>
-                <button id="instr_submit" type="button" class="btn btn-success" id="finish_experiments" disabled>Finish the instructions</button>
+                <button id="instr_submit" type="button" class="btn btn-success" disabled>Finish the instructions</button>
             </div>
 
             <br><br>
@@ -218,7 +218,7 @@
         }
 
         if (q1 && q2 && q3) {
-            $("#finish_experiments").prop('disabled', false);
+            $("#instr_submit").prop('disabled', false);
         }
 
     });
