@@ -36,4 +36,5 @@ urlpatterns = [
     path('normalize_persp/<slug:claim_id>', views.vis_normalize_persp, name="normalize_claim"),
     path('api/submit_rel_anno/', views.submit_rel_anno, name="submit_rel_anno"),
     path('api/auth_login/', auth.auth_login, name="auth_login"),
+    path('api/submit_instr/', views.submit_instr, name="submit_instr")
 ]

@@ -19,8 +19,9 @@
           integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous" />
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Perspective Annotation Interface</title>
     <script src="{% static "js/csrf_util.js" %}"></script>
-    <script src="{% static "js/login.js" %}"></script>
+    <script src="{% static "js/instr.js" %}"></script>
     {% csrf_token %}
 </head>
 <body>
@@ -165,7 +166,7 @@
 
             <div style="align-self: center; align-content: center; text-align: center">
                 You have to answer the above samples correctly in order for the bottom to be activated. <br>
-                <button type="button" class="btn btn-success" id="finish_experiments" disabled>Finish the instructions</button>
+                <button id="instr_submit" type="button" class="btn btn-success" id="finish_experiments" disabled>Finish the instructions</button>
             </div>
 
             <br><br>
