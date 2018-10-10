@@ -68,10 +68,10 @@ def main_page(request):
 
 @login_required
 def vis_claims(request):
-    data = load_json(file_names["iDebate"])
-    claim_titles = get_all_claim_title_id(data)
+    claim_titles = []
+    for c in Claim.objects.all():
+        claim_titles.append((c.title, c.id))
 
-    # print(len(claim_titles))
     context = {
         "claim_titles": claim_titles
     }
@@ -80,10 +80,18 @@ def vis_claims(request):
 
 @login_required
 def vis_persps(request, claim_id):
-    data = load_json(file_names["iDebate"])
-    claim = get_claim_given_id(data, claim_id)
+    claim = Claim.objects.get(id=claim_id)
+    rel_set = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id)
+    rel_sup_ids = [r["perspective_id"] for r in rel_set.filter(rel='S').values("perspective_id")]
+    rel_und_ids = [r["perspective_id"] for r in rel_set.filter(rel='U').values("perspective_id")]
+
+    persp_sup = Perspective.objects.filter(id__in=rel_sup_ids)
+    persp_und = Perspective.objects.filter(id__in=rel_und_ids)
+
     context = {
-        "claim": claim
+        "claim": claim,
+        "persp_sup": persp_sup,
+        "persp_und": persp_und,
     }
 
     return render(request, 'persp.html', context)
