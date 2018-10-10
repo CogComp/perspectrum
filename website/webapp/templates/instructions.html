@@ -43,218 +43,185 @@
         </nav>
 
         <div class="rel_option_container">
-            For each of the following claims and instructions ...
+            For each of the following tasks check if the <strong>perspective</strong> provides a view about the given <strong>claim</strong>.
 
             <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6>{{ claim.title }} </strong>
+                <strong><h6>Claim: </h6> The West should invade Syria</strong>
                 <hr>
-                <strong><h6> Perspective: </h6>{{ persp.title }}</strong>
+                <strong><h6> Perspective: </h6>Sovereign countries should never be invaded. </strong>
                 <hr>
                 <div class="rel-q1">
                     <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
                     <div class="row rel_radio_container">
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_sup_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q1" type="radio" id="q1_sup_{{ persp.id }}" value="q1_supp" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="green"><b>Supports</b></font>
                             </label>
                         </div>
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_und_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q1" type="radio" id="q1_und_{{ persp.id }}" value="q1_under" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="red"><b>Undermines</b></font>
                             </label>
                         </div>
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_irr_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="blue"><b>Neither</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_ns_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q1" type="radio" id="q1_ns_{{ persp.id }}" value="q1_not_sure" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
                             </label>
                         </div>
                     </div>
                 </div>
+                <div class="alert alert-success" id="q1-succc" role="alert" style="display: none">
+                    That is the correct answer! The given perspective undermines the given claim.
+                </div>
+                <div class="alert alert-danger"  id="q1-fail" role="alert" style="display: none">
+                  Not correct! Give it another try ...
+                </div>
             </div>
 
-
             <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6>{{ claim.title }} </strong>
+                <strong><h6>Claim: </h6>The West should invade Syria </strong>
                 <hr>
-                <strong><h6> Perspective: </h6>{{ persp.title }}</strong>
+                <strong><h6> Perspective: </h6> If the United States does not intervene, the moral responsibility of those dying will be on us. </strong>
                 <hr>
                 <div class="rel-q1">
                     <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
                     <div class="row rel_radio_container">
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_sup_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q2" type="radio" id="q2_sup_{{ persp.id }}" value="q2_supp" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="green"><b>Supports</b></font>
                             </label>
                         </div>
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_und_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q2" type="radio" id="q2_und_{{ persp.id }}" value="q2_undermine" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="red"><b>Undermines</b></font>
                             </label>
                         </div>
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_irr_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="blue"><b>Neither</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_ns_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q2" type="radio" id="q2_ns_{{ persp.id }}" value="q2_not_sure" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
                             </label>
                         </div>
                     </div>
                 </div>
+                <div class="alert alert-success" id="q2-succc" role="alert" style="display: none">
+                    That is the correct answer! The given perspective takes a supporting stance on the given claim.
+                </div>
+                <div class="alert alert-danger" id="q2-fail" role="alert" style="display: none">
+                  Not correct! Give it another try ...
+                </div>
             </div>
 
 
             <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6>{{ claim.title }} </strong>
+                <strong><h6>Claim: </h6> The West should invade Syria </strong>
                 <hr>
-                <strong><h6> Perspective: </h6>{{ persp.title }}</strong>
+                <strong><h6> Perspective: </h6> Death toll </strong>
                 <hr>
                 <div class="rel-q1">
                     <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
                     <div class="row rel_radio_container">
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_sup_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q3" type="radio" id="q3_sup_{{ persp.id }}" value="q3_support" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="green"><b>Supports</b></font>
                             </label>
                         </div>
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_und_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q3" type="radio" id="q3_und_{{ persp.id }}" value="q3_undermine" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="red"><b>Undermines</b></font>
                             </label>
                         </div>
                         <div class="col">
                             <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_irr_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="blue"><b>Neither</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_ns_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
+                                <input name="q3" type="radio" id="q3_ns_{{ persp.id }}" value="q3_not_sure" data-toggle="radio" class="custom-radio rel_option">
                                 <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                 <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
                             </label>
                         </div>
                     </div>
                 </div>
-            </div>
-
-
-            <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6>{{ claim.title }} </strong>
-                <hr>
-                <strong><h6> Perspective: </h6>{{ persp.title }}</strong>
-                <hr>
-                <div class="rel-q1">
-                    <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
-                    <div class="row rel_radio_container">
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_sup_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="green"><b>Supports</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_und_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="red"><b>Undermines</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_irr_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="blue"><b>Neither</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_ns_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
-                            </label>
-                        </div>
-                    </div>
+                <div class="alert alert-success" id="q3-succc" role="alert" style="display: none">
+                    That is the correct answer! The given perspective does not take a clear supporting or negating stance aganst the given claim.
+                </div>
+                <div class="alert alert-danger" id="q3-fail" role="alert" style="display: none">
+                  Not correct! Give it another try ...
                 </div>
             </div>
 
-            <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6>{{ claim.title }} </strong>
-                <hr>
-                <strong><h6> Perspective: </h6>{{ persp.title }}</strong>
-                <hr>
-                <div class="rel-q1">
-                    <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
-                    <div class="row rel_radio_container">
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_sup_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="green"><b>Supports</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_und_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="red"><b>Undermines</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_irr_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="blue"><b>Neither</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1_{{ persp.id }}" type="radio" id="q1_ns_{{ persp.id }}" value="q1_{{ persp.id }}" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div style="align-self: center; align-content: center; text-align: center">
-                <button id="instr_submit" type="button" class="btn btn-success">Finish the instructions and go back</button>
+                You have to answer the above samples correctly in order for the bottom to be activated. <br>
+                <button id="instr_submit" type="button" class="btn btn-success" disabled>Finish the instructions</button>
             </div>
 
             <br><br>
 
+        </div>
     </div>
 
 </body>
+<script>
+    q1 = false;
+    q2 = false;
+    q3 = false;
+    // if all the options are answered correctly, turn the botton active
+    $('input[type="radio"]').on('click change', function(e) {
+        console.log($(this).val());
+        if ($(this).val().includes("q1") ) {
+            // if you select undermine, it's good; otherwise it's incorrect
+            if ($(this).val().includes("under") ) {
+                $("#q1-fail").css("display", "none");
+                $("#q1-succc").css("display", "block");
+                q1 = true
+            }
+            else {
+                $("#q1-succc").css("display", "none");
+                $("#q1-fail").css("display", "block");
+            }
+        }
+        if ($(this).val().includes("q2") ) {
+            if ($(this).val().includes("supp") ) {
+                $("#q2-fail").css("display", "none");
+                $("#q2-succc").css("display", "block");
+                q2 = true
+            }
+            else {
+                $("#q2-succc").css("display", "none");
+                $("#q2-fail").css("display", "block");
+            }
+        }
+        if ($(this).val().includes("q3") ) {
+            if ($(this).val().includes("sure") ) {
+                $("#q3-fail").css("display", "none");
+                $("#q3-succc").css("display", "block");
+                q3 = true
+            }
+            else {
+                $("#q3-succc").css("display", "none");
+                $("#q3-fail").css("display", "block");
+            }
+        }
+
+        if (q1 && q2 && q3) {
+            $("#instr_submit").prop('disabled', false);
+        }
+
+    });
+</script>
+
 </html>
