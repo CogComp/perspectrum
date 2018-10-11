@@ -33,7 +33,7 @@ def get_hit_session(username):
     if unfinished_sessions.count() > 0:
         session = unfinished_sessions[0]
     else:
-        claim_ids = generate_jobs(username, 4)
+        claim_ids = generate_jobs(username, 10)
         time_now = datetime.datetime.now(datetime.timezone.utc)
         session = HITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_jobs=json.dumps([]),
                                             instruction_complete=instr_needed(username), duration=datetime.timedelta(),
