@@ -1,6 +1,6 @@
 $(document).ready(function () {
     csrfSetup();
-
+    let submitted = false;
     $("#hideshow").click(function() {
         // assumes element with id='button'
         $(".rel-demo").toggle();
@@ -9,7 +9,12 @@ $(document).ready(function () {
     $('#rel_option_clear').click(function() {
         $('.rel_option').prop('checked', false);
     });
-    $('#rel_option_submit').click(submit);
+    $('#rel_option_submit').click(function (){
+        if (!submitted) {
+            submit();
+        }
+        submitted = true
+    });
 });
 
 var rel_mapping = {

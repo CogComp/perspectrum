@@ -52,27 +52,61 @@ def instr_needed(username):
     return count > 0
 
 
+# def generate_jobs(username, num_claims):
+#     """
+#     Get the list of ids of least annoatated claims in the database.
+#     Length of the list specified by num_claims.
+#     :param username:
+#     :param num_claims: number of claims you want
+#     :return: list of claim ids
+#     """
+#     PerspectiveRelation.objects.filter(author=username).values("claim_id")
+#     group = PerspectiveRelation.objects.exclude(author=PerspectiveRelation.GOLD)\
+#             .exclude(author="TEST").values("claim_id").annotate(count=Count("claim_id"))
+#
+#     ranked = sorted(group, key=lambda entry: entry["count"])
+#     claim_id_list = [entry["claim_id"] for entry in ranked]
+#
+#     ids_list = Claim.objects.all().values_list('id', flat=True)
+#     exclude_exist = [x for x in ids_list if x not in claim_id_list]
+#     ranked_all = exclude_exist + ranked
+#
+#     return ranked_all[:num_claims]
+
 def generate_jobs(username, num_claims):
     """
-    Get the list of ids of least annoatated claims in the database.
-    Length of the list specified by num_claims.
+    Temporary solution
     :param username:
     :param num_claims: number of claims you want
     :return: list of claim ids
     """
-    PerspectiveRelation.objects.filter(author=username).values("claim_id")
-    group = PerspectiveRelation.objects.exclude(author=PerspectiveRelation.GOLD)\
-            .exclude(author="TEST").values("claim_id").annotate(count=Count("claim_id"))
+    claim_id_set = Claim.objects.all().values_list('id', flat=True)
 
-    ranked = sorted(group, key=lambda entry: entry["count"])
-    claim_id_list = [entry["claim_id"] for entry in ranked]
+    # Temporary solution for idebate TODO: delete this line
+    claim_id_set = [x for x in claim_id_set if x >= 155]
 
-    ids_list = Claim.objects.all().values_list('id', flat=True)
-    exclude_exist = [x for x in ids_list if x not in claim_id_list]
-    ranked_all = exclude_exist + ranked
+    sessions = HITSession.objects.all().order_by("-id")
 
-    return ranked_all[:num_claims]
+    max_id = max(claim_id_set)
+    min_id = min(claim_id_set)
+    if sessions.count() == 0:
+        start = min_id
+    else:
+        prev_jobs = json.loads(sessions[0].jobs)
+        start = prev_jobs[-1] + 1
 
+    # Temporary solution for idebate TODO: delete this if statement
+    if start < min_id:
+        start = min_id
+
+    jobs = []
+    for i in range(num_claims):
+        jid = start + i
+        if jid > max_id:
+            jid = jid - max_id - 1 + min_id
+        jobs.append(jid)
+
+    return jobs
 
 def generate_code(username, time_now):
     """
