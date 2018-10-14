@@ -27,10 +27,10 @@ There are three json files in the folder -- `claims_high_quality.json`, `perspec
 `annotations_high_quality.json`: A list of annotations between claim-perspective pairs. Each annotation object looks like this:
 ```python
 {   
-    "claim_id":1, 
-    "perspective_id":7,
+    "claim_id":2, 
+    "perspective_id":14,
     "agreement":1.0,        # Observed agreement for this annotation, can be used as confidence measure
-    "annotator_count":1,    # Number of human annotations
+    "annotator_count":3,    # Number of human annotations
     "label":"und"           # There are two possible labels, "sup" (support), "und" (undermine/refute)
 } 
 ```
