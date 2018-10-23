@@ -11,7 +11,7 @@ if __name__ == '__main__':
     json_path = "/mnt/e/work/cogcomp-new/projects/perspective/data/debatewise/debatewise.json"
     data = load_json(json_path)
 
-    SOURCE = "procon"
+    SOURCE = "debatewise"
 
     for _c in data:
         title = _c["claim_title"]

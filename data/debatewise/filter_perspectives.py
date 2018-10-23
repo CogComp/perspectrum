@@ -69,7 +69,11 @@ if __name__ == '__main__':
         clean_persps(claim["perspectives_against"])
         claim["perspectives_for_count"] = len(claim["perspectives_for"])
         claim["perspectives_against_count"] = len(claim["perspectives_against"])
-        if claim["perspectives_for_count"] == 0 and claim["perspectives_against_count"] == 0:
+
+        if len(nltk.word_tokenize(claim["claim_title"])) <= 3:
+            drop_claim_list.append(idx)
+
+        elif claim["perspectives_for_count"] == 0 and claim["perspectives_against_count"] == 0:
             drop_claim_list.append(idx)
 
         persp_for_count += claim["perspectives_for_count"]
