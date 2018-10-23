@@ -9,6 +9,7 @@ class Perspective(models.Model):
 class Claim(models.Model):
     source = models.CharField(max_length=50)
     title = models.TextField()
+    assignment_counts = models.IntegerField(default=0)
 
 
 class Evidence(models.Model):
