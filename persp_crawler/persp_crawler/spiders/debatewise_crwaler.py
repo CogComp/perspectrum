@@ -50,7 +50,7 @@ class DebatewiseCrawler(scrapy.Spider):
 
             is_persp_for = persp_id.startswith("#yes")
 
-            evidence = response.css(persp_id).xpath('.//div[contains(@class, "point")]//text()').extract()
+            evidence = response.css(persp_id).xpath('.//div[contains(@class, "pointArgument")]//text()').extract()
             evidence = [p.strip() for p in evidence]
             evidence = [p for p in evidence if p]
 
