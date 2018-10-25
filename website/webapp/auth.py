@@ -101,27 +101,27 @@ def generate_jobs(username, num_claims):
 
     claim_id_set = Claim.objects.filter(assignment_counts__lt=TARGET_ASSIGNMENT_PER_CLAIM)
 
-    # if len(claim_id_set) > num_claims:
-    #     # Case 1: where we still have claims with lower than 3 assignments
-    #     assign_counts = claim_id_set.values_list('id', 'assignment_counts', named=True)\
-    #         .order_by('assignment_counts')
-    #
-    #     # Add [0, 1) random parts to each assignment counts, for randomly sorting claims with assignment counts
-    #     count_tuples = []
-    #     for c in assign_counts:
-    #         count_tuples.append((c.id, c.assignment_counts + random.random()))
-    #
-    #     count_tuples = sorted(count_tuples, key=lambda t: t[1])[:num_claims]
-    #
-    #     jobs = [t[0] for t in count_tuples]
-    #
-    # else:
-    # Case 2: all claims are assigned at least 3 times.
-    # Take 5 * num_claims least annotated claims
-    assign_counts = Claim.objects.all().order_by('finished_counts') \
-                        .values_list('id', 'finished_counts', named=True)[:num_claims * 5]
+    if len(claim_id_set) > num_claims:
+        # Case 1: where we still have claims with lower than 3 assignments
+        assign_counts = claim_id_set.values_list('id', 'assignment_counts', named=True)\
+            .order_by('assignment_counts')
 
-    jobs = random.choices([t.id for t in assign_counts], k=10)
+        # Add [0, 1) random parts to each assignment counts, for randomly sorting claims with assignment counts
+        count_tuples = []
+        for c in assign_counts:
+            count_tuples.append((c.id, c.assignment_counts + random.random()))
+
+        count_tuples = sorted(count_tuples, key=lambda t: t[1])[:num_claims]
+
+        jobs = [t[0] for t in count_tuples]
+
+    else:
+        # Case 2: all claims are assigned at least 3 times.
+        # Take 5 * num_claims least annotated claims
+        assign_counts = Claim.objects.all().order_by('finished_counts')\
+            .values_list('id', 'finished_counts', named=True)[:num_claims * 5]
+
+        jobs = random.choices([t.id for t in assign_counts], k=10)
 
     increment_assignment_counts(jobs)
     return jobs
