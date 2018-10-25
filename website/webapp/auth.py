@@ -5,10 +5,12 @@ from webapp.models import HITSession, PerspectiveRelation, Claim
 from django.db.models import Count
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
+from webapp.util.session_helpers import clean_idle_sessions, increment_assignment_counts, decrease_assignment_counts
 
 import json
 import datetime
 import hashlib
+import random
 
 @csrf_protect
 def auth_login(request):
@@ -54,59 +56,76 @@ def instr_needed(username):
 
 # def generate_jobs(username, num_claims):
 #     """
-#     Get the list of ids of least annoatated claims in the database.
-#     Length of the list specified by num_claims.
+#     Temporary solution
 #     :param username:
 #     :param num_claims: number of claims you want
 #     :return: list of claim ids
 #     """
-#     PerspectiveRelation.objects.filter(author=username).values("claim_id")
-#     group = PerspectiveRelation.objects.exclude(author=PerspectiveRelation.GOLD)\
-#             .exclude(author="TEST").values("claim_id").annotate(count=Count("claim_id"))
+#     claim_id_set = Claim.objects.all().values_list('id', flat=True)
 #
-#     ranked = sorted(group, key=lambda entry: entry["count"])
-#     claim_id_list = [entry["claim_id"] for entry in ranked]
+#     # Temporary solution for idebate TODO: delete this line
+#     claim_id_set = [x for x in claim_id_set if x >= 155]
 #
-#     ids_list = Claim.objects.all().values_list('id', flat=True)
-#     exclude_exist = [x for x in ids_list if x not in claim_id_list]
-#     ranked_all = exclude_exist + ranked
+#     sessions = HITSession.objects.all().order_by("-id")
 #
-#     return ranked_all[:num_claims]
+#     max_id = max(claim_id_set)
+#     min_id = min(claim_id_set)
+#     if sessions.count() == 0:
+#         start = min_id
+#     else:
+#         prev_jobs = json.loads(sessions[0].jobs)
+#         start = prev_jobs[-1] + 1
+#
+#     # Temporary solution for idebate TODO: delete this if statement
+#     if start < min_id:
+#         start = min_id
+#
+#     jobs = []
+#     for i in range(num_claims):
+#         jid = start + i
+#         if jid > max_id:
+#             jid = jid - max_id - 1 + min_id
+#         jobs.append(jid)
+#
+#     return jobs
+
+TARGET_ASSIGNMENT_PER_CLAIM = 3
 
 def generate_jobs(username, num_claims):
     """
-    Temporary solution
     :param username:
     :param num_claims: number of claims you want
     :return: list of claim ids
     """
-    claim_id_set = Claim.objects.all().values_list('id', flat=True)
+    clean_idle_sessions()
 
-    # Temporary solution for idebate TODO: delete this line
-    claim_id_set = [x for x in claim_id_set if x >= 155]
+    claim_id_set = Claim.objects.filter(assignment_counts__lt=TARGET_ASSIGNMENT_PER_CLAIM)
 
-    sessions = HITSession.objects.all().order_by("-id")
+    # if len(claim_id_set) > num_claims:
+    #     # Case 1: where we still have claims with lower than 3 assignments
+    #     assign_counts = claim_id_set.values_list('id', 'assignment_counts', named=True)\
+    #         .order_by('assignment_counts')
+    #
+    #     # Add [0, 1) random parts to each assignment counts, for randomly sorting claims with assignment counts
+    #     count_tuples = []
+    #     for c in assign_counts:
+    #         count_tuples.append((c.id, c.assignment_counts + random.random()))
+    #
+    #     count_tuples = sorted(count_tuples, key=lambda t: t[1])[:num_claims]
+    #
+    #     jobs = [t[0] for t in count_tuples]
+    #
+    # else:
+    # Case 2: all claims are assigned at least 3 times.
+    # Take 5 * num_claims least annotated claims
+    assign_counts = Claim.objects.all().order_by('finished_counts') \
+                        .values_list('id', 'finished_counts', named=True)[:num_claims * 5]
 
-    max_id = max(claim_id_set)
-    min_id = min(claim_id_set)
-    if sessions.count() == 0:
-        start = min_id
-    else:
-        prev_jobs = json.loads(sessions[0].jobs)
-        start = prev_jobs[-1] + 1
+    jobs = random.choices([t.id for t in assign_counts], k=10)
 
-    # Temporary solution for idebate TODO: delete this if statement
-    if start < min_id:
-        start = min_id
-
-    jobs = []
-    for i in range(num_claims):
-        jid = start + i
-        if jid > max_id:
-            jid = jid - max_id - 1 + min_id
-        jobs.append(jid)
-
+    increment_assignment_counts(jobs)
     return jobs
+
 
 def generate_code(username, time_now):
     """

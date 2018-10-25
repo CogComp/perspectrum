@@ -10,12 +10,10 @@ from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render, redirect
 from .forms import ContactForm
 
-from webapp.util.helper import *
 from webapp.models import *
 from webapp.auth import get_hit_session
 import datetime
 
-from .util.helper import get_all_claim_title_id, get_claim_given_id
 file_names = {
     "iDebate": '../data/idebate/idebate.json'
 }
@@ -170,6 +168,12 @@ def submit_rel_anno(request):
         delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
         session.duration = session.duration + delta
         session.save()
+
+        # Increment finished counts in claim table
+        claim = Claim.objects.get(id=claim_id)
+        claim.finished_counts += 1
+        claim.save()
+
         return HttpResponse("Submission Success!", status=200)
 
 
