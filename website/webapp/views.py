@@ -258,3 +258,19 @@ def vis_normalize_persp(request, claim_id):
         "claim": claim,
         "perspective_pool": perspective_pool
     })
+
+
+@login_required
+def vis_verify_evidence(request, claim_id):
+    username = request.user.username
+    try:
+        claim = Claim.objects.get(id=claim_id)
+    except Claim.DoesNotExist:
+        pass  # TODO: Do something? 404?
+
+    perspective_pool = get_all_persp(claim_id)
+
+    return render(request, 'normalize_persp.html', {
+        "claim": claim,
+        "perspective_pool": perspective_pool
+    })
