@@ -127,13 +127,3 @@ def generate_jobs(username, num_claims):
     return jobs
 
 
-def generate_code(username, time_now):
-    """
-    Generate the reward code for HIT session (8 bytes of hex)
-    :param username:
-    :param time_now: datetime object
-    :return:
-    """
-    line = (username + str(time_now)).encode('utf-8')
-    code = hashlib.md5(line).hexdigest()[:8]
-    return code
