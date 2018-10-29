@@ -1,8 +1,10 @@
 import pickle as pkl
 import math
 import collections
-
 from enum import Enum
+
+from nltk.stem.wordnet import WordNetLemmatizer
+from nltk import word_tokenize
 
 
 class _Mode(Enum):
@@ -10,29 +12,41 @@ class _Mode(Enum):
     READY = 1
 
 
-class SparseVector:
+class SparseUnigramDoc:
     """
-    A simple dictionary-based sparse vector implementation
+    A simple representation of document in unigram counts
     """
-    def __init__(self):
-        self._vec = {}
+    def __init__(self, init_data=None):
+        if init_data:
+            self._vec = init_data
+        else:
+            self._vec = {}
 
     def dot(self, vec):
         _result = 0
         for key, val in self._vec.items():
-            if key in vec:
-                _result += vec[key] * val
+            if key in vec._vec:
+                _result += vec.get(key) * val
         return _result
 
-    def __getitem__(self, index):
-        if index in self._vec:
-            return self._vec[index]
+    def get(self, word):
+        if word in self._vec:
+            return self._vec[word]
         else:
             return 0
 
-    def __setitem__(self, index, value):
-        if value != 0:
-            self._vec[index] = value
+    def set(self, word, score):
+        if word != 0:
+            self._vec[word] = score
+
+    def magnitude(self):
+        _result = 0
+        for key, val in self._vec.items():
+            _result += val * val
+        return _result
+
+    def cos_similiarity(self, vec):
+        return self.dot(vec) / (self.magnitude() * vec.magnitude())
 
 
 class IdfProcessor:
@@ -98,25 +112,7 @@ class Tfidf:
                 raise ValueError("oov_idf must be non-negative.")
             else:
                 self.oov_idf = oov_idf
-
-    def get_word_tfidf(self, word, tf):
-        """
-        Get tfidf weight of a word, given its surface form and term frequency
-        :param word:
-        :param tf: (normalized) term frequency of the word
-        :return:
-        """
-        return tf * self._get_idf(word)
-
-    # TODO: Think of a better name for the function. (wish I was writing java :p)
-    def get_word_tfidf_in_doc(self, word, all_toks_in_doc):
-        """
-        Get tfidf weight of a word, given list of all tokens in document
-        :param word:
-        :param all_toks_in_doc:
-        :return:
-        """
-        return self._compute_tf(word, all_toks_in_doc) * self._get_idf(word)
+        self.lem = WordNetLemmatizer()
 
     def _get_idf(self, word):
         if word in self.idf:
@@ -133,28 +129,35 @@ class Tfidf:
         """
         return all_toks.count(tok) / len(all_toks)
 
+    def vectorize(self, text):
+        """
+        Yeah just vectorize it
+        :param text: piece of untokenized text
+        :return: A SparseUnigram instance, storing the tfidf representation of the input text(see above)
+        """
+        toks = [self.lem.lemmatize(t) for t in word_tokenize(text)]
+        doc_len = len(toks)
+        doc = SparseUnigramDoc()
+        counter = collections.Counter(toks)
+        for key, val in counter.items():
+            doc.set(key, val / doc_len * self._get_idf(key))
+
+        return doc
+
 
 if __name__ == '__main__':
 
     pkl_p = "/shared/preprocessed/schen149/newsdata/nyt_tfidf/nyt_tfidf.pkl"
     tfidf = Tfidf(pkl_p)
 
-    # Example 1: Stop word
-    doc1 = ["This", "is", "a", "sample", "a"]
-    word1 = "This"
-    print("Tfidf for \"{}\" in doc1:\t {}".format(word1 ,tfidf.get_word_tfidf_in_doc(word1, doc1)))
+    text1 = "My name is Rick."
+    text1_a = "My name is also Rick."
+    text2 = "Das ist alles Gibbbbbeeerish."
 
-    # Example 2: NE
-    doc2 = ["This", "is", "Donald", ",", "Mr.", "Donald", "."]
-    word2 = "Donald"
-    print("Tfidf for \"{}\" in doc2:\t {}".format(word2 ,tfidf.get_word_tfidf_in_doc(word2, doc2)))
+    t1 = tfidf.vectorize(text1)
+    t1_a = tfidf.vectorize(text1_a)
+    t2 = tfidf.vectorize(text2)
 
-    # Example 3: Word that's not present in current document
-    word3 = "Gibberish"
-    print("Tfidf for \"{}\" in doc2:\t {}".format(word3 ,tfidf.get_word_tfidf_in_doc(word3, doc2)))
-
-    # Example 4: Unseen word during idf calculation
-    doc3 = ["This", "is", "a", "AClearlyMade-upWord", ",", "Mr.", "Donald", "."]
-    oov_word = "AClearlyMade-upWord"
-    print("Tfidf for \"{}\" in doc3:\t {}".format(oov_word, tfidf.get_word_tfidf_in_doc(oov_word, doc3)))
+    print(t1.cos_similiarity(t1_a))
+    print(t2.cos_similiarity(t1))
 
