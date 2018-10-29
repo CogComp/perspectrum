@@ -80,6 +80,7 @@ class EvidenceHITSession(models.Model):
     last_start_time = models.DateTimeField(null=True) # Used to calculate duration
 
 class EvidenceAnnotation(models.Model):
+    hit_session_id = models.IntegerField()
     author = models.CharField(max_length=100)
     perspective_id = models.IntegerField()
     evidence_id = models.IntegerField()
