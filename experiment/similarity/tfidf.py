@@ -14,7 +14,7 @@ class _Mode(Enum):
 
 class SparseUnigramDoc:
     """
-    A simple representation of document in unigram counts
+    A simple sparse unigram counts representation of document
     """
     def __init__(self, init_data=None):
         if init_data:
@@ -43,7 +43,7 @@ class SparseUnigramDoc:
         _result = 0
         for key, val in self._vec.items():
             _result += val * val
-        return _result
+        return math.sqrt(_result)
 
     def cos_similiarity(self, vec):
         return self.dot(vec) / (self.magnitude() * vec.magnitude())
