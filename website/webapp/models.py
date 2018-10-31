@@ -4,6 +4,7 @@ from django.core.validators import int_list_validator
 class Perspective(models.Model):
     source = models.CharField(max_length=50)
     title = models.TextField()
+    pilot1_high_agreement = models.BooleanField(default=False)
 
 
 class Claim(models.Model):

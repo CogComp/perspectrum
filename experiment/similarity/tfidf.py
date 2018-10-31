@@ -16,37 +16,41 @@ class SparseUnigramDoc:
     """
     A simple sparse unigram counts representation of document
     """
-    def __init__(self, init_data=None):
-        if init_data:
-            self._vec = init_data
+    def __init__(self, data=None):
+        if data:
+            self._dict = data
         else:
-            self._vec = {}
+            self._dict = {}
 
-    def dot(self, vec):
+    @property
+    def dict(self):
+        return self._dict
+
+    def dot(self, doc2):
         _result = 0
-        for key, val in self._vec.items():
-            if key in vec._vec:
-                _result += vec.get(key) * val
+        for key, val in self._dict.items():
+            if key in doc2.dict:
+                _result += doc2.get(key) * val
         return _result
 
     def get(self, word):
-        if word in self._vec:
-            return self._vec[word]
+        if word in self._dict:
+            return self._dict[word]
         else:
             return 0
 
     def set(self, word, score):
         if word != 0:
-            self._vec[word] = score
+            self._dict[word] = score
 
     def magnitude(self):
         _result = 0
-        for key, val in self._vec.items():
+        for key, val in self._dict.items():
             _result += val * val
         return math.sqrt(_result)
 
-    def cos_similiarity(self, vec):
-        return self.dot(vec) / (self.magnitude() * vec.magnitude())
+    def cos_similiarity(self, doc):
+        return self.dot(doc) / (self.magnitude() * doc.magnitude())
 
 
 class IdfProcessor:
