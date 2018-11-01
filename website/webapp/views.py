@@ -270,7 +270,7 @@ def vis_verify_evidence(request, claim_id):
 
     perspective_pool = get_all_persp(claim_id)
 
-    return render(request, 'verify_evidence.html', {
+    return render(request, 'step2/verify_evidence.html', {
         "claim": claim,
         "perspective_pool": perspective_pool
     })
