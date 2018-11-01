@@ -1,9 +1,3 @@
-"""
-Cleaning idle sessions that hasn't been active for 30 minutes
-Update the assignment counts in claim table of the db
-"""
-
-from django.db.models import Count
 from webapp.models import *
 import datetime
 import json
@@ -15,6 +9,10 @@ TIMEOUT_IDLE_MINUTE = 30
 _TIMEOUT_IDLE_MINUTE = datetime.timedelta(minutes=TIMEOUT_IDLE_MINUTE)
 
 def clean_idle_sessions():
+    """
+    Cleaning idle sessions that hasn't been active for 30 minutes
+    Update the assignment counts in claim table of the db
+    """
     sessions = HITSession.objects.filter(job_complete=0, finished_jobs="[]")
     for s in sessions.iterator():
         last_access_time = s.last_start_time
@@ -74,43 +72,6 @@ def _offset_assignment_counts(claim_ids, offset):
         claim.assignment_counts += offset
         claim.save()
 
-
-# Evidence Verification Assignment counts
-
-def clean_evidence_idle_sessions():
-    sessions = EvidenceHITSession.objects.filter(job_complete=0, finished_jobs="[]")
-    for s in sessions.iterator():
-        last_access_time = s.last_start_time
-        time_now = datetime.datetime.now(datetime.timezone.utc)
-        elapsed = time_now - last_access_time
-        if elapsed > _TIMEOUT_IDLE_MINUTE:
-            jobs = json.loads(s.jobs)
-            decrease_evidence_assign_counts(jobs)
-            s.delete()
-
-def increment_evidence_assign_counts(claim_ids):
-    """
-    increase by assignment counts of the claim ids by 1
-    :param claim_ids:
-    :return:
-    """
-    return _offset_assignment_counts(claim_ids, 1)
-
-
-def decrease_evidence_assign_counts(claim_ids):
-    """
-    decrease by assignment counts of the claim ids by 1
-    :param claim_ids:
-    :return:
-    """
-    return _offset_assignment_counts(claim_ids, -1)
-
-
-def _offset_evidence_assign_counts(claim_ids, offset):
-    for cid in claim_ids:
-        claim = Claim.objects.get(id=cid)
-        claim.evidence_assign_counts += offset
-        claim.save()
 
 if __name__ == '__main__':
     clean_idle_sessions()
