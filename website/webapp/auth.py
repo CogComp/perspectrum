@@ -151,9 +151,6 @@ def generate_evidence_jobs(username, num_claims):
 
         jobs = random.choices([t.id for t in assign_counts], k=10)
 
-    # For each claim, generate the choices of evidences
-    for cid in jobs:
-        PerspectiveRelation
     increment_evidence_assign_counts(jobs)
     return jobs
 

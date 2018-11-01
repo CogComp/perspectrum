@@ -139,7 +139,7 @@ class Tfidf:
         :param text: piece of untokenized text
         :return: A SparseUnigram instance, storing the tfidf representation of the input text(see above)
         """
-        toks = [self.lem.lemmatize(t) for t in word_tokenize(text)]
+        toks = [self.lem.lemmatize(t).lower() for t in word_tokenize(text)]
         doc_len = len(toks)
         doc = SparseUnigramDoc()
         counter = collections.Counter(toks)
