@@ -260,8 +260,10 @@ def vis_normalize_persp(request, claim_id):
     })
 
 
+# Step 2 apis
+
 @login_required
-def vis_verify_evidence(request, claim_id):
+def vis_persp_equivalence(request, claim_id):
     username = request.user.username
     try:
         claim = Claim.objects.get(id=claim_id)
@@ -270,7 +272,26 @@ def vis_verify_evidence(request, claim_id):
 
     perspective_pool = get_all_persp(claim_id)
 
-    return render(request, 'step2/verify_evidence.html', {
+    candidates = {}
+
+    for persp in perspective_pool:
+        cand_ids = set(json.loads(Perspective.objects.get(id=persp.id).similar_persps))
+        cand_persps = Perspective.objects.filter(id__in=cand_ids)
+        candidates[persp.id] = cand_persps
+
+    return render(request, 'step2/persp_equivalence.html', {
         "claim": claim,
-        "perspective_pool": perspective_pool
+        "perspective_pool": perspective_pool,
+        "candidates": candidates
     })
+
+@login_required
+@csrf_protect
+def submit_equivalence_annotation(request):
+    if request.method != 'POST':
+        raise ValueError("submit_rel_anno API only supports POST request")
+    else:
+        print(request.POST.dict())
+        return HttpResponse(status=400)
+        # claim_id = request.POST.get('claim_id')
+        # username = request.user.username

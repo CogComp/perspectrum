@@ -5,6 +5,7 @@ class Perspective(models.Model):
     source = models.CharField(max_length=50)
     title = models.TextField()
     pilot1_high_agreement = models.BooleanField(default=False)
+    similar_persps = models.TextField(default='[]') # Json serialized list of perspective ids
 
 
 class Claim(models.Model):
