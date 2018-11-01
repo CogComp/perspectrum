@@ -20,10 +20,9 @@ from webapp import views
 from webapp import auth
 
 urlpatterns = [
+    # commmon urls
     path('', views.render_login_page, name="render_login"),
     path('logout/', views.logout_request, name="logout"),
-    path('task_list/', views.render_list_page, name="task_list"),
-    path('instructions/', views.render_instructions, name="instructions"),
     path('contact/', views.render_contact, name="contact"),
     path('success/', views.successView, name='success'),
     path('admin/', admin.site.urls),
@@ -31,11 +30,18 @@ urlpatterns = [
     path('get_json/', views.get_json),
     path('claims/', views.vis_claims),
     path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives"),
+
+    # step 1
+    path('step1/task_list/', views.render_list_page, name="task_list"),
+    path('step1/instructions/', views.render_instructions, name="instructions"),
     path('claim_neg_anno/<slug:claim_id>', views.vis_neg_anno, name="claim_neg_anno"),
     path('claim_relation/<slug:claim_id>', views.vis_relation, name="claim_relation"),
     path('normalize_persp/<slug:claim_id>', views.vis_normalize_persp, name="normalize_claim"),
-    path('verify_evidence/<slug:claim_id>', views.vis_verify_evidence, name="verify_evidence"),
     path('api/submit_rel_anno/', views.submit_rel_anno, name="submit_rel_anno"),
     path('api/auth_login/', auth.auth_login, name="auth_login"),
-    path('api/submit_instr/', views.submit_instr, name="submit_instr")
+    path('api/submit_instr/', views.submit_instr, name="submit_instr"),
+
+    # step 2
+    path('step2/verify_evidence/<slug:claim_id>', views.vis_verify_evidence, name="verify_evidence"),
+    path('step2/instructions/', views.vis_verify_evidence, name="instructions"),
 ]
