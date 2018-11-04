@@ -1,10 +1,11 @@
 from django.db import models
-from django.core.validators import int_list_validator
+
 
 class Perspective(models.Model):
     source = models.CharField(max_length=50)
     title = models.TextField()
     pilot1_high_agreement = models.BooleanField(default=False)
+    similar_persps = models.TextField(default='[]') # Json serialized list of perspective ids
 
 
 class Claim(models.Model):
@@ -15,8 +16,8 @@ class Claim(models.Model):
     finished_counts = models.IntegerField(default=0)
 
     # Human annotation counts for evidence verification
-    evidence_assign_counts = models.IntegerField(default=0)
-    evidence_finished_counts = models.IntegerField(default=0)
+    equivalence_assign_counts = models.IntegerField(default=0)
+    equivalence_finished_counts = models.IntegerField(default=0)
 
 
 class Evidence(models.Model):
@@ -67,11 +68,9 @@ class HITSession(models.Model):
     duration = models.DurationField()
     last_start_time = models.DateTimeField(null=True) # Used to calculate duration
 
-# Evidence
-class EvidenceHITSession(models.Model):
-    """
 
-    """
+# Equivalence
+class EquivalenceHITSession(models.Model):
     username = models.CharField(max_length=100)
     instruction_complete = models.BooleanField(default=False)
     job_complete = models.BooleanField(default=False)
@@ -80,11 +79,10 @@ class EvidenceHITSession(models.Model):
     duration = models.DurationField()
     last_start_time = models.DateTimeField(null=True) # Used to calculate duration
 
-class EvidenceAnnotation(models.Model):
-    hit_session_id = models.IntegerField()
+
+class EquivalenceAnnotation(models.Model):
+    session_id = models.IntegerField()
     author = models.CharField(max_length=100)
     perspective_id = models.IntegerField()
-    evidence_id = models.IntegerField()
-    obfuscation_choices = models.TextField() # A json serialized list of perspective ids
-    user_choice = models.IntegerField(null=True) # A perspective id
+    user_choice = models.TextField(default="[]") # A json serialized list of perspective ids
 

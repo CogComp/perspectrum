@@ -59,5 +59,5 @@ function submit() {
  * TODO: Change according to AMT protocol, maybe load next page in HIT?
  */
 function submit_callback() {
-    window.location.href = '/task_list';
+    window.location.href = '/step1/task_list';
 }
