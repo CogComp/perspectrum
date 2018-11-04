@@ -20,5 +20,5 @@ function login() {
 }
 
 function login_callback() {
-    window.location.href = '/task_list';
+    window.location.href = '/step2/task_list';
 }
