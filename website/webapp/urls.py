@@ -44,5 +44,6 @@ urlpatterns = [
     # step 2
     path('step2/perspective_equivalence/<slug:claim_id>', views.vis_persp_equivalence, name="perspective_equivalence"),
     path('step2/instructions/', views.vis_persp_equivalence, name="instructions"),
+    path('step2/task_list/', views.render_step2_task_list, name="step2_task_list"),
     path('step2/api/submit_equivalence_annotation', views.submit_equivalence_annotation, name="submit_equivalence_annotation")
 ]

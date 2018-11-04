@@ -43,6 +43,6 @@ def decrease_equivalence_assign_counts(claim_ids):
 def _offset_equivalence_assign_counts(claim_ids, offset):
     for cid in claim_ids:
         claim = Claim.objects.get(id=cid)
-        claim.evidence_assign_counts += offset
+        claim.equivalence_assign_counts += offset
         claim.save()
 
