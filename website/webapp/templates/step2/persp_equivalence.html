@@ -41,28 +41,33 @@
                 </p>
             </p>
         </div>
+
         <div class="rel_option_container">
-
             {% for persp in perspective_pool %}
-
-            <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6>{{ claim.title }} </strong>
-                <hr>
-                <strong><h6> Argument: </h6> {{ persp.title }}
-                </strong>
-                <hr>
-                <div class="rel-q1">
-                    <p>Among the following arguments, select the one(s) that express the <strong>exact same</strong> idea as the given argument. </p>
-
-                    {% for cand in candidates|dict_get_item:persp.id%}
-                    <div class="col">
-                        <label class="checkbox" for="{{ persp.id }}_{{ cand.id }}">
-                        <input type="checkbox" value="{{ persp.id }}_{{ cand.id }}" id="{{ persp.id }}_{{ cand.id }}" data-toggle="checkbox_{{ persp.id }}_{{ cand.id }}" class="custom-checkbox">
-                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                            {{ cand.title }}
-                        </label>
+            <div class="col persps-container rel_tile">
+                <div class="container">
+                    <p>Among the following <font color="red">arguments</font>, select the one(s) that express the <strong>exact same</strong> idea expressed by <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                  <hr>
+                    <div class="row">
+                        <div class="col-4">
+                            <strong><h6 style="color: blue">Claim: </h6>{{ claim.title }} </strong>
+                        </div>
+                    <div class="col-sm">
+                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> {{ persp.title }} </span>
+                        <hr>
+                        <div class="rel-q1">
+                            {% for cand in candidates|dict_get_item:persp.id%}
+                            <div class="col">
+                                <label class="checkbox" for="{{ persp.id }}_{{ cand.id }}">
+                                <input type="checkbox" value="{{ persp.id }}_{{ cand.id }}" id="{{ persp.id }}_{{ cand.id }}" data-toggle="checkbox_{{ persp.id }}_{{ cand.id }}" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> {{ cand.title }}</span>
+                                </label>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
-                    {% endfor %}
+                  </div>
                 </div>
             </div>
             {% endfor %}
