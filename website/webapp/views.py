@@ -5,13 +5,13 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
 
-from .models import *
 from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render, redirect
 from .forms import ContactForm
 
 from webapp.models import *
 from webapp.auth import get_hit_session
+from webapp.util.step2.equivalence_auth import get_equivalence_hit_session
 import datetime
 
 file_names = {
@@ -170,9 +170,10 @@ def submit_rel_anno(request):
         session.save()
 
         # Increment finished counts in claim table
-        claim = Claim.objects.get(id=claim_id)
-        claim.finished_counts += 1
-        claim.save()
+        if username != 'TEST':
+            claim = Claim.objects.get(id=claim_id)
+            claim.finished_counts += 1
+            claim.save()
 
         return HttpResponse("Submission Success!", status=200)
 
@@ -260,9 +261,15 @@ def vis_normalize_persp(request, claim_id):
     })
 
 
+# Step 2 apis
+
 @login_required
-def vis_verify_evidence(request, claim_id):
+def vis_persp_equivalence(request, claim_id):
     username = request.user.username
+    session = get_equivalence_hit_session(username)
+    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
+    session.save()
+
     try:
         claim = Claim.objects.get(id=claim_id)
     except Claim.DoesNotExist:
@@ -270,7 +277,93 @@ def vis_verify_evidence(request, claim_id):
 
     perspective_pool = get_all_persp(claim_id)
 
-    return render(request, 'step2/verify_evidence.html', {
+    candidates = {}
+
+    for persp in perspective_pool:
+        cand_ids = set(json.loads(Perspective.objects.get(id=persp.id).similar_persps))
+        cand_persps = Perspective.objects.filter(id__in=cand_ids)
+        candidates[persp.id] = cand_persps
+
+    return render(request, 'step2/persp_equivalence.html', {
         "claim": claim,
-        "perspective_pool": perspective_pool
+        "perspective_pool": perspective_pool,
+        "candidates": candidates
     })
+
+def render_step2_instructions(request):
+    return render(request, "step2/instructions.html", {})
+
+def render_step2_task_list(request):
+    username = request.user.username
+    session = get_equivalence_hit_session(username)
+
+    instr_complete = session.instruction_complete
+    jobs = json.loads(session.jobs)
+    finished = json.loads(session.finished_jobs)
+
+    task_list = []
+    for job in jobs:
+        task_list.append({
+            "id": job,
+            "done": job in finished
+        })
+
+    tasks_are_done = all(item["done"] for item in task_list)
+
+    task_id = -1
+    if tasks_are_done:  # TODO: change this condition to if the user has completed the task
+        task_id = session.id
+        session.job_complete = True
+        session.save()
+
+    context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
+
+    return render(request, 'step2/task_list.html', context)
+
+
+@login_required
+@csrf_protect
+def submit_equivalence_annotation(request):
+    if request.method != 'POST':
+        raise ValueError("submit_rel_anno API only supports POST request")
+    else:
+        claim_id = request.POST.get('claim_id')
+        annos = json.loads(request.POST.get('annotations'))
+        username = request.user.username
+        session = get_equivalence_hit_session(username)
+
+        # Update annotation in EquivalenceAnnotation table
+        for p, cands in annos.items():
+            EquivalenceAnnotation.objects.create(session_id=session.id, author=username,
+                                                 perspective_id=p, user_choice=json.dumps(annos[p]))
+
+        # Update finished jobs in user session
+        fj = set(json.loads(session.finished_jobs))
+        fj.add(int(claim_id))
+        session.finished_jobs = json.dumps(list(fj))
+
+        # increment duration in database
+        delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
+        session.duration = session.duration + delta
+        session.save()
+
+        # Increment finished assignment count in claim table, if not using test acc
+        if username != 'TEST':
+            c = Claim.objects.get(claim_id=claim_id)
+            c.equivalence_finished_counts += 1
+            c.save()
+
+        return HttpResponse("Submission Success!", status=200)
+
+@login_required
+@csrf_protect
+def step2_submit_instr(request):
+    if request.method != 'POST':
+        raise ValueError("submit_instr API only supports POST request")
+    else:
+        username = request.user.username
+        session = get_equivalence_hit_session(username)
+
+        session.instruction_complete = True
+        session.save()
+        return HttpResponse("Submission Success!", status=200)
