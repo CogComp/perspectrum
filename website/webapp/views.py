@@ -290,6 +290,8 @@ def vis_persp_equivalence(request, claim_id):
         "candidates": candidates
     })
 
+def render_step2_instructions(request):
+    return render(request, "step2/instructions.html", {})
 
 def render_step2_task_list(request):
     username = request.user.username
@@ -351,4 +353,17 @@ def submit_equivalence_annotation(request):
             c.equivalence_finished_counts += 1
             c.save()
 
+        return HttpResponse("Submission Success!", status=200)
+
+@login_required
+@csrf_protect
+def step2_submit_instr(request):
+    if request.method != 'POST':
+        raise ValueError("submit_instr API only supports POST request")
+    else:
+        username = request.user.username
+        session = get_equivalence_hit_session(username)
+
+        session.instruction_complete = True
+        session.save()
         return HttpResponse("Submission Success!", status=200)
