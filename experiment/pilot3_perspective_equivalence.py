@@ -64,8 +64,8 @@ def read_inputs():
                 "hypothesis": str(item2["title"])
             }
             try:
-                json = predictor.predict_json(inputs)
-                label_logits = json["label_logits"]
+                json1 = predictor.predict_json(inputs)
+                label_logits = json1["label_logits"]
                 exps = [math.exp(x) for x in label_logits]
                 sumexps = sum(exps)
                 prob = [e / sumexps for e in exps]
@@ -80,8 +80,8 @@ def test_entailment():
         "premise": "I always write unit tests for my code.",
         "hypothesis": "One time I didn't write any unit tests for my code."
     }
-    json = predictor.predict_json(inputs)
-    print(json)
+    json1 = predictor.predict_json(inputs)
+    print(json1)
 
 def logit_to_prob(logit):
     odds = math.exp(logit)
