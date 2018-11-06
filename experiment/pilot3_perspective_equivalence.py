@@ -39,6 +39,10 @@ def read_inputs():
 
     print("Done with pre-processing the lemmas . . . ")
 
+    def save():
+        with open("/Users/daniel/ideaProjects/perspective/data/perspectives_pairs.json", 'a') as fp:
+            json.dump(output_json, fp)
+
     for i, item1 in enumerate(data):
         print(f" - Processes {i} out of {len(data)}")
         # filter the perspectives
@@ -51,7 +55,8 @@ def read_inputs():
                 filtered_list.append(item2)
 
         print(f"Size of selected list: {len(filtered_list)}")
-
+        if i % 100 == 1:
+            save()
         for item2 in filtered_list:
             # print("item2: " + str(item2["title"]))
             inputs = {
@@ -67,9 +72,7 @@ def read_inputs():
                 output_json.append({"id1": item1["id"], "id2": item2["id"], "prob": prob})
             except ValueError:
                 print("Something happened . . . ")
-
-    with open("/Users/daniel/ideaProjects/perspective/data/perspectives_pairs.json", 'w') as fp:
-        json.dump(output_json, fp)
+    save()
 
 def test_entailment():
     predictor = load_model()
