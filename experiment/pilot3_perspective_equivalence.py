@@ -9,7 +9,7 @@ def load_model():
     predictor = Predictor.from_archive(archive, 'textual-entailment')
     return predictor
 
-stop_words = ["me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now"]
+stop_words = ["me", "my", "myself", "we", "our", "ours", "ourselves", "you", "your", "yours", "yourself", "yourselves", "he", "him", "his", "himself", "she", "her", "hers", "herself", "it", "its", "itself", "they", "them", "their", "theirs", "themselves", "what", "which", "who", "whom", "this", "that", "these", "those", "am", "is", "are", "was", "were", "be", "been", "being", "have", "has", "had", "having", "do", "does", "did", "doing", "a", "an", "the", "and", "but", "if", "or", "because", "as", "until", "while", "of", "at", "by", "for", "with", "about", "against", "between", "into", "through", "during", "before", "after", "above", "below", "to", "from", "up", "down", "in", "out", "on", "off", "over", "under", "again", "further", "then", "once", "here", "there", "when", "where", "why", "how", "all", "any", "both", "each", "few", "more", "most", "other", "some", "such", "no", "nor", "not", "only", "own", "same", "so", "than", "too", "very", "s", "t", "can", "will", "just", "don", "should", "now", ",", ".", "?"]
 
 def intersection(lst1, lst2):
     lst3 = [value for value in lst1 if value in lst2]
@@ -21,7 +21,7 @@ def read_inputs():
 
     output_json = []
     import json
-    file = "/Users/daniel/ideaProjects/perspective/data/perspectives.json"
+    file = "/home/danielk/perspectives/data/perspectives.json"
 
     with open(file, encoding='utf-8') as data_file:
         predictor = load_model()
@@ -40,7 +40,7 @@ def read_inputs():
     print("Done with pre-processing the lemmas . . . ")
 
     def save():
-        with open("/Users/daniel/ideaProjects/perspective/data/perspectives_pairs.json", 'a') as fp:
+        with open("/home/danielk/perspectives/data/perspectives_pairs.json", 'a') as fp:
             json.dump(output_json, fp)
 
     for i, item1 in enumerate(data):
