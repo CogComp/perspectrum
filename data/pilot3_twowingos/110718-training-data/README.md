@@ -4,7 +4,7 @@
 ### Task description
 Given a claim and a pool of perspectives, find all perspectives that either support or undermine the claim.
 ### Dataset Format
-There are three json files in the folder -- `claim_perspective.json`, `perspectives_high_quality.json`, `annotations_high_quality.json`. 
+There are three json files in the folder -- `claim_perspective.json`, `evidence.json`, `gold_annotation.json`. 
 
 `claim_perspective.json`: A list of perspectves, each perspectve have an unique id.
 ```json
