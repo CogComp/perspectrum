@@ -37,4 +37,3 @@ if anything happens middle of the experiment and you want to delete the existing
 ```
 curl -XDELETE 'http://localhost:9200/perspectivesAndClaims'
 ```
-
