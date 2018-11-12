@@ -54,6 +54,7 @@ if __name__ == '__main__':
     with open(claim_persp_path, 'r', encoding='utf-8') as fin:
         cps = json.load(fin)
 
+    count = 0
     for cp in cps:
         id = cp['id']
         if id not in processed_pids:
@@ -61,7 +62,10 @@ if __name__ == '__main__':
             res = gs.search(cp['title'], start_index=2)
             res['perspective_id'] = id
             resps.append(res)
-            time.sleep(0.8)
+            time.sleep(0.2)
+            count += 1
+            if count >= 1000:
+                break
 
     with open(out_path, 'w') as fout:
         json.dump(resps, fout)
