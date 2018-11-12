@@ -1,7 +1,7 @@
 $(document).ready(function () {
     csrfSetup();
     let submitted = false;
-
+    let alerted = false;
     $('#rel_option_clear').click(function() {
         $('.custom-checkbox').prop('checked', false);
     });
@@ -22,7 +22,8 @@ function submit() {
     let el_persps = $('.checkbox');
     let annos = {};
     el_persps.each(function() {
-        $(this).find('input:checked').each(function() {
+        checked = $(this).find('input:checked');
+        checked.each(function() {
             let el_id = $(this).attr('id').split("_");
             let cand_id = el_id.pop();
             let persp_id = el_id.pop();
@@ -36,8 +37,6 @@ function submit() {
     });
 
     let annos_json = JSON.stringify(annos);
-
-    console.log(annos_json);
 
     let claim_id = $(location).attr('href').split('/').pop();
     $.post("/step2/api/submit_equivalence_annotation", {

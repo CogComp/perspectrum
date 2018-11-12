@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Perspective Annotation Interface</title>
     <script src="{% static "js/csrf_util.js" %}"></script>
-    <script src="{% static "js/instr.js" %}"></script>
+    <script src="{% static "js/step2/instr.js" %}"></script>
     {% csrf_token %}
 </head>
 <body>
@@ -46,9 +46,6 @@
             For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an argument</font> with respect to it (either supporting or undermining it).
             In addition, you are given a list of <font color="red">candidate arguments</font> that are topically relevant to the given problem. <br>
             We want you to select all the items (from the list of given <font color="green">candidate arguments</font>) that convey the same points, as to the given <font color="green">argument</font>.
-
-            </p>
-
 
             Please solve the following examples, according the above instructions:
             <div class="col persps-container rel_tile">
