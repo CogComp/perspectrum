@@ -97,7 +97,7 @@ def vis_persps(request, claim_id):
 
 @login_required
 def vis_neg_anno(request, claim_id):
-    return render(request, 'claim_neg_anno.html', {})
+    return render(request, 'step1/claim_neg_anno.html', {})
 
 
 @login_required
@@ -109,7 +109,7 @@ def vis_relation(request, claim_id):
 
     perspective_pool = get_pool_from_claim_id(claim_id)
 
-    return render(request, 'claim_relation.html', {
+    return render(request, 'step1/claim_relation.html', {
         "claim": "",
         "perspective_pool": perspective_pool
     })
@@ -217,10 +217,10 @@ def render_list_page(request):
         session.save()
 
     context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
-    return render(request, "list_tasks.html", context)
+    return render(request, "step1/list_tasks.html", context)
 
 def render_instructions(request):
-    return render(request, "instructions.html", {})
+    return render(request, "step1/instructions.html", {})
 
 def render_contact(request):
     if request.method == 'GET':
@@ -255,7 +255,7 @@ def vis_normalize_persp(request, claim_id):
 
     perspective_pool = get_all_persp(claim_id)
 
-    return render(request, 'normalize_persp.html', {
+    return render(request, 'step1/normalize_persp.html', {
         "claim": claim,
         "perspective_pool": perspective_pool
     })

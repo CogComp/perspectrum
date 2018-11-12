@@ -43,39 +43,57 @@
         </nav>
 
         <div class="rel_option_container">
-            For each of the following tasks check if the <strong>perspective</strong> provides a view about the given <strong>claim</strong>.
-            <p>Note that in this task we are <strong>NOT</strong> asking for your <strong>personal opinions</strong>; instead our aim is to discover perspectives that could possibly be convincing for those with different world view.
+            For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an argument</font> with respect to it (either supporting or undermining it).
+            In addition, you are given a list of <font color="red">candidate arguments</font> that are topically relevant to the given problem. <br>
+            We want you to select all the items (from the list of given <font color="green">candidate arguments</font>) that convey the same points, as to the given <font color="green">argument</font>.
+
             </p>
-                <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6> The West should invade Syria</strong>
-                <hr>
-                <strong><h6> Perspective: </h6>Sovereign countries should never be invaded. </strong>
-                <hr>
-                <div class="rel-q1">
-                    <p>Among the following arguments, select the one(s) that express the <strong>exact same</strong> idea as the given argument.</p>
-                    <div class="row rel_radio_container">
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1" type="radio" id="q1_sup_{{ persp.id }}" value="q1_supp" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="green"><b>Supports</b></font>
-                            </label>
+
+
+            Please solve the following examples, according the above instructions:
+            <div class="col persps-container rel_tile">
+                <div class="container">
+                    <p>Among the following <font color="red"> candidate arguments</font>, select the one(s) that express the <strong>exact same</strong> idea expressed by <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                  <hr>
+                    <div class="row">
+                        <div class="col-4">
+                            <strong><h6 style="color: blue">Claim: </h6>The use of child performers should be banned. </strong>
                         </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1" type="radio" id="q1_und_{{ persp.id }}" value="q1_under" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="red"><b>Undermines</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q1" type="radio" id="q1_ns_{{ persp.id }}" value="q1_not_sure" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
-                            </label>
+                    <div class="col-sm">
+                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> Being a performer can make the child physically vulnerable. </span>
+                        <hr>
+                        <div class="rel-q1" id="q1">
+                            <div class="col">
+                                <label class="checkbox">
+                                <input type="checkbox" id="check11" data-toggle="checkbox_11" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font>Are Children Who Appear on Reality Television Adequately Protected by Federal and State Law?</span>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <label class="checkbox">
+                                <input type="checkbox" id="check12" data-toggle="checkbox_11" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font>Why Congress Should Protect Children in Reality Programming</span>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <label class="checkbox">
+                                <input type="checkbox" id="check13" data-toggle="checkbox_11" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font>Keep Out of Reach of Children </span>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <label class="checkbox">
+                                <input type="checkbox" id="check14" data-toggle="checkbox_11" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font>Forced child performance could physically harm children.  </span>
+                                </label>
+                            </div>
                         </div>
                     </div>
+                  </div>
                 </div>
                 <div class="alert alert-success" id="q1-succc" role="alert" style="display: none">
                     That is the correct answer! The given perspective undermines the given claim.
@@ -85,85 +103,59 @@
                 </div>
             </div>
 
-            <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6>The West should invade Syria </strong>
-                <hr>
-                <strong><h6> Perspective: </h6> If the United States does not intervene, the moral responsibility of those dying will be on us. </strong>
-                <hr>
-                <div class="rel-q1">
-                    <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
-                    <div class="row rel_radio_container">
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q2" type="radio" id="q2_sup_{{ persp.id }}" value="q2_supp" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="green"><b>Supports</b></font>
-                            </label>
+            Here is another example:
+
+            <div class="col persps-container rel_tile">
+                <div class="container">
+                    <p>Among the following <font color="red"> candidate arguments</font>, select the one(s) that express the <strong>exact same</strong> idea expressed by <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                  <hr>
+                    <div class="row">
+                        <div class="col-4">
+                            <strong><h6 style="color: blue">Claim: </h6>Trade is better than aid.  </strong>
                         </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q2" type="radio" id="q2_und_{{ persp.id }}" value="q2_undermine" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="red"><b>Undermines</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q2" type="radio" id="q2_ns_{{ persp.id }}" value="q2_not_sure" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
-                            </label>
+                    <div class="col-sm">
+                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> Trade does not allocate resources effectively. </span>
+                        <hr>
+                        <div class="rel-q1" id="q2">
+                            <div class="col">
+                                <label class="checkbox">
+                                <input type="checkbox" id="check21" data-toggle="checkbox_11" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font>How Economic Systems Allocate Resources Effectively</span>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <label class="checkbox">
+                                <input type="checkbox" id="check22" data-toggle="checkbox_11" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font>Trade not Aid</span>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <label class="checkbox">
+                                <input type="checkbox" id="check23" data-toggle="checkbox_11" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font>Trade is unlikely to result in an effective end.</span>
+                                </label>
+                            </div>
+                            <div class="col">
+                                <label class="checkbox">
+                                <input type="checkbox" id="check24" data-toggle="checkbox_11" class="custom-checkbox">
+                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font>The effectiveness of direct aid</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
+                  </div>
                 </div>
                 <div class="alert alert-success" id="q2-succc" role="alert" style="display: none">
-                    That is the correct answer! The given perspective takes a supporting stance on the given claim.
+                    That is the correct answer! The given perspective undermines the given claim.
                 </div>
-                <div class="alert alert-danger" id="q2-fail" role="alert" style="display: none">
+                <div class="alert alert-danger"  id="q2-fail" role="alert" style="display: none">
                   Not correct! Give it another try ...
                 </div>
             </div>
-
-
-            <div class="col persps-container rel_tile" id='content'>
-                <strong><h6>Claim: </h6> The West should invade Syria </strong>
-                <hr>
-                <strong><h6> Perspective: </h6> Death toll </strong>
-                <hr>
-                <div class="rel-q1">
-                    <p><strong>Q:</strong> Do you think the perspective supports or undermines the claim?</p>
-                    <div class="row rel_radio_container">
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q3" type="radio" id="q3_sup_{{ persp.id }}" value="q3_support" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="green"><b>Supports</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q3" type="radio" id="q3_und_{{ persp.id }}" value="q3_undermine" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="red"><b>Undermines</b></font>
-                            </label>
-                        </div>
-                        <div class="col">
-                            <label class="radio rel_option_radio">
-                                <input name="q3" type="radio" id="q3_ns_{{ persp.id }}" value="q3_not_sure" data-toggle="radio" class="custom-radio rel_option">
-                                <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                <font face="verdana" color="#8a2be2"><b>Not sure</b></font>
-                            </label>
-                        </div>
-                    </div>
-                </div>
-                <div class="alert alert-success" id="q3-succc" role="alert" style="display: none">
-                    That is the correct answer! The given perspective does not take a clear supporting or negating stance aganst the given claim.
-                </div>
-                <div class="alert alert-danger" id="q3-fail" role="alert" style="display: none">
-                  Not correct! Give it another try ...
-                </div>
-            </div>
-
 
             <div style="align-self: center; align-content: center; text-align: center">
                 You have to answer the above samples correctly in order for the bottom to be activated. <br>
@@ -177,51 +169,165 @@
 
 </body>
 <script>
-    q1 = false;
-    q2 = false;
-    q3 = false;
+    showFirst = false;
+    showSecond = false;
+    q11 = false;
+    q12 = false;
+    q13 = false;
+    q14 = false;
+
+    q21 = false;
+    q22 = false;
+    q23 = false;
+    q24 = false;
+
+    $('#check11').click(function () {
+        console.log("clicked . . . ");
+        if ($(this).is(':checked')) {
+            console.log("checked . . . ");
+            q11 = true;
+        }
+        else {
+            console.log("not checked . . . ")
+            q11 = false;
+        }
+        showFirst = true
+    });
+    $('#check12').click(function () {
+        console.log("clicked . . . ");
+        if ($(this).is(':checked')) {
+            console.log("checked . . . ");
+            q12 = true;
+        }
+        else {
+            console.log("not checked . . . ")
+            q12 = false;
+        }
+        showFirst = true
+    });
+    $('#check13').click(function () {
+        console.log("clicked . . . ");
+        if ($(this).is(':checked')) {
+            console.log("checked . . . ");
+            q13 = true;
+        }
+        else {
+            console.log("not checked . . . ")
+            q13 = false;
+        }
+        showFirst = true
+    });
+    $('#check14').click(function () {
+        console.log("clicked . . . ");
+        if ($(this).is(':checked')) {
+            console.log("checked . . . ");
+            q14 = true;
+        }
+        else {
+            console.log("not checked . . . ")
+            q14 = false;
+        }
+        showFirst = true
+    });
+
+
+    // second question
+    $('#check21').click(function () {
+        console.log("clicked . . . ");
+        if ($(this).is(':checked')) {
+            console.log("checked . . . ");
+            q21 = true;
+        }
+        else {
+            console.log("not checked . . . ")
+            q21 = false;
+        }
+        showSecond = true
+    });
+    $('#check22').click(function () {
+        console.log("clicked . . . ");
+        if ($(this).is(':checked')) {
+            console.log("checked . . . ");
+            q22 = true;
+        }
+        else {
+            console.log("not checked . . . ")
+            q22 = false;
+        }
+        showSecond = true
+    });
+    $('#check23').click(function () {
+        console.log("clicked . . . ");
+        if ($(this).is(':checked')) {
+            console.log("checked . . . ");
+            q23 = true;
+        }
+        else {
+            console.log("not checked . . . ")
+            q23 = false;
+        }
+        showSecond = true
+    });
+    $('#check24').click(function () {
+        console.log("clicked . . . ");
+        if ($(this).is(':checked')) {
+            console.log("checked . . . ");
+            q24 = true;
+        }
+        else {
+            console.log("not checked . . . ")
+            q24 = false;
+        }
+        showSecond = true
+    });
+
+    firstCorrect = false;
+    secondCorrect = false;
+
     // if all the options are answered correctly, turn the botton active
-    $('input[type="radio"]').on('click change', function(e) {
-        console.log($(this).val());
-        if ($(this).val().includes("q1") ) {
-            // if you select undermine, it's good; otherwise it's incorrect
-            if ($(this).val().includes("under") ) {
+    $('#q1').on('click change', function(e) {
+
+        if(showFirst) {
+            if (q14 && !q13 && !q12 && !q11 ) {
                 $("#q1-fail").css("display", "none");
                 $("#q1-succc").css("display", "block");
-                q1 = true
+                firstCorrect = true
             }
             else {
                 $("#q1-succc").css("display", "none");
                 $("#q1-fail").css("display", "block");
+                firstCorrect = false
             }
         }
-        if ($(this).val().includes("q2") ) {
-            if ($(this).val().includes("supp") ) {
+
+        if (firstCorrect && secondCorrect) {
+            $("#instr_submit").prop('disabled', false);
+        }
+        else {
+             $("#instr_submit").prop('disabled', true);
+        }
+    });
+
+    $('#q2').on('click change', function(e) {
+        if(showSecond) {
+            if (!q24 && q23 && !q22 && !q21 ) {
                 $("#q2-fail").css("display", "none");
                 $("#q2-succc").css("display", "block");
-                q2 = true
+                secondCorrect = true;
             }
             else {
                 $("#q2-succc").css("display", "none");
                 $("#q2-fail").css("display", "block");
-            }
-        }
-        if ($(this).val().includes("q3") ) {
-            if ($(this).val().includes("sure") ) {
-                $("#q3-fail").css("display", "none");
-                $("#q3-succc").css("display", "block");
-                q3 = true
-            }
-            else {
-                $("#q3-succc").css("display", "none");
-                $("#q3-fail").css("display", "block");
+                secondCorrect = false;
             }
         }
 
-        if (q1 && q2 && q3) {
+        if (firstCorrect && secondCorrect) {
             $("#instr_submit").prop('disabled', false);
         }
-
+        else {
+            $("#instr_submit").prop('disabled', true);
+        }
     });
 </script>
 
