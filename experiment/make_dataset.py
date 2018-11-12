@@ -24,7 +24,8 @@ claim_persp_out_path = "/home/squirrel/ccg-new/projects/perspective/data/pilot3_
 evidence_out_path = "/home/squirrel/ccg-new/projects/perspective/data/pilot3_twowingos/110718-training-data/evidence.json"
 # Out File 3: Gold annotation between perspective and claim
 gold_annotation_out_path = "/home/squirrel/ccg-new/projects/perspective/data/pilot3_twowingos/110718-training-data/gold_annotation.json"
-
+# Out File 4: Perspective only version
+persp_out_path = "/home/squirrel/ccg-new/projects/perspective/data/pilot3_twowingos/110718-training-data/perspective.json"
 
 def concat_two_sentences(sent1, sent2):
     sent1 = sent1.strip()
@@ -48,7 +49,7 @@ if __name__ == '__main__':
 
     p_rel_df = p_rel_df.loc[p_rel_df.author == 'GOLD']
     # Produce the evidence output, since it's the easiest
-    # edf[['id', 'content']].to_json(evidence_out_path, orient='records')
+    edf[['id', 'content']].to_json(evidence_out_path, orient='records')
 
     # Produce the gold annotation
     valid_pdf = pdf.loc[pdf.pilot1_high_agreement == 1]
@@ -59,7 +60,7 @@ if __name__ == '__main__':
     p_c_e_merged_df = pd.merge(p_c_merged_df, e_rel_df[['perspective_id', 'evidence_id']], on='perspective_id')
     p_c_e_merged_df.info()
 
-    # p_c_e_merged_df[['perspective_id', 'evidence_id']].to_json(gold_annotation_out_path, orient='records')
+    p_c_e_merged_df[['perspective_id', 'evidence_id']].to_json(gold_annotation_out_path, orient='records')
 
     # produce perspective + claim
     claim_persp_objects = []
@@ -74,3 +75,15 @@ if __name__ == '__main__':
 
     with open(claim_persp_out_path, 'w') as fout:
         json.dump(claim_persp_objects, fout)
+
+    persp_objects = []
+    for idx, row in p_c_e_merged_df.iterrows():
+        persp_title = row.title
+
+        persp_objects.append({
+            'id': row.id,
+            'title': persp_title
+        })
+
+    with open(persp_out_path, 'w') as fout:
+        json.dump(persp_objects, fout)
