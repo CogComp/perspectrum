@@ -46,7 +46,7 @@
             {% for persp in perspective_pool %}
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Among the following <font color="red">arguments</font>, select the one(s) that express the <strong>exact same</strong> idea expressed by <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                    <p>Among the following <font color="red">arguments</font>, select the one(s) that express the <strong>exact same</strong> idea as <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
                   <hr>
                     <div class="row">
                         <div class="col-4">
@@ -76,11 +76,6 @@
                                     </div>
                                 </div>
                                 <hr>
-
-{#                                <label class="checkbox" for="{{ persp.id }}_{{ cand.id }}">#}
-{#                                <input type="checkbox" value="{{ persp.id }}_{{ cand.id }}" id="{{ persp.id }}_{{ cand.id }}" data-toggle="checkbox_{{ persp.id }}_{{ cand.id }}" class="custom-checkbox">#}
-{#                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>#}
-{#                                </label>#}
                             </div>
                             {% endfor %}
                         </div>
