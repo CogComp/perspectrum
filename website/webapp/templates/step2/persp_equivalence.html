@@ -57,12 +57,30 @@
                         <hr>
                         <div class="rel-q1">
                             {% for cand in candidates|dict_get_item:persp.id%}
-                            <div class="col">
-                                <label class="checkbox" for="{{ persp.id }}_{{ cand.id }}">
-                                <input type="checkbox" value="{{ persp.id }}_{{ cand.id }}" id="{{ persp.id }}_{{ cand.id }}" data-toggle="checkbox_{{ persp.id }}_{{ cand.id }}" class="custom-checkbox">
-                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> {{ cand.title }}</span>
-                                </label>
+                            <div class="col equi-cand-container">
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> {{ cand.title }}</div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <label class="radio rel_option_radio">
+                                            <input name="equi_{{ persp.id }}_{{ cand.id }}" type="radio" id="equi_same_{{ persp.id }}_{{ cand.id }}" value="equi_{{ persp_id }}_{{ cand.id }}" data-toggle="radio" class="custom-radio equi_option">
+                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                            <b>Same</b>
+                                        </label>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="radio rel_option_radio">
+                                            <input name="equi_{{ persp.id }}_{{ cand.id }}" type="radio" id="equi_diff_{{ persp.id }}_{{ cand.id }}" value="equi_{{ persp.id }}_{{ cand.id }}" data-toggle="radio" class="custom-radio equi_option">
+                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                            <b>Different</b>
+                                        </label>
+                                    </div>
+                                </div>
+                                <hr>
+
+{#                                <label class="checkbox" for="{{ persp.id }}_{{ cand.id }}">#}
+{#                                <input type="checkbox" value="{{ persp.id }}_{{ cand.id }}" id="{{ persp.id }}_{{ cand.id }}" data-toggle="checkbox_{{ persp.id }}_{{ cand.id }}" class="custom-checkbox">#}
+{#                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>#}
+{#                                </label>#}
                             </div>
                             {% endfor %}
                         </div>
@@ -74,10 +92,10 @@
 
             <div class="row">
                 <div class="col-4">
-                    <a id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</a>
+                    <button id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</button>
                 </div>
                 <div class="col-8">
-                    <a id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</a>
+                    <button id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</button>
                 </div>
             </div>
             <br>
