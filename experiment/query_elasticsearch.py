@@ -27,13 +27,13 @@ def get_top_evidences(perpsective):
 
 
 def get_top_google_perspectives(text):
-    res = es.search(index="perspectivesandclaims_google", doc_type="text", body={"query": {"match": {"google_candidates": text}}}, size=50)
+    res = es.search(index="perspectivesandclaims_google", doc_type="text", body={"query": {"match": {"candidate": text}}}, size=50)
     print("%d documents found:" % res['hits']['total'])
     output = []
     for doc in res['hits']['hits']:
         id = doc['_source']["perspective_id"]
         score = doc['_score']
-        perspective_text = doc['_source']["google_candidates"]
+        perspective_text = doc['_source']["candidate"]
         output.append((perspective_text, id, score))
 
     return output
@@ -57,8 +57,6 @@ if __name__ == '__main__':
     if len(sys.argv) != 2:
         print("Usage: python ... [google_persp]", file=sys.stderr)
         exit(1)
-
-    es.indices.delete("perspectivesandclaims_google")
 
     google_persp = sys.argv[1]
     with open(google_persp, 'r', encoding='utf-8') as fin:
