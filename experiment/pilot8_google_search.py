@@ -66,17 +66,16 @@ if __name__ == '__main__':
         for idx, item in enumerate(items):
             if site_excluded(item['formattedUrl']):
                 continue
-            # print(item['pagemap']['metatags'].keys())
             cands = parse_snippets(item['snippet'])
 
             if cands:
                 persp_cands.append(cands[0])
-                # print("\tResult #{} from {}: {}".format(idx, item['formattedUrl'], cands))
 
-        out_data.append({
-            'perspective_id': persp_id,
-            'google_candidates': persp_cands
-        })
+        for c in persp_cands:
+            out_data.append({
+                'perspective_id': persp_id,
+                'candidate': c
+            })
 
     with open(cand_output, 'w', encoding='utf-8') as fout:
         json.dump(out_data, fout)
