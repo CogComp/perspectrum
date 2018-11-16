@@ -3,7 +3,7 @@ es = Elasticsearch(['http://bronte.cs.illinois.edu'],port=8080)
 
 def get_top_perspectives(evidence):
     res = es.search(index="perspectivesandclaims", doc_type="text", body={"query": {"match": {"title": evidence}}}, size=50)
-    print("%d documents found:" % res['hits']['total'])
+    # print("%d documents found:" % res['hits']['total'])
     output = []
     for doc in res['hits']['hits']:
         id = doc['_source']["id"]
@@ -16,7 +16,7 @@ def get_top_perspectives(evidence):
 
 def get_top_evidences(perpsective):
     res = es.search(index="evidences", doc_type="text", body={"query": {"match": {"content": perpsective}}}, size=50)
-    print("%d documents found:" % res['hits']['total'])
+    # print("%d documents found:" % res['hits']['total'])
     output = []
     for doc in res['hits']['hits']:
         id = doc['_source']["id"]
@@ -28,7 +28,7 @@ def get_top_evidences(perpsective):
 
 def get_top_google_perspectives(text):
     res = es.search(index="perspectivesandclaims_google", doc_type="text", body={"query": {"match": {"candidate": text}}}, size=50)
-    print("%d documents found:" % res['hits']['total'])
+    # print("%d documents found:" % res['hits']['total'])
     output = []
     for doc in res['hits']['hits']:
         id = doc['_source']["perspective_id"]

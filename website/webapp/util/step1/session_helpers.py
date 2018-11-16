@@ -8,7 +8,8 @@ TIMEOUT_IDLE_MINUTE = 30
 
 _TIMEOUT_IDLE_MINUTE = datetime.timedelta(minutes=TIMEOUT_IDLE_MINUTE)
 
-def clean_idle_sessions():
+
+def clean_idle_persp_sessions():
     """
     Cleaning idle sessions that hasn't been active for 30 minutes
     Update the assignment counts in claim table of the db
@@ -20,8 +21,9 @@ def clean_idle_sessions():
         elapsed = time_now - last_access_time
         if elapsed > _TIMEOUT_IDLE_MINUTE:
             jobs = json.loads(s.jobs)
-            decrease_assignment_counts(jobs)
+            decrease_persp_assignment_counts(jobs)
             s.delete()
+
 
 def update_all_claim_counts():
     """
@@ -48,7 +50,7 @@ def update_all_claim_counts():
         claim.save()
 
 
-def increment_assignment_counts(claim_ids):
+def increment_persp_assignment_counts(claim_ids):
     """
     increase by assignment counts of the claim ids by 1
     :param claim_ids:
@@ -57,7 +59,7 @@ def increment_assignment_counts(claim_ids):
     return _offset_assignment_counts(claim_ids, 1)
 
 
-def decrease_assignment_counts(claim_ids):
+def decrease_persp_assignment_counts(claim_ids):
     """
     decrease by assignment counts of the claim ids by 1
     :param claim_ids:
@@ -74,5 +76,5 @@ def _offset_assignment_counts(claim_ids, offset):
 
 
 if __name__ == '__main__':
-    clean_idle_sessions()
+    clean_idle_persp_sessions()
     update_all_claim_counts()

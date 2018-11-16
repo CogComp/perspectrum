@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from .forms import ContactForm
 
 from webapp.models import *
-from webapp.auth import get_hit_session
+from webapp.util.step1.persp_verification_auth import get_persp_hit_session
 from webapp.util.step2.equivalence_auth import get_equivalence_hit_session
 import datetime
 
@@ -45,6 +45,31 @@ def get_all_persp(claim_id):
     """
     related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id).\
         order_by("?")
+    related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
+
+    return related_persps
+
+
+def get_all_google_persp(claim_id):
+    """
+    :param claim_id: id of the claim
+    :return: list of perspectives
+    """
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD,
+                                                            claim_id=claim_id, comment="google")\
+        .order_by("?")
+    related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
+
+    return related_persps
+
+
+def get_all_original_persp(claim_id):
+    """
+    :param claim_id: id of the claim
+    :return: list of perspectives
+    """
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id)\
+        .exclude(comment="google").order_by("?")
     related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
 
     return related_persps
@@ -123,7 +148,7 @@ def submit_instr(request):
         # TODO: Actaully not sure what to do here..
     else:
         username = request.user.username
-        session = get_hit_session(username)
+        session = get_persp_hit_session(username)
 
         session.instruction_complete = True
         session.save()
@@ -143,7 +168,7 @@ def submit_rel_anno(request):
         annos = request.POST.getlist('annotations[]')
 
         username = request.user.username
-        session = get_hit_session(username)
+        session = get_persp_hit_session(username)
 
         if claim_id and annos:
             for a in annos:
@@ -196,7 +221,7 @@ def render_list_page(request):
     Renderer the list of task
     """
     username = request.user.username
-    session = get_hit_session(username)
+    session = get_persp_hit_session(username)
     instr_complete = session.instruction_complete
     jobs = json.loads(session.jobs)
     finished = json.loads(session.finished_jobs)
@@ -245,7 +270,7 @@ def successView(request):
 @login_required
 def vis_normalize_persp(request, claim_id):
     username = request.user.username
-    session = get_hit_session(username)
+    session = get_persp_hit_session(username)
     session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
     session.save()
     try:
@@ -253,7 +278,7 @@ def vis_normalize_persp(request, claim_id):
     except Claim.DoesNotExist:
         pass  # TODO: Do something? 404?
 
-    perspective_pool = get_all_persp(claim_id)
+    perspective_pool = get_all_google_persp(claim_id)
 
     return render(request, 'step1/normalize_persp.html', {
         "claim": claim,

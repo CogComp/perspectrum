@@ -24,11 +24,21 @@ def _clean_snippet(raw_snippet):
         .replace('  ', ' ')
 
 
+def lstrip_nonalphanum(s):
+    if s:
+        if s[0].isalnum():
+            return s
+        else:
+            return lstrip_nonalphanum(s[1:])
+    else:
+        return s
+
 def parse_snippets(raw_snippet):
     raw_snippet = _clean_snippet(raw_snippet)
     pieces = [p.strip() for p in raw_snippet.split('...')]
-    pieces = [p for p in pieces if p.endswith('.')]
+    pieces = [lstrip_nonalphanum(p) for p in pieces if p.endswith('.')]
     return pieces
+
 
 if __name__ == '__main__':
 
