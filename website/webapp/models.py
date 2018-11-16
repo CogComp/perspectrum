@@ -33,7 +33,8 @@ class PerspectiveRelation(models.Model):
     CLAIM_PERSP_REL = (
         ('S', 'Support'),
         ('U', 'Undermine'),
-        ('I', 'Irrelevant'),
+        ('A', 'Slight Support'),
+        ('B', 'Slight Undermine'),
         ('N', 'Not Sure')
     )
     

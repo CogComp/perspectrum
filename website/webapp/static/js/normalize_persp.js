@@ -20,7 +20,8 @@ $(document).ready(function () {
 var rel_mapping = {
     'sup': 'S',
     'und': 'U',
-    'irr': 'I',
+    'ssup': 'A',
+    'sund': 'B',
     'ns': 'N',
 };
 
