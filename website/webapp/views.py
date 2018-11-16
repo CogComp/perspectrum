@@ -50,6 +50,31 @@ def get_all_persp(claim_id):
     return related_persps
 
 
+def get_all_google_persp(claim_id):
+    """
+    :param claim_id: id of the claim
+    :return: list of perspectives
+    """
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD,
+                                                            claim_id=claim_id, comment="google")\
+        .order_by("?")
+    related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
+
+    return related_persps
+
+
+def get_all_original_persp(claim_id):
+    """
+    :param claim_id: id of the claim
+    :return: list of perspectives
+    """
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id)\
+        .exclude(comment="google").order_by("?")
+    related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
+
+    return related_persps
+
+
 """ APIs """
 def get_json(request):
     data = load_json(file_names["iDebate"])
@@ -253,7 +278,7 @@ def vis_normalize_persp(request, claim_id):
     except Claim.DoesNotExist:
         pass  # TODO: Do something? 404?
 
-    perspective_pool = get_all_persp(claim_id)
+    perspective_pool = get_all_google_persp(claim_id)
 
     return render(request, 'step1/normalize_persp.html', {
         "claim": claim,
