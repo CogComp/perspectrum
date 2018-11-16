@@ -27,26 +27,26 @@
 <body>
     <div class="container">
         <h4 class="rel_claim_title pallete pallete-peter-river">
-            Perspective Annotations Interface
+            Perspective Equivalence Annotation Interface
         </h4>
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/step2/task_list/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Task</li>
+          </ol>
+        </nav>
+
         <div class="rel_instr_container">
-            <strong>Instructions:</strong>
-            <p class="rel_instr_text">
-                In this task we annotate whether a given evidence <font face="verdana" color="green"><b>supports</b></font>,
-                <font face="verdana" color="red"><b>undermines</b></font> a given claim. Or if you are <font face="verdana" color="#8a2be2"><b>Not Sure</b></font>.
-                <br>
-                For the given claim, annotate the paragraphs with appropriate labels.
-                <br>
-                <p>Note that in this task we are <strong>NOT</strong> asking for your <strong>personal opinions</strong>; instead our aim is to discover perspectives that could possibly be convincing for those with different world view.
-                </p>
-            </p>
+            For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an argument</font> with respect to it (either supporting or undermining it).
+            In addition, you are given a list of <font color="red">candidate arguments</font> that are topically relevant to the given problem. <br>
+            We want you to select all the items (from the list of given <font color="green">candidate arguments</font>) that convey the same points, as to the given <font color="green">argument</font>.
         </div>
 
         <div class="rel_option_container">
             {% for persp in perspective_pool %}
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Among the following <font color="red">arguments</font>, select the one(s) that express the <strong>exact same</strong> idea expressed by <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                    <p>Among the following <font color="red">arguments</font>, select the one(s) that express the <strong>exact same</strong> idea as <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
                   <hr>
                     <div class="row">
                         <div class="col-4">
@@ -57,12 +57,25 @@
                         <hr>
                         <div class="rel-q1">
                             {% for cand in candidates|dict_get_item:persp.id%}
-                            <div class="col">
-                                <label class="checkbox" for="{{ persp.id }}_{{ cand.id }}">
-                                <input type="checkbox" value="{{ persp.id }}_{{ cand.id }}" id="{{ persp.id }}_{{ cand.id }}" data-toggle="checkbox_{{ persp.id }}_{{ cand.id }}" class="custom-checkbox">
-                                    <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                    <span style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> {{ cand.title }}</span>
-                                </label>
+                            <div class="col equi-cand-container">
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> {{ cand.title }}</div>
+                                <div class="row">
+                                    <div class="col-4">
+                                        <label class="radio rel_option_radio">
+                                            <input name="equi_{{ persp.id }}_{{ cand.id }}" type="radio" id="equi_same_{{ persp.id }}_{{ cand.id }}" value="equi_{{ persp_id }}_{{ cand.id }}" data-toggle="radio" class="custom-radio equi_option">
+                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                            <b>Same</b>
+                                        </label>
+                                    </div>
+                                    <div class="col-4">
+                                        <label class="radio rel_option_radio">
+                                            <input name="equi_{{ persp.id }}_{{ cand.id }}" type="radio" id="equi_diff_{{ persp.id }}_{{ cand.id }}" value="equi_{{ persp.id }}_{{ cand.id }}" data-toggle="radio" class="custom-radio equi_option">
+                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
+                                            <b>Different</b>
+                                        </label>
+                                    </div>
+                                </div>
+                                <hr>
                             </div>
                             {% endfor %}
                         </div>
@@ -74,10 +87,10 @@
 
             <div class="row">
                 <div class="col-4">
-                    <a id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</a>
+                    <button id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</button>
                 </div>
                 <div class="col-8">
-                    <a id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</a>
+                    <button id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</button>
                 </div>
             </div>
             <br>

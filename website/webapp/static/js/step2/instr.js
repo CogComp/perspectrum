@@ -9,7 +9,7 @@ $(document).ready(function() {
 function submit() {
     csrfSetup();
 
-    $.post("/api/submit_instr/", {}, instr_callback);
+    $.post("/step2/api/submit_instr/", {}, instr_callback);
 }
 
 function instr_callback() {
