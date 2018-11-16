@@ -11,7 +11,8 @@ def get_persp_hit_session(username):
     if unfinished_sessions.count() > 0:
         session = unfinished_sessions[0]
     else:
-        claim_ids = generate_persp_jobs(username, 10)
+        num_jobs = 5
+        claim_ids = generate_persp_jobs(username, num_jobs)
         time_now = datetime.datetime.now(datetime.timezone.utc)
         session = HITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_jobs=json.dumps([]),
                                             instruction_complete=persp_instr_needed(username), duration=datetime.timedelta(),
@@ -62,7 +63,7 @@ def generate_persp_jobs(username, num_claims):
         assign_counts = Claim.objects.all().order_by('finished_counts')\
             .values_list('id', 'finished_counts', named=True)[:num_claims * 5]
 
-        jobs = random.choices([t.id for t in assign_counts], k=10)
+        jobs = random.choices([t.id for t in assign_counts], k=num_claims)
 
     increment_persp_assignment_counts(jobs)
     return jobs
