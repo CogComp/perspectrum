@@ -10,10 +10,8 @@ $(document).ready(function () {
         $('.rel_option').prop('checked', false);
     });
     $('#rel_option_submit').click(function (){
-        if (!submitted) {
-            submit();
-        }
-        submitted = true
+        disable_submit_button();
+        submit();
     });
 });
 
@@ -44,14 +42,14 @@ function submit() {
 
     if (el_persps.length !== annos.length) {
         alert("Please annotate all questions!");
-        return;
+        return enable_submit_button();
     }
     else {
         let claim_id = $(location).attr('href').split('/').pop();
         $.post("/api/submit_rel_anno/", {
             "claim_id": claim_id,
             "annotations": annos
-        }, submit_callback);
+        }, submit_callback).fail(enable_submit_button);
     }
 }
 
@@ -61,4 +59,12 @@ function submit() {
  */
 function submit_callback() {
     window.location.href = '/step1/task_list';
+}
+
+function disable_submit_button() {
+    $('#rel_option_submit').prop('disabled', true);
+}
+
+function enable_submit_button() {
+    $('#rel_option_submit').prop('disabled', false);
 }

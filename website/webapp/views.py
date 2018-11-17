@@ -178,7 +178,8 @@ def submit_rel_anno(request):
 
                 persp_id = parts[0]
                 rel = parts[1]
-                anno_entry = PerspectiveRelation.objects.create(author=username, claim_id=claim_id, perspective_id=persp_id, rel=rel)
+                anno_entry = PerspectiveRelation.objects.create(author=username, claim_id=claim_id,
+                                                                perspective_id=persp_id, rel=rel, comment="turk_google")
                 anno_entry.save()
 
         else:
