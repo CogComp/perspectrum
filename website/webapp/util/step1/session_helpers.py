@@ -71,7 +71,11 @@ def decrease_persp_assignment_counts(claim_ids):
 def _offset_assignment_counts(claim_ids, offset):
     for cid in claim_ids:
         claim = Claim.objects.get(id=cid)
-        claim.assignment_counts += offset
+        target = claim.assignment_counts + offset
+        if target >= 0:
+            claim.assignment_counts = target
+        else:
+            claim.assignment_counts = 0
         claim.save()
 
 
