@@ -65,6 +65,12 @@ def generate_persp_jobs(username, num_claims):
 
         jobs = random.choices([t.id for t in assign_counts], k=num_claims)
 
-    increment_persp_assignment_counts(jobs)
+    if username != 'TEST':
+        increment_persp_assignment_counts(jobs)
+
     return jobs
+
+
+def generate_test_persp_jobs(username, num_claims):
+    return [i for i in range(1, num_claims+1)]
 

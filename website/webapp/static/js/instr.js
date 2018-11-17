@@ -13,5 +13,5 @@ function submit() {
 }
 
 function instr_callback() {
-    window.location.href = '/task_list';
+    window.location.href = '/step1/task_list';
 }
