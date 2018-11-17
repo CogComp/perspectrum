@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Perspective Annotation Interface</title>
     <script src="{% static "js/csrf_util.js" %}"></script>
-    <script src="{% static "js/claim_relation.js" %}"></script>
+    <script src="{% static "js/claim_relation.js" %}?ver2"></script>
     {% csrf_token %}
 </head>
 <body>
@@ -181,10 +181,10 @@
             {% endfor %}
             <div class="row">
                 <div class="col-4">
-                    <a id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</a>
+                    <button id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</button>
                 </div>
                 <div class="col-8">
-                    <a id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</a>
+                    <button id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</button>
                 </div>
             </div>
             <br>
