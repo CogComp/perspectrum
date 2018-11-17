@@ -54,7 +54,7 @@ def generate_persp_jobs(username, num_claims):
             count_tuples.append((c.id, c.assignment_counts + random.random()))
 
         count_tuples = sorted(count_tuples, key=lambda t: t[1])[:num_claims]
-
+        print(count_tuples)
         jobs = [t[0] for t in count_tuples]
 
     else:
