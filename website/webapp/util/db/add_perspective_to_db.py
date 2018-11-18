@@ -89,6 +89,7 @@ def add_persp_rel_google_perspectives(candidates_path):
         cid = PerspectiveRelation.objects.get(perspective_id=pid, author=PerspectiveRelation.GOLD).claim_id
 
         _google_cands = [_c for _c in c['candidates'] if validate_perspective(_c[0])]
+        added_persps = set()
         for gc in _google_cands[:5]:
             title = gc[0]
             _q = Perspective.objects.filter(title=title, source="google")
@@ -96,9 +97,11 @@ def add_persp_rel_google_perspectives(candidates_path):
                 continue
 
             _p = _q.first()
-            _rel = PerspectiveRelation.objects.create(claim_id=cid, perspective_id=_p.id, author=PerspectiveRelation.GOLD,
-                                                    rel="N", comment="google")
-            _rel.save()
+            if _p.id not in added_persps:
+                _rel = PerspectiveRelation.objects.create(claim_id=cid, perspective_id=_p.id, author=PerspectiveRelation.GOLD,
+                                                        rel="N", comment="google")
+                added_persps.add(_p.id)
+                _rel.save()
 
 
 if __name__ == '__main__':
