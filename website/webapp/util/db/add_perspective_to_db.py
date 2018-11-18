@@ -104,12 +104,23 @@ def add_persp_rel_google_perspectives(candidates_path):
                 _rel.save()
 
 
+def remove_redundant_gold_persp_rel_annotation():
+    count = 0
+    for p in PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD):
+        if PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=p.claim_id, perspective_id=p.perspective_id).count() > 1:
+            p.delete()
+            count+=1
+
+    print("Removed {} duplicate records. ".format(count))
+
+
 if __name__ == '__main__':
 
-    google_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_google_cands.json"
+    # google_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_google_cands.json"
     # lucene_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_lucene_cands.json"
 
     # google_perspectives_to_db(google_candidates)
     # lucene_perspectives_to_db(lucene_candidates)
 
-    add_persp_rel_google_perspectives(google_candidates)
+    # add_persp_rel_google_perspectives(google_candidates)
+    remove_redundant_gold_persp_rel_annotation()

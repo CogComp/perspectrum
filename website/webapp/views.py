@@ -183,7 +183,7 @@ def submit_rel_anno(request):
                 anno_entry.save()
 
         else:
-            return HttpResponse("Submission Failed! Annotation not valid.", status=400)
+            return HttpResponse("Empty Submission", status=200)
 
         # Update finished jobs in user session
         fj = set(json.loads(session.finished_jobs))
