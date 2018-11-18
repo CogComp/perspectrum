@@ -89,6 +89,7 @@ def add_persp_rel_google_perspectives(candidates_path):
         cid = PerspectiveRelation.objects.get(perspective_id=pid, author=PerspectiveRelation.GOLD).claim_id
 
         _google_cands = [_c for _c in c['candidates'] if validate_perspective(_c[0])]
+        added_persps = set()
         for gc in _google_cands[:5]:
             title = gc[0]
             _q = Perspective.objects.filter(title=title, source="google")
@@ -96,17 +97,30 @@ def add_persp_rel_google_perspectives(candidates_path):
                 continue
 
             _p = _q.first()
-            _rel = PerspectiveRelation.objects.create(claim_id=cid, perspective_id=_p.id, author=PerspectiveRelation.GOLD,
-                                                    rel="N", comment="google")
-            _rel.save()
+            if _p.id not in added_persps:
+                _rel = PerspectiveRelation.objects.create(claim_id=cid, perspective_id=_p.id, author=PerspectiveRelation.GOLD,
+                                                        rel="N", comment="google")
+                added_persps.add(_p.id)
+                _rel.save()
+
+
+def remove_redundant_gold_persp_rel_annotation():
+    count = 0
+    for p in PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD):
+        if PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=p.claim_id, perspective_id=p.perspective_id).count() > 1:
+            p.delete()
+            count+=1
+
+    print("Removed {} duplicate records. ".format(count))
 
 
 if __name__ == '__main__':
 
-    google_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_google_cands.json"
+    # google_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_google_cands.json"
     # lucene_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_lucene_cands.json"
 
     # google_perspectives_to_db(google_candidates)
     # lucene_perspectives_to_db(lucene_candidates)
 
-    add_persp_rel_google_perspectives(google_candidates)
+    # add_persp_rel_google_perspectives(google_candidates)
+    remove_redundant_gold_persp_rel_annotation()
