@@ -6,6 +6,13 @@ Update perspective equivalent candidates in db
 from webapp.models import *
 import json
 import sys
+from nltk import word_tokenize
+
+
+def validate_perspective(perspective_title):
+    toks = word_tokenize(perspective_title)
+    return len(toks) > 3
+
 
 def update_perspectives_in_db(persps, source):
     """
@@ -30,17 +37,24 @@ def google_perspectives_to_db(candidates_path):
     with open(candidates_path, 'r') as fin:
         cands = json.load(fin)
 
-    candidate_set = set()
     for c in cands:
         pid = c['persp_id']
         cur_p = Perspective.objects.get(id=pid)
         _cands_id = json.loads(cur_p.similar_persps)
-        for gc in c['candidates'][:5]:
+
+        _google_cands = [_c for _c in c['candidates'] if validate_perspective(_c[0])]
+        for gc in _google_cands[:5]:
             title = gc[0]
-            candidate_set.add(title)
-            _p = Perspective.objects.create(source='google', title=title)
-            _p.save()
-            _cands_id.append(_p.id)
+            _q = Perspective.objects.filter(title=title)
+            if _q.count() > 0:
+                _p = _q.first()
+            else:
+                _p = Perspective.objects.create(source='google', title=title)
+                _p.save()
+
+            cand_pid = _p.id
+            if cand_pid not in _cands_id:
+                _cands_id.append(cand_pid)
 
         cur_p.similar_persps = _cands_id
         cur_p.save()
@@ -66,24 +80,33 @@ def lucene_perspectives_to_db(candidates_path):
         cur_p.save()
 
 
-def add_persp_rel_google_perspectives():
-    q = Perspective.objects.all().exclude(similar_persps="[]")
-    for p in q:
-        pid = p.id
-        cid = PerspectiveRelation.objects.get(perspective_id=pid, author=PerspectiveRelation.GOLD).claim_id
-        google_pids = json.loads(p.similar_persps)[:5]
+def add_persp_rel_google_perspectives(candidates_path):
+    with open(candidates_path, 'r') as fin:
+        cands = json.load(fin)
 
-        for gpid in google_pids:
-            _p = PerspectiveRelation.objects.create(claim_id=cid, perspective_id=gpid, author=PerspectiveRelation.GOLD,
-                                               rel="N", comment="google")
-            _p.save()
+    for c in cands:
+        pid = c['persp_id']
+        cid = PerspectiveRelation.objects.get(perspective_id=pid, author=PerspectiveRelation.GOLD).claim_id
+
+        _google_cands = [_c for _c in c['candidates'] if validate_perspective(_c[0])]
+        for gc in _google_cands[:5]:
+            title = gc[0]
+            _q = Perspective.objects.filter(title=title, source="google")
+            if _q.count() == 0:
+                continue
+
+            _p = _q.first()
+            _rel = PerspectiveRelation.objects.create(claim_id=cid, perspective_id=_p.id, author=PerspectiveRelation.GOLD,
+                                                    rel="N", comment="google")
+            _rel.save()
+
 
 if __name__ == '__main__':
 
-    # google_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_google_cands.json"
+    google_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_google_cands.json"
     # lucene_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_lucene_cands.json"
 
     # google_perspectives_to_db(google_candidates)
     # lucene_perspectives_to_db(lucene_candidates)
 
-    add_persp_rel_google_perspectives()
+    add_persp_rel_google_perspectives(google_candidates)
