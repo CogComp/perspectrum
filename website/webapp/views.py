@@ -182,9 +182,6 @@ def submit_rel_anno(request):
                                                                 perspective_id=persp_id, rel=rel, comment="turk_google")
                 anno_entry.save()
 
-        else:
-            return HttpResponse("Empty Submission", status=200)
-
         # Update finished jobs in user session
         fj = set(json.loads(session.finished_jobs))
         fj.add(int(claim_id))
