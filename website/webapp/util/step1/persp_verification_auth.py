@@ -11,7 +11,7 @@ def get_persp_hit_session(username):
     if unfinished_sessions.count() > 0:
         session = unfinished_sessions[0]
     else:
-        num_jobs = 5
+        num_jobs = 8
         claim_ids = generate_persp_jobs(username, num_jobs)
         time_now = datetime.datetime.now(datetime.timezone.utc)
         session = HITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_jobs=json.dumps([]),
