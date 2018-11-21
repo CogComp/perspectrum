@@ -87,3 +87,17 @@ class EquivalenceAnnotation(models.Model):
     perspective_id = models.IntegerField()
     user_choice = models.TextField(default="[]") # A json serialized list of perspective ids
 
+
+# Experiment results
+class ReStep1Results(models.Model):
+    claim_id = models.IntegerField()
+    perspective_id = models.IntegerField()
+    vote_support = models.IntegerField(default=0)
+    vote_leaning_support = models.IntegerField(default=0)
+    vote_leaning_undermine = models.IntegerField(default=0)
+    vote_undermine = models.IntegerField(default=0)
+    vote_not_valid = models.IntegerField(default=0)
+    p_i_5 = models.FloatField(default=0)
+    p_i_3 = models.FloatField(default=0)
+
+
