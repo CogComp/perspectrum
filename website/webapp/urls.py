@@ -30,7 +30,7 @@ urlpatterns = [
     path('get_json/', views.get_json),
     path('claims/', views.vis_claims),
     path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives"),
-
+    path('vis_spectrum/<slug:claim_id>', views.vis_spectrum, name="vis_spectrum"),
     # step 1
     path('step1/task_list/', views.render_list_page, name="task_list"),
     path('step1/instructions/', views.render_instructions, name="instructions"),

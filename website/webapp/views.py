@@ -100,6 +100,29 @@ def vis_claims(request):
     }
     return render(request, 'claims.html', context)
 
+@login_required
+def vis_spectrum(request, claim_id):
+    claim = Claim.objects.get(id=claim_id)
+
+    categories = [[] for _ in range(5)]
+
+    pq = ReStep1Results.objects.filter(claim_id=claim.id, p_i_3__gte=0.5)
+    for r in pq:
+        p = Perspective.objects.get(id=r.perspective_id)
+        votes = [r.vote_support, r.vote_leaning_support, r.vote_leaning_undermine, r.vote_undermine, r.vote_not_valid]
+        idx = votes.index(max(votes))
+        categories[idx].append(p)
+
+    context = {
+        "claim": claim,
+        "sup": categories[0],
+        "lsup": categories[1],
+        "lund": categories[2],
+        "und": categories[3],
+        "nv": categories[4],
+    }
+    return render(request, 'step1/vis_spectrum.html', context)
+
 
 @login_required
 def vis_persps(request, claim_id):
@@ -276,7 +299,7 @@ def vis_normalize_persp(request, claim_id):
     except Claim.DoesNotExist:
         pass  # TODO: Do something? 404?
 
-    perspective_pool = get_all_original_persp(claim_id)
+    perspective_pool = get_all_google_persp(claim_id)
 
     return render(request, 'step1/normalize_persp.html', {
         "claim": claim,
