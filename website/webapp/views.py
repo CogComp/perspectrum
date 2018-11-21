@@ -299,7 +299,7 @@ def vis_normalize_persp(request, claim_id):
     except Claim.DoesNotExist:
         pass  # TODO: Do something? 404?
 
-    perspective_pool = get_all_google_persp(claim_id)
+    perspective_pool = get_all_persp(claim_id)
 
     return render(request, 'step1/normalize_persp.html', {
         "claim": claim,
