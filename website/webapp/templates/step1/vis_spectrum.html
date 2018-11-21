@@ -34,7 +34,7 @@
                 <h6 style="color: green; font-weight: bold">Support</h6>
                 {% for persp in sup %}
                 <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
-                        {{ persp.id }}:&nbsp;&nbsp;{{ persp.title }}
+                        {{ persp.id }} ({{ persp.source }}):&nbsp;&nbsp;{{ persp.title }}
                 </a>
                 {% endfor %}
             </div>
@@ -42,7 +42,7 @@
                 <h6 style="color: limegreen; font-weight: bold">Leaning Support</h6>
                 {% for persp in lsup %}
                 <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
-                        {{ persp.id }}:&nbsp;&nbsp;{{ persp.title }}
+                        {{ persp.id }} ({{ persp.source }}):&nbsp;&nbsp;{{ persp.title }}
                 </a>
                 {% endfor %}
             </div>
@@ -50,7 +50,7 @@
                 <h6 style="color: lightcoral; font-weight: bold">Leaning Undermine</h6>
                 {% for persp in lund %}
                 <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
-                        {{ persp.id }}:&nbsp;&nbsp;{{ persp.title }}
+                        {{ persp.id }} ({{ persp.source }}):&nbsp;&nbsp;{{ persp.title }}
                 </a>
                 {% endfor %}
             </div>
@@ -58,7 +58,7 @@
                 <h6 style="color: red; font-weight: bold">Undermine</h6>
                 {% for persp in und %}
                 <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
-                        {{ persp.id }}:&nbsp;&nbsp;{{ persp.title }}
+                        {{ persp.id }} ({{ persp.source }}): &nbsp;{{ persp.title }}
                 </a>
                 {% endfor %}
             </div>
@@ -66,7 +66,7 @@
                 <h6 style="color: black; font-weight: bold">Not Valid</h6>
                 {% for persp in nv %}
                 <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
-                        {{ persp.id }}:&nbsp;&nbsp;{{ persp.title }}
+                        {{ persp.id }} ({{ persp.source }}):&nbsp;&nbsp;{{ persp.title }}
                 </a>
                 {% endfor %}
             </div>
