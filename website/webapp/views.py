@@ -413,3 +413,107 @@ def step2_submit_instr(request):
         session.instruction_complete = True
         session.save()
         return HttpResponse("Submission Success!", status=200)
+
+
+"""
+Step 3 APIs 
+"""
+@login_required
+def render_evidence_verification(request, claim_id):
+    username = request.user.username
+    # session = get_persp_hit_session(username)
+    # session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
+    # session.save()
+    # try:
+    #     claim = Claim.objects.get(id=claim_id)
+    # except Claim.DoesNotExist:
+    #     pass  # TODO: Do something? 404?
+    #
+    # perspective_pool = get_all_persp(claim_id)
+    #
+    return render(request, 'step3/evidence_verification.html', {
+        # "claim": claim,
+        # "perspective_pool": perspective_pool
+    })
+
+def render_step3_task_list(request):
+
+    # username = request.user.username
+    # session = get_equivalence_hit_session(username)
+    #
+    # instr_complete = session.instruction_complete
+    # jobs = json.loads(session.jobs)
+    # finished = json.loads(session.finished_jobs)
+    #
+    # task_list = []
+    # for job in jobs:
+    #     task_list.append({
+    #         "id": job,
+    #         "done": job in finished
+    #     })
+    #
+    # tasks_are_done = all(item["done"] for item in task_list)
+    #
+    # task_id = -1
+    # if tasks_are_done:  # TODO: change this condition to if the user has completed the task
+    #     task_id = session.id
+    #     session.job_complete = True
+    #     session.save()
+    #
+    # context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
+    #
+    # return render(request, 'step2/task_list.html', context)
+    return render(request, 'step3/task_list.html', {})
+
+def render_step3_instructions(request):
+    return render(request, "step3/instructions.html", {})
+
+
+@login_required
+@csrf_protect
+def submit_evidence_annotation(request):
+    pass
+    # if request.method != 'POST':
+    #     raise ValueError("submit_rel_anno API only supports POST request")
+    # else:
+    #     claim_id = request.POST.get('claim_id')
+    #     annos = json.loads(request.POST.get('annotations'))
+    #     username = request.user.username
+    #     session = get_equivalence_hit_session(username)
+    #
+    #     # Update annotation in EquivalenceAnnotation table
+    #     for p, cands in annos.items():
+    #         EquivalenceAnnotation.objects.create(session_id=session.id, author=username,
+    #                                              perspective_id=p, user_choice=json.dumps(annos[p]))
+    #
+    #     # Update finished jobs in user session
+    #     fj = set(json.loads(session.finished_jobs))
+    #     fj.add(int(claim_id))
+    #     session.finished_jobs = json.dumps(list(fj))
+    #
+    #     # increment duration in database
+    #     delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
+    #     session.duration = session.duration + delta
+    #     session.save()
+    #
+    #     # Increment finished assignment count in claim table, if not using test acc
+    #     if username != 'TEST':
+    #         c = Claim.objects.get(claim_id=claim_id)
+    #         c.equivalence_finished_counts += 1
+    #         c.save()
+    #
+    #     return HttpResponse("Submission Success!", status=200)
+
+@login_required
+@csrf_protect
+def step3_submit_instr(request):
+    pass
+    # if request.method != 'POST':
+    #     raise ValueError("submit_instr API only supports POST request")
+    # else:
+    #     username = request.user.username
+    #     session = get_equivalence_hit_session(username)
+    #
+    #     session.instruction_complete = True
+    #     session.save()
+    #     return HttpResponse("Submission Success!", status=200)
