@@ -419,7 +419,7 @@ def step2_submit_instr(request):
 Step 3 APIs 
 """
 @login_required
-def vis_evidence_verification(request, claim_id):
+def render_evidence_verification(request, claim_id):
     username = request.user.username
     # session = get_persp_hit_session(username)
     # session.last_start_time = datetime.datetime.now(datetime.timezone.utc)

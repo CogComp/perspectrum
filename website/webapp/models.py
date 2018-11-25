@@ -16,8 +16,8 @@ class Claim(models.Model):
     finished_counts = models.IntegerField(default=0)
 
     # Human annotation counts for evidence verification
-    equivalence_assign_counts = models.IntegerField(default=0)
-    equivalence_finished_counts = models.IntegerField(default=0)
+    evidence_assign_counts = models.IntegerField(default=0)
+    evidence_finished_counts = models.IntegerField(default=0)
 
 
 class Evidence(models.Model):
