@@ -19,7 +19,7 @@
           integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous" />
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <title>Perspective Annotation Interface</title>
+    <title>Evidence Annotation Interface</title>
     <script src="{% static "js/csrf_util.js" %}"></script>
     <script src="{% static "js/login.js" %}"></script>
     {% csrf_token %}
@@ -39,11 +39,11 @@
         <div class="alert alert-secondary" role="alert">
             Here are the list of tasks. You have to read and pass the instructions in order to move on the annotation tasks.
 
-            <button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location='/step2/instructions/'">Instructions</button>
+            <button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location='/step3/instructions/'">Instructions</button>
 
             {% if instr_complete%}
                 {% for item in task_list %}
-                    <button type="button" class="btn btn-info btn-lg btn-block" onclick="window.location='/step2/perspective_equivalence/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
+                    <button type="button" class="btn btn-info btn-lg btn-block" onclick="window.location='/step/perspective_equivalence/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
                 {% endfor %}
             {% else %}
                 <br>

@@ -21,14 +21,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Perspective Annotation Interface</title>
     <script src="{% static "js/csrf_util.js" %}"></script>
-    <script src="{% static "js/step2/instr.js" %}"></script>
+    <script src="{% static "js/step3/instr.js" %}"></script>
     {% csrf_token %}
 </head>
 <body>
     <div class="container">
         <div class="login-page-title">
             <h5>
-                Perspective Equivalence Annotation Interface: Instructions
+                Evidence Annotation Interface: Instructions
             </h5>
             <p>
                 Welcome, Worker ID: {{ request.user.username }}! <button type="button" class="btn btn-danger btn-sm" onclick="window.location='/logout/'">Logout</button>
@@ -37,104 +37,106 @@
 
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/step2/task_list/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/step3/task_list/">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Instructions</li>
           </ol>
         </nav>
 
         <div class="rel_option_container">
-            For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an argument</font> with respect to it (either supporting or undermining it).
-            In addition, you are given a list of <font color="red">candidate arguments</font> that are topically relevant to the given problem. <br>
-            We want you to select all the items (from the list of given <font color="green">candidate arguments</font>) that convey the same points, as to the given <font color="green">argument</font>.
+            In this task, we would like to annotate all <font color="red">the claims</font> that are supported by the provided <font color="blue">paragraph</font>.
+            In other words, do you think the evidences provided in <font color="blue">the paragraph</font> sufficiently explain <font color="red">each claim</font> or not.
+            <br>
 
             Please solve the following examples, according the above instructions:
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Among the following <font color="red"> candidate arguments</font>, select the one(s) that express the <strong>exact same</strong> idea as <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                    <p>Indicate whether each <font color="red">claim</font> is supported by the given <font color="blue">paragraph</font>:</p>
                   <hr>
                     <div class="row">
-                        <div class="col-4">
-                            <strong><h6 style="color: blue">Claim: </h6>The use of child performers should be banned. </strong>
+                        <div class="col-7">
+                            <strong><h6 style="color: blue">Paragraph: </h6></strong>
+                                <p>
+                                    This
+                                </p>
+
                         </div>
                     <div class="col-sm">
-                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> Being a performer can make the child physically vulnerable. </span>
-                        <hr>
                         <div class="rel-q1" id="q1">
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Are Children Who Appear on Reality Television Adequately Protected by Federal and State Law?</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font> Are Children Who Appear on Reality Television Adequately Protected by Federal and State Law?</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
                                             <input name="check11" type="radio" id="check11_same" value="same" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
                                             <input name="check11" type="radio" id="check11_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Why Congress Should Protect Children in Reality Programming</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font> Why Congress Should Protect Children in Reality Programming</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
                                             <input name="check12" type="radio" id="check12_same" value="same" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
                                             <input name="check12" type="radio" id="check12_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Keep Out of Reach of Children</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font> Keep Out of Reach of Children</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
                                             <input name="check13" type="radio" id="check13_same" value="same" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
                                             <input name="check13" type="radio" id="check13_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Forced child performance could physically harm children.</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font> Forced child performance could physically harm children.</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
                                             <input name="check14" type="radio" id="check14_same" value="same" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
                                             <input name="check14" type="radio" id="check14_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
@@ -145,7 +147,7 @@
                   </div>
                 </div>
                 <div class="alert alert-success" id="q1-succc" role="alert" style="display: none">
-                    Correct! Only the fourth argument expresses the <b>exact same</b> idea as the given argument.
+                    Correct!
                 </div>
                 <div class="alert alert-danger"  id="q1-fail" role="alert" style="display: none">
                   Not correct! Give it another try ...
@@ -156,91 +158,92 @@
 
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Among the following <font color="red"> candidate arguments</font>, select the one(s) that express the <strong>exact same</strong> idea as <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                    <p>Indicate whether each <font color="red">claim</font> is supported by the given <font color="blue">paragraph</font>:</p>
                   <hr>
                     <div class="row">
-                        <div class="col-4">
-                            <strong><h6 style="color: blue">Claim: </h6>Trade is better than aid.  </strong>
+                        <div class="col-7">
+                            <strong><h6 style="color: blue">Paragraph: </h6></strong>
+                            <p>
+
+                            </p>
                         </div>
                     <div class="col-sm">
-                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> Trade does not allocate resources effectively. </span>
-                        <hr>
                         <div class="rel-q1" id="q2">
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> How Economic Systems Allocate Resources Effectively</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font> How Economic Systems Allocate Resources Effectively</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
                                             <input name="check21" type="radio" id="check21_same" value="same" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
                                             <input name="check21" type="radio" id="check21_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Trade not Aid</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font> Trade not Aid</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
                                             <input name="check22" type="radio" id="check22_same" value="same" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
                                             <input name="check22" type="radio" id="check22_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Trade is unlikely to result in an effective end.</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font> Trade is unlikely to result in an effective end.</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
                                             <input name="check23" type="radio" id="check23_same" value="same" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
                                             <input name="check23" type="radio" id="check23_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Trade is unlikely to result in an effective end.</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font> Trade is unlikely to result in an effective end.</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
                                             <input name="check24" type="radio" id="check24_same" value="same" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
                                             <input name="check24" type="radio" id="check24_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
@@ -251,7 +254,7 @@
                   </div>
                 </div>
                 <div class="alert alert-success" id="q2-succc" role="alert" style="display: none">
-                    Correct! Only the third argument expresses the <b>exact same</b> idea as the given argument.
+                    Correct!
                 </div>
                 <div class="alert alert-danger"  id="q2-fail" role="alert" style="display: none">
                   Not correct! Give it another try ...
