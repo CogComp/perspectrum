@@ -101,3 +101,13 @@ class ReStep1Results(models.Model):
     p_i_3 = models.FloatField(default=0)
 
 
+# Evidence
+class EvidenceHITSession(models.Model):
+    username = models.CharField(max_length=100)
+    instruction_complete = models.BooleanField(default=False)
+    job_complete = models.BooleanField(default=False)
+    jobs = models.TextField()  # a list of integer claim ids
+    finished_jobs = models.TextField()
+    duration = models.DurationField()
+    last_start_time = models.DateTimeField(null=True) # Used to calculate duration
+
