@@ -11,14 +11,13 @@ def update_persp_candidates():
     Update persp candidates in evidence table
     :return:
     """
-    pilot12_result = "/home/squirrel/ccg-new/projects/perspective/data/pilot12_evidence_verification/perspective_candidates.json"
+    pilot12_result = "/home/squirrel/ccg-new/projects/perspective/data/pilot12_evidence_verification/reverse_persp_candidates.json"
     with open(pilot12_result) as fin:
         pilot12_data = json.load(fin)
 
-    for evi_data in pilot12_data:
-        eid = evi_data['evidence_id']
+    for eid, cands in pilot12_data.items():
         evi = Evidence.objects.get(id=eid)
-        p_cands = [c[2] for c in evi_data['candidates']]
+        p_cands = [c[1] for c in cands]
 
         origin_p_cands = [c for c in p_cands if c <= th]
         google_p_cands = [c for c in p_cands if c > th]
@@ -37,7 +36,7 @@ def update_persp_candidates():
 
 
 def generate_evidence_batch(num_evidence_each_bin=10):
-    id_list = Evidence.objects.all().values_list('id', flat=True)
+    id_list = Evidence.objects.all().exclude(content="").values_list('id', flat=True)
 
     bin = []
     for id in id_list:
@@ -52,5 +51,5 @@ def generate_evidence_batch(num_evidence_each_bin=10):
 
 
 if __name__ == '__main__':
-    update_persp_candidates()
-    # generate_evidence_batch()
+    # update_persp_candidates()
+    generate_evidence_batch()
