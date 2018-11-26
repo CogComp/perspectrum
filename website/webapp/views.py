@@ -12,6 +12,8 @@ from .forms import ContactForm
 from webapp.models import *
 from webapp.util.step1.persp_verification_auth import get_persp_hit_session
 from webapp.util.step2.equivalence_auth import get_equivalence_hit_session
+from webapp.util.step3.evidence_auth import get_evidence_hit_session
+
 import datetime
 
 file_names = {
@@ -418,102 +420,124 @@ def step2_submit_instr(request):
 """
 Step 3 APIs 
 """
+
+num_original_persps = 4
+num_google_persps = 1
+
 @login_required
-def render_evidence_verification(request, claim_id):
+def render_evidence_verification(request, batch_id):
     username = request.user.username
-    # session = get_persp_hit_session(username)
-    # session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
-    # session.save()
-    # try:
-    #     claim = Claim.objects.get(id=claim_id)
-    # except Claim.DoesNotExist:
-    #     pass  # TODO: Do something? 404?
-    #
-    # perspective_pool = get_all_persp(claim_id)
-    #
+    session = get_evidence_hit_session(username)
+    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
+    session.save()
+    try:
+        eb = EvidenceBatch.objects.get(id=batch_id)
+    except EvidenceBatch.DoesNotExist:
+        pass  # TODO: Do something? 404?
+
+    eids = json.loads(eb.evidence_ids)
+    evidences = [Evidence.objects.get(id=i) for i in eids]
+
+    candidates = {}
+    for evi in evidences:
+        origin_cands = json.loads(evi.origin_candidates)
+        google_cands = json.loads(evi.google_candidates)
+
+        all_cands = origin_cands[:num_original_persps] + google_cands[:num_google_persps]
+
+        persps = [Perspective.objects.get(id=i) for i in all_cands[:1]]
+        candidates[evi.id] = persps
+
     return render(request, 'step3/evidence_verification.html', {
-        # "claim": claim,
-        # "perspective_pool": perspective_pool
+        "evidences": evidences,
+        "candidates": candidates
     })
+
 
 def render_step3_task_list(request):
 
-    # username = request.user.username
-    # session = get_equivalence_hit_session(username)
-    #
-    # instr_complete = session.instruction_complete
-    # jobs = json.loads(session.jobs)
-    # finished = json.loads(session.finished_jobs)
-    #
-    # task_list = []
-    # for job in jobs:
-    #     task_list.append({
-    #         "id": job,
-    #         "done": job in finished
-    #     })
-    #
-    # tasks_are_done = all(item["done"] for item in task_list)
-    #
-    # task_id = -1
-    # if tasks_are_done:  # TODO: change this condition to if the user has completed the task
-    #     task_id = session.id
-    #     session.job_complete = True
-    #     session.save()
-    #
-    # context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
-    #
-    # return render(request, 'step2/task_list.html', context)
-    return render(request, 'step3/task_list.html', {})
+    username = request.user.username
+    session = get_evidence_hit_session(username)
+
+    instr_complete = session.instruction_complete
+    jobs = json.loads(session.jobs)
+    finished = json.loads(session.finished_jobs)
+
+    task_list = []
+    for job in jobs:
+        task_list.append({
+            "id": job,
+            "done": job in finished
+        })
+
+    tasks_are_done = all(item["done"] for item in task_list)
+
+    task_id = -1
+    if tasks_are_done:  # TODO: change this condition to if the user has completed the task
+        task_id = session.id
+        session.job_complete = True
+        session.save()
+
+    context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
+
+    return render(request, 'step3/task_list.html', context)
+
 
 def render_step3_instructions(request):
     return render(request, "step3/instructions.html", {})
 
 
+evidence_label_mapping = {
+    "sup" : "S",
+    "nsup" : "N"
+}
+
 @login_required
 @csrf_protect
 def submit_evidence_annotation(request):
     pass
-    # if request.method != 'POST':
-    #     raise ValueError("submit_rel_anno API only supports POST request")
-    # else:
-    #     claim_id = request.POST.get('claim_id')
-    #     annos = json.loads(request.POST.get('annotations'))
-    #     username = request.user.username
-    #     session = get_equivalence_hit_session(username)
-    #
-    #     # Update annotation in EquivalenceAnnotation table
-    #     for p, cands in annos.items():
-    #         EquivalenceAnnotation.objects.create(session_id=session.id, author=username,
-    #                                              perspective_id=p, user_choice=json.dumps(annos[p]))
-    #
-    #     # Update finished jobs in user session
-    #     fj = set(json.loads(session.finished_jobs))
-    #     fj.add(int(claim_id))
-    #     session.finished_jobs = json.dumps(list(fj))
-    #
-    #     # increment duration in database
-    #     delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
-    #     session.duration = session.duration + delta
-    #     session.save()
-    #
-    #     # Increment finished assignment count in claim table, if not using test acc
-    #     if username != 'TEST':
-    #         c = Claim.objects.get(claim_id=claim_id)
-    #         c.equivalence_finished_counts += 1
-    #         c.save()
-    #
-    #     return HttpResponse("Submission Success!", status=200)
+    if request.method != 'POST':
+        raise ValueError("submit_rel_anno API only supports POST request")
+    else:
+        batch_id = request.POST.get('batch_id')
+        annos = json.loads(request.POST.get('annotations'))
+        username = request.user.username
+        session = get_evidence_hit_session(username)
+
+        # Update annotation in EquivalenceAnnotation table
+        for anno in annos:
+            label = anno[2]
+            if label in evidence_label_mapping:
+                EvidenceRelation.objects.create(author=username, evidence_id=anno[0], perspective_id=anno[1],
+                                            anno=evidence_label_mapping[label])
+
+        # Update finished jobs in user session
+        fj = set(json.loads(session.finished_jobs))
+        fj.add(int(batch_id))
+        session.finished_jobs = json.dumps(list(fj))
+
+        # increment duration in database
+        delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
+        session.duration = session.duration + delta
+        session.save()
+
+        # Increment finished assignment count in claim table, if not using test acc
+        if username != 'TEST':
+            c = EvidenceBatch.objects.get(id=batch_id)
+            c.finished_counts += 1
+            c.save()
+
+        return HttpResponse("Submission Success!", status=200)
 
 @login_required
 @csrf_protect
 def step3_submit_instr(request):
-    pass
-    # if request.method != 'POST':
-    #     raise ValueError("submit_instr API only supports POST request")
-    # else:
-    #     username = request.user.username
-    #     session = get_equivalence_hit_session(username)
-    #
-    #     session.instruction_complete = True
-    #     session.save()
-    #     return HttpResponse("Submission Success!", status=200)
+    if request.method != 'POST':
+        raise ValueError("submit_instr API only supports POST request")
+    else:
+        username = request.user.username
+        session = get_evidence_hit_session(username)
+
+        session.instruction_complete = True
+        session.save()
+        return HttpResponse("Submission Success!", status=200)

@@ -1,7 +1,6 @@
 $(document).ready(function () {
     csrfSetup();
-    let submitted = false;
-    let alerted = false;
+
     $('#rel_option_clear').click(function() {
         $('.custom-checkbox').prop('checked', false);
     });
@@ -17,7 +16,7 @@ $(document).ready(function () {
 function submit() {
 
     // Get all annotations
-    let annos = {};
+    let annos = [];
     let radios = $("input.equi_option");
     let checked = radios.filter(':checked');
 
@@ -28,25 +27,18 @@ function submit() {
 
     checked.each(function() {
         let el_id = $(this).attr('id').split("_");
-        let cand_id = el_id.pop();
+        let value = $(this).val();
         let persp_id = el_id.pop();
+        let evi_id = el_id.pop();
 
-        if (el_id.pop() === 'same') {
-            if (persp_id in annos) {
-                annos[persp_id].push(cand_id);
-            }
-            else {
-                annos[persp_id] = [cand_id]
-            }
-        }
-
+        annos.push([evi_id, persp_id, value])
     });
 
     let annos_json = JSON.stringify(annos);
 
-    let claim_id = $(location).attr('href').split('/').pop();
-    $.post("/step3/api/submit_equivalence_annotation", {
-        "claim_id": claim_id,
+    let batch_id = $(location).attr('href').split('/').pop();
+    $.post("/step3/api/submit_annotation", {
+        "batch_id": batch_id,
         "annotations": annos_json
     }, success_callback).fail(enable_submit_button)
 }

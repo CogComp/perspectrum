@@ -21,57 +21,58 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Perspective Annotation Interface</title>
     <script src="{% static "js/csrf_util.js" %}"></script>
-    <script src="{% static "js/step2/persp_equivalence.js" %}"></script>
+    <script src="{% static "js/step3/evidence_verification.js" %}"></script>
     {% csrf_token %}
 </head>
 <body>
     <div class="container">
         <h4 class="rel_claim_title pallete pallete-peter-river">
-            Perspective Equivalence Annotation Interface
+            Evidence Annotation Interface
         </h4>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/step2/task_list/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/step3/task_list/">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Task</li>
           </ol>
         </nav>
 
-        <div class="rel_instr_container">
-            For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an argument</font> with respect to it (either supporting or undermining it).
-            In addition, you are given a list of <font color="red">candidate arguments</font> that are topically relevant to the given problem. <br>
-            We want you to select all the items (from the list of given <font color="green">candidate arguments</font>) that convey the same points, as to the given <font color="green">argument</font>.
-        </div>
-
         <div class="rel_option_container">
-            {% for persp in perspective_pool %}
+            In this task, we would like to annotate all <font color="red">the claims</font> that are supported by the provided <font color="blue">paragraph</font>.
+            In other words, do you think the evidences provided in <font color="blue">the paragraph</font> sufficiently explain <font color="red">each claim</font> or not.
+            <br>
+
+            Please solve the following examples, according the above instructions:
+
+            {% for evi in evidences %}
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Among the following <font color="red">arguments</font>, select the one(s) that express the <strong>exact same</strong> idea as <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                    <p>Indicate whether each <font color="red">claim</font> is supported by the given <font color="blue">paragraph</font>:</p>
                   <hr>
                     <div class="row">
-                        <div class="col-4">
-                            <strong><h6 style="color: blue">Claim: </h6>{{ claim.title }} </strong>
+                        <div class="col-7">
+                            <strong><h6 style="color: blue">Paragraph: </h6></strong>
+                                <p> {{ evi.content }}
+                                </p>
+
                         </div>
                     <div class="col-sm">
-                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> {{ persp.title }} </span>
-                        <hr>
-                        <div class="rel-q1">
-                            {% for cand in candidates|dict_get_item:persp.id%}
+                        <div class="rel-q1" id="q1">
+                            {% for persp in candidates|dict_get_item:evi.id %}
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> {{ cand.title }}</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Claim:</strong> </font>{{ persp.title }}</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
-                                            <input name="equi_{{ persp.id }}_{{ cand.id }}" type="radio" id="equi_same_{{ persp.id }}_{{ cand.id }}" value="equi_{{ persp_id }}_{{ cand.id }}" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
+                                            <b>Supported</b>
                                         </label>
                                     </div>
-                                    <div class="col-4">
+                                    <div class="col-5">
                                         <label class="radio rel_option_radio">
-                                            <input name="equi_{{ persp.id }}_{{ cand.id }}" type="radio" id="equi_diff_{{ persp.id }}_{{ cand.id }}" value="equi_{{ persp.id }}_{{ cand.id }}" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
+                                            <b>Not supported</b>
                                         </label>
                                     </div>
                                 </div>
