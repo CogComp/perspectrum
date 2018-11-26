@@ -10,7 +10,7 @@ def get_evidence_hit_session(username):
     if unfinished_sessions.count() > 0:
         session = unfinished_sessions[0]
     else:
-        claim_ids = generate_evidence_jobs_pilot(username, 5)
+        claim_ids = generate_evidence_jobs_pilot(username, 3)
         time_now = datetime.datetime.now(datetime.timezone.utc)
         session = EvidenceHITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_jobs=json.dumps([]),
                                                        instruction_complete=evidence_instr_needed(username), duration=datetime.timedelta(),
@@ -71,4 +71,4 @@ def generate_evidence_jobs(username, num_evidences):
     return jobs
 
 def generate_evidence_jobs_pilot(username, num_evidences):
-    return [100, 200, 300, 400, 500]
+    return [900, 1100, 1300]
