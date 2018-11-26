@@ -29,6 +29,7 @@ urlpatterns = [
     path('main/', views.main_page, name="main_page"),
     path('get_json/', views.get_json),
     path('claims/', views.vis_claims),
+    path('personality/', views.personality),
     path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives"),
     path('vis_spectrum/<slug:claim_id>', views.vis_spectrum, name="vis_spectrum"),
 

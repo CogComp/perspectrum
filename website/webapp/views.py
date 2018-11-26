@@ -80,6 +80,9 @@ def get_json(request):
     data = load_json(file_names["iDebate"])
     return JsonResponse({"data": data})
 
+def personality(request):
+    context = { }
+    return render(request, 'personality.html', context)
 
 @login_required
 def main_page(request):
