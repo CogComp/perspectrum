@@ -44,7 +44,7 @@ def createIndices(indices_name, data):
         return
 
     es.indices.create(indices_name)
-    for idx, doc in enumerate(data):
+    for idx, doc in enumerate(data):    
         print("Processing id: {}".format(idx))
         es.index(index=indices_name, doc_type='text', id=idx, body=doc)
 

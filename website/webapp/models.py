@@ -23,6 +23,8 @@ class Claim(models.Model):
 class Evidence(models.Model):
     source = models.CharField(max_length=50)
     content = models.TextField()
+    origin_candidates = models.TextField(default="[]")
+    google_candidates = models.TextField(default="[]")
 
 
 class PerspectiveRelation(models.Model):
@@ -50,9 +52,14 @@ class EvidenceRelation(models.Model):
     Relation annotation between evidence and perspective
     """
     GOLD = 'GOLD'
+    REL = (
+        ('S', 'Supported'),
+        ('N', 'Not_Supported')
+    )
     author = models.CharField(max_length=100)
     perspective_id = models.IntegerField()
     evidence_id = models.IntegerField()
+    anno = models.CharField(max_length=1, choices=REL, default='S')
     comment = models.TextField(null=True)
 
 
@@ -111,3 +118,9 @@ class EvidenceHITSession(models.Model):
     duration = models.DurationField()
     last_start_time = models.DateTimeField(null=True) # Used to calculate duration
 
+
+# Evidence Batch for step3
+class EvidenceBatch(models.Model):
+    evidence_ids = models.TextField(default="[]") # list of integer evidence ids
+    assign_counts = models.IntegerField(default=0)
+    finished_counts = models.IntegerField(default=0)

@@ -50,7 +50,7 @@ urlpatterns = [
     path('step2/api/submit_instr/', views.step2_submit_instr, name="step2_submit_instr"),
 
     # step 3
-    path('step3/verify_evidence/<slug:claim_id>', views.render_evidence_verification, name="verify_evidence"),
+    path('step3/verify_evidence/<slug:batch_id>', views.render_evidence_verification, name="verify_evidence"),
     path('step3/instructions/', views.render_step3_instructions, name="step3_instructions"),
     path('step3/task_list/', views.render_step3_task_list, name="step3_task_list"),
     path('step3/api/submit_annotation', views.submit_evidence_annotation,
