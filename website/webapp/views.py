@@ -445,7 +445,7 @@ def render_evidence_verification(request, batch_id):
 
         all_cands = origin_cands[:num_original_persps] + google_cands[:num_google_persps]
 
-        persps = [Perspective.objects.get(id=i) for i in all_cands[:1]]
+        persps = [Perspective.objects.get(id=i) for i in all_cands]
         candidates[evi.id] = persps
 
     return render(request, 'step3/evidence_verification.html', {
