@@ -1,0 +1,89 @@
+{% load static %}
+{% load claim_filter %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
+          integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Evidence Annotation Interface</title>
+    <script src="{% static "js/csrf_util.js" %}"></script>
+    {% csrf_token %}
+</head>
+<body>
+    <div class="container">
+        <div class="login-page-title">
+            <h5>
+                Evidence Annotation Interface
+            </h5>
+            <p>
+                Welcome, Worker ID: {{ request.user.username }}!  <button type="button" class="btn btn-danger btn-sm" onclick="window.location='/logout/'">Logout</button>
+            </p>
+        </div>
+
+
+        <div class="alert alert-secondary" role="alert">
+            Here are the list of tasks. You have to read and pass the instructions in order to move on the annotation tasks.
+
+            <button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location='/step3/instructions/'">Instructions</button>
+
+            {% if instr_complete%}
+                {% for item in task_list %}
+                    <button type="button" class="btn btn-info btn-lg btn-block" onclick="window.location='/step3/verify_evidence/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
+                {% endfor %}
+            {% else %}
+                <br>
+                <div style="text-align: center; align-content: center">
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        Out records show that you haven't finished the instructions. The tasks below will be open after you finish them.
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                </div>
+                <br>
+                {% for item in task_list %}
+                    <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="window.location='/step3/verify_evidence/{{ item.id }}'" disabled>Task {{ forloop.counter }}</button>
+                {% endfor %}
+            {% endif %}
+        </div>
+
+        <br>
+
+        <div class="alert alert-warning" role="alert">
+            if you have any concerns please let us know:
+            <button type="button" class="btn btn-primary" onclick="window.location='/contact/'">Contact us</button>
+        </div>
+
+        <br>
+
+        {% if task_id > 0%}
+        <div class="alert alert-danger" role="alert">
+            <p>Thanks for the annotation task! Please copy the following code and enter it in the Mechanical Turk interface:</p>
+            <p>(Note that this is your <strong>ONLY</strong> chance to do so! Don't close the tab until you have saved the code)</p>
+
+            <div style="text-align: center; align-content: center">
+                <div style="text-align: center; align-content: center; width: 100pt; margin: 0 auto;">
+                    <input type="email" class="form-control" value= "{{ task_id }}" style="text-align: center; font-weight: bold; font-size: larger;">
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+    </div>
+
+</body>
+</html>
