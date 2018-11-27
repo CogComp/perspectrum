@@ -2,6 +2,20 @@ from webapp.models import *
 import pandas as pd
 import sys
 
+label_5 = ["S", "A", "B", "U", "N"]
+label_3 = ["S", "U", "N"]
+
+def update_labels():
+    results = ReStep1Results.objects.all()
+
+    for r in results:
+        s = r.vote_support
+        a = r.vote_leaning_support
+        b = r.vote_leaning_undermine
+        u = r.vote_undermine
+        n = r.vote_not_valid
+        votes_5 = [s, a, b, u, n]
+
 if __name__ == '__main__':
 
     if len(sys.argv) != 3:
