@@ -4,3 +4,5 @@ httplib2>=0.10.3
 requests>2.18
 django-mathfilters>=0.4.0
 requests
+matplotlib
+sklearn
