@@ -19,6 +19,9 @@ class Claim(models.Model):
     evidence_assign_counts = models.IntegerField(default=0)
     evidence_finished_counts = models.IntegerField(default=0)
 
+    # Keywords
+    keywords = models.TextField(default="[]") # List of string keywords
+
 
 class Evidence(models.Model):
     source = models.CharField(max_length=50)
