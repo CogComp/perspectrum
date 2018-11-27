@@ -2,8 +2,18 @@ from webapp.models import *
 import pandas as pd
 import sys
 
-label_5 = ["S", "A", "B", "U", "N"]
-label_3 = ["S", "U", "N"]
+LABEL_5 = ["S", "A", "B", "U", "N"]
+LABEL_3 = ["S", "U", "N"]
+DUPLICATE_VOTE_LABEL = "D"
+
+
+def get_majority_vote_label(votes, label_set, duplicate_maj_vote_label=DUPLICATE_VOTE_LABEL):
+    max_val = max(votes)
+    if votes.count(max_val) > 1:
+        return duplicate_maj_vote_label
+    else:
+        return label_set[votes.index(max_val)]
+
 
 def update_labels():
     results = ReStep1Results.objects.all()
@@ -15,6 +25,10 @@ def update_labels():
         u = r.vote_undermine
         n = r.vote_not_valid
         votes_5 = [s, a, b, u, n]
+        votes_3 = [s + a, b + u, n]
+        r.label_3 = get_majority_vote_label(votes_3, LABEL_3)
+        r.label_5 = get_majority_vote_label(votes_5, LABEL_5)
+        r.save()
 
 if __name__ == '__main__':
 
@@ -45,3 +59,5 @@ if __name__ == '__main__':
                                       vote_undermine=row["und"], vote_not_valid=row["not_valid"], p_i_5=row["P_i_5_labels"],
                                       p_i_3=row["P_i_3_labels"])
         r.save()
+
+    update_labels()
