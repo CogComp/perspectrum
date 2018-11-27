@@ -19,6 +19,9 @@ class Claim(models.Model):
     evidence_assign_counts = models.IntegerField(default=0)
     evidence_finished_counts = models.IntegerField(default=0)
 
+    # Keywords
+    keywords = models.TextField(default="[]") # List of string keywords
+
 
 class Evidence(models.Model):
     source = models.CharField(max_length=50)
@@ -97,6 +100,22 @@ class EquivalenceAnnotation(models.Model):
 
 # Experiment results
 class ReStep1Results(models.Model):
+    LABEL_5_CHOICES = (
+        ('S', 'Support'),
+        ('U', 'Undermine'),
+        ('A', 'Slight Support'),
+        ('B', 'Slight Undermine'),
+        ('N', 'Not Valid'),
+        ('D', 'Doesnt have Majority Vote')
+    )
+
+    LABEL_3_CHOICES = (
+        ('S', 'Support'),
+        ('U', 'Undermine'),
+        ('N', 'Not Valid'),
+        ('D', 'Doesnt have Majority Vote')
+    )
+
     claim_id = models.IntegerField()
     perspective_id = models.IntegerField()
     vote_support = models.IntegerField(default=0)
@@ -104,6 +123,8 @@ class ReStep1Results(models.Model):
     vote_leaning_undermine = models.IntegerField(default=0)
     vote_undermine = models.IntegerField(default=0)
     vote_not_valid = models.IntegerField(default=0)
+    label_5 = models.CharField(default='D', max_length=1, choices=LABEL_5_CHOICES)
+    label_3 = models.CharField(default='D', max_length=1, choices=LABEL_3_CHOICES)
     p_i_5 = models.FloatField(default=0)
     p_i_3 = models.FloatField(default=0)
 
