@@ -57,4 +57,8 @@ urlpatterns = [
     path('step3/api/submit_annotation', views.submit_evidence_annotation,
          name="submit_evidence_annotation"),
     path('step3/api/submit_instr/', views.step3_submit_instr, name="step3_submit_instr"),
+
+
+    # step 4
+    path('step4/task_list/', views.render_step4_task_list, name="step4_topic_annotation"),
 ]
