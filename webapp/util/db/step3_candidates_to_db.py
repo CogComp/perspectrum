@@ -1,7 +1,6 @@
 from webapp.models import *
 import json
 
-
 th = 8136
 num_original_cands = 4
 num_google_cands = 1
@@ -11,7 +10,8 @@ def update_persp_candidates():
     Update persp candidates in evidence table
     :return:
     """
-    pilot12_result = "/home/squirrel/ccg-new/projects/perspective/data/pilot12_evidence_verification/reverse_persp_candidates.json"
+    pilot12_result = "data/pilot12_evidence_verification/reverse_persp_candidates.json" # Only includes high quality perspectives WITH STANCES
+
     with open(pilot12_result) as fin:
         pilot12_data = json.load(fin)
 
@@ -30,9 +30,12 @@ def update_persp_candidates():
         else:
             origin_p_cands.insert(0, origin_p_cands.pop(origin_p_cands.index(gold_pid)))
 
-        evi.origin_candidates = json.dumps(origin_p_cands)
-        evi.google_candidates = json.dumps(google_p_cands)
-        evi.save()
+        try:
+            evi.origin_candidates = json.dumps(origin_p_cands)
+            evi.google_candidates = json.dumps(google_p_cands)
+            evi.save()
+        except Exception as e:
+            print(e)
 
 
 def generate_evidence_batch(num_evidence_each_bin=10):
