@@ -14,6 +14,7 @@ from webapp.util.step1.persp_verification_auth import get_persp_hit_session
 from webapp.util.step2.equivalence_auth import get_equivalence_hit_session
 from webapp.util.step3.evidence_auth import get_evidence_hit_session
 
+from collections import OrderedDict
 import datetime
 
 file_names = {
@@ -424,7 +425,7 @@ def step2_submit_instr(request):
 Step 3 APIs 
 """
 
-PERSP_NUM = 10
+PERSP_NUM = 8
 
 @login_required
 def render_evidence_verification(request, batch_id):
@@ -470,6 +471,7 @@ def render_evidence_verification(request, batch_id):
         keywords[evi.id] = _keywords
 
         all_cands = origin_cands + same_claim_cands + google_cands
+        all_cands = list(OrderedDict.fromkeys(all_cands))
         persps = [Perspective.objects.get(id=i) for i in all_cands[:PERSP_NUM]]
         candidates[evi.id] = persps
 
