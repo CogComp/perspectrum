@@ -15,6 +15,8 @@ def update_persp_candidates():
     with open(pilot12_result) as fin:
         pilot12_data = json.load(fin)
 
+    print(len(pilot12_data))
+
     for eid, cands in pilot12_data.items():
         evi = Evidence.objects.get(id=eid)
         p_cands = [c[1] for c in cands]
@@ -29,6 +31,9 @@ def update_persp_candidates():
             origin_p_cands.insert(0, gold_pid)
         else:
             origin_p_cands.insert(0, origin_p_cands.pop(origin_p_cands.index(gold_pid)))
+
+        if eid == 1:
+            print(origin_p_cands)
 
         try:
             evi.origin_candidates = json.dumps(origin_p_cands)
@@ -54,5 +59,5 @@ def generate_evidence_batch(num_evidence_each_bin=10):
 
 
 if __name__ == '__main__':
-    # update_persp_candidates()
-    generate_evidence_batch()
+    update_persp_candidates()
+    # generate_evidence_batch()

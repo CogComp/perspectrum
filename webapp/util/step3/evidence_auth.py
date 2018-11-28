@@ -40,7 +40,7 @@ def generate_evidence_jobs(username, num_evidences):
     :return:
     """
     clean_evidence_idle_sessions()
-
+        
     eb_id_set = EvidenceBatch.objects.filter(assign_counts__lt=TARGET_ASSIGNMENT_COUNT)
 
     if len(eb_id_set) > num_evidences:
