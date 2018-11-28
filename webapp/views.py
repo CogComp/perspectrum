@@ -537,7 +537,7 @@ def submit_evidence_annotation(request):
             label = anno[2]
             if label in evidence_label_mapping:
                 EvidenceRelation.objects.create(author=username, evidence_id=anno[0], perspective_id=anno[1],
-                                            anno=evidence_label_mapping[label])
+                                            anno=evidence_label_mapping[label], comment="pilot")
 
         # Update finished jobs in user session
         fj = set(json.loads(session.finished_jobs))

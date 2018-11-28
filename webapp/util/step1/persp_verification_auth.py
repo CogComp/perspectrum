@@ -1,6 +1,7 @@
 import datetime
 import json
 import random
+import numpy as np
 
 from webapp.models import HITSession, Claim
 from webapp.util.step1.session_helpers import clean_idle_persp_sessions, increment_persp_assignment_counts
@@ -63,7 +64,7 @@ def generate_persp_jobs(username, num_claims):
         assign_counts = Claim.objects.all().order_by('finished_counts')\
             .values_list('id', 'finished_counts', named=True)[:num_claims * 5]
 
-        jobs = random.choices([t.id for t in assign_counts], k=num_claims)
+        jobs = np.random.choice([t.id for t in assign_counts], size=num_claims, replace=False).tolist()
 
     if username != 'TEST':
         increment_persp_assignment_counts(jobs)
