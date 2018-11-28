@@ -489,6 +489,8 @@ def render_step3_task_list(request):
 def render_step3_instructions(request):
     return render(request, "step3/instructions.html", {})
 
+def render_step4_task_list(request):
+    return render(request, "step4_topics/topic_interface.html", {})
 
 evidence_label_mapping = {
     "sup" : "S",
