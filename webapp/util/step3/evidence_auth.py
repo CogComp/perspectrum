@@ -42,9 +42,11 @@ def generate_evidence_jobs(username, num_evidences):
     """
     clean_evidence_idle_sessions()
 
-    eb_id_set = EvidenceBatch.objects.filter(assign_counts__lt=TARGET_ASSIGNMENT_COUNT)
+    finished = get_all_finished_batches(username)
 
-    if len(eb_id_set) > num_evidences:
+    eb_id_set = EvidenceBatch.objects.filter(assign_counts__lt=TARGET_ASSIGNMENT_COUNT).exclude(id__in=finished)
+
+    if len(eb_id_set) >= num_evidences:
         # Case 1: where we still have claims with lower than 3 assignments
         assign_counts = eb_id_set.values_list('id', 'assign_counts', named=True)\
             .order_by('assign_counts')
@@ -61,10 +63,13 @@ def generate_evidence_jobs(username, num_evidences):
     else:
         # Case 2: all claims are assigned at least 3 times.
         # Take 5 * num_claims least annotated claims
-        assign_counts = EvidenceBatch.objects.all().order_by('finished_counts')\
+        assign_counts = EvidenceBatch.objects.all().exclude(id__in=finished).order_by('finished_counts')\
             .values_list('id', 'finished_counts', named=True)[:num_evidences * 5]
 
-        jobs = np.random.choice([t.id for t in assign_counts], size=num_evidences, replace=False).tolist()
+        if len(assign_counts) == 0:
+            jobs = []
+        else:
+            jobs = np.random.choice([t.id for t in assign_counts], size=num_evidences, replace=False).tolist()
 
     if username != "TEST":
         increment_evidence_assign_counts(jobs)
@@ -73,9 +78,11 @@ def generate_evidence_jobs(username, num_evidences):
 
 def generate_evidence_jobs_pilot(username, num_evidences):
     test_batch = [1624,1625,1626,1627,1628,1629,1630,1631,1632]
-    eb_id_set = EvidenceBatch.objects.filter(assign_counts__lt=5, id__in=test_batch)
+
+    finished = get_all_finished_batches(username)
+    eb_id_set = EvidenceBatch.objects.filter(assign_counts__lt=5, id__in=test_batch).exclude(id__in=finished)
     print(eb_id_set)
-    if len(eb_id_set) > num_evidences:
+    if len(eb_id_set) >= num_evidences:
         # Case 1: where we still have claims with lower than 3 assignments
         assign_counts = eb_id_set.values_list('id', 'assign_counts', named=True)\
             .order_by('assign_counts')
@@ -92,10 +99,13 @@ def generate_evidence_jobs_pilot(username, num_evidences):
     else:
         # Case 2: all claims are assigned at least 3 times.
         # Take 5 * num_claims least annotated claims
-        assign_counts = EvidenceBatch.objects.filter(id__in=test_batch).all()\
+        assign_counts = EvidenceBatch.objects.filter(id__in=test_batch).exclude(id__in=finished)\
         .order_by('finished_counts').values_list('id', 'finished_counts', named=True)[:num_evidences * 5]
 
-        jobs = np.random.choice([t.id for t in assign_counts], size=num_evidences, replace=False).tolist()
+        if len(assign_counts) == 0:
+            jobs = []
+        else:
+            jobs = np.random.choice([t.id for t in assign_counts], size=num_evidences, replace=False).tolist()
 
     if username != "TEST":
         increment_evidence_assign_counts(jobs)
