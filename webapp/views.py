@@ -424,8 +424,7 @@ def step2_submit_instr(request):
 Step 3 APIs 
 """
 
-num_original_persps = 4
-num_google_persps = 1
+PERSP_NUM = 10
 
 @login_required
 def render_evidence_verification(request, batch_id):
@@ -439,21 +438,45 @@ def render_evidence_verification(request, batch_id):
         pass  # TODO: Do something? 404?
 
     eids = json.loads(eb.evidence_ids)
-    evidences = [Evidence.objects.get(id=i) for i in eids]
 
+    evidences = [Evidence.objects.get(id=i) for i in eids]
+    keywords = {}
     candidates = {}
     for evi in evidences:
         origin_cands = json.loads(evi.origin_candidates)
         google_cands = json.loads(evi.google_candidates)
 
-        all_cands = origin_cands[:num_original_persps] + google_cands[:num_google_persps]
+        same_claim_cands = []
 
-        persps = [Perspective.objects.get(id=i) for i in all_cands]
+
+        # Get Keywords
+        try:
+            _er = EvidenceRelation.objects.filter(author="GOLD").get(evidence_id=evi.id)
+            pid = _er.perspective_id
+            _pr = PerspectiveRelation.objects.filter(author="GOLD").get(perspective_id=pid)
+            cid = _pr.claim_id
+            _c = Claim.objects.get(id=cid)
+            same_claim_cands = list(PerspectiveRelation.objects.filter(author="GOLD", claim_id=cid).
+                                    exclude(comment="google").values_list("perspective_id", flat=True))
+
+            _keywords = json.loads(_c.keywords)
+        except EvidenceRelation.DoesNotExist:
+            _keywords = []
+        except PerspectiveRelation.DoesNotExist:
+            _keywords = []
+        except Claim.DoesNotExist:
+            _keywords = []
+
+        keywords[evi.id] = _keywords
+
+        all_cands = origin_cands + same_claim_cands + google_cands
+        persps = [Perspective.objects.get(id=i) for i in all_cands[:PERSP_NUM]]
         candidates[evi.id] = persps
 
     return render(request, 'step3/evidence_verification.html', {
         "evidences": evidences,
-        "candidates": candidates
+        "candidates": candidates,
+        "keywords": keywords
     })
 
 

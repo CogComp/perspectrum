@@ -47,6 +47,10 @@
             <div class="col persps-container rel_tile">
                 <div class="container">
                     <p>Indicate whether each <font color="red">claim</font> is supported by the given <font color="blue">paragraph</font>:</p>
+                    <p>Paragraph Keywords: {% for kw in keywords|dict_get_item:evi.id %}
+                        <span class="badge badge badge-info">{{ kw }}</span>
+                        {% endfor %}
+                        </p>
                   <hr>
                     <div class="row">
                         <div class="col-7">
