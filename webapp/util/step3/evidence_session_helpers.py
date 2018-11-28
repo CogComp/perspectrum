@@ -49,3 +49,12 @@ def _offset_evidence_assign_counts(eb_ids, offset):
             eb.assign_counts = 0
 
         eb.save()
+
+
+def get_all_finished_batches(username):
+    _jobs = EvidenceHITSession.objects.filter(username=username).values_list("jobs", flat=True)
+    jobs = []
+    for j in _jobs:
+        jobs += json.loads(j)
+
+    return jobs

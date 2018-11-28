@@ -499,7 +499,7 @@ def render_step3_task_list(request):
     tasks_are_done = all(item["done"] for item in task_list)
 
     task_id = -1
-    if tasks_are_done:  # TODO: change this condition to if the user has completed the task
+    if tasks_are_done and len(jobs) > 0:  # TODO: change this condition to if the user has completed the task
         task_id = session.id
         session.job_complete = True
         session.save()
