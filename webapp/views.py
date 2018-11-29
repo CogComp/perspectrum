@@ -16,6 +16,7 @@ from webapp.util.step3.evidence_auth import get_evidence_hit_session
 
 from collections import OrderedDict
 import datetime
+import random
 
 file_names = {
     "iDebate": '../data/idebate/idebate.json'
@@ -440,6 +441,8 @@ def render_evidence_verification(request, batch_id):
 
     eids = json.loads(eb.evidence_ids)
 
+    valid_persp_ids = ReStep1Results.objects.filter(label_3__in=["S", "U"], p_i_3__gt=0.5).values_list('perspective_id').distinct()
+
     evidences = [Evidence.objects.get(id=i) for i in eids]
     keywords = {}
     candidates = {}
@@ -448,7 +451,6 @@ def render_evidence_verification(request, batch_id):
         google_cands = json.loads(evi.google_candidates)
 
         same_claim_cands = []
-
 
         # Get Keywords
         try:
@@ -459,6 +461,8 @@ def render_evidence_verification(request, batch_id):
             _c = Claim.objects.get(id=cid)
             same_claim_cands = list(PerspectiveRelation.objects.filter(author="GOLD", claim_id=cid).
                                     exclude(comment="google").values_list("perspective_id", flat=True))
+
+            same_claim_cands = [scc for scc in valid_persp_ids]
 
             _keywords = json.loads(_c.keywords)
         except EvidenceRelation.DoesNotExist:
@@ -473,6 +477,9 @@ def render_evidence_verification(request, batch_id):
         all_cands = origin_cands + same_claim_cands + google_cands
         all_cands = list(OrderedDict.fromkeys(all_cands))
         persps = [Perspective.objects.get(id=i) for i in all_cands[:PERSP_NUM]]
+
+        # shuffle the order of perspectives
+        persps = random.shuffle(persps)
         candidates[evi.id] = persps
 
     return render(request, 'step3/evidence_verification.html', {
