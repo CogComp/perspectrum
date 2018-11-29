@@ -479,7 +479,6 @@ def render_evidence_verification(request, batch_id):
         persps = [Perspective.objects.get(id=i) for i in all_cands[:PERSP_NUM]]
 
         # shuffle the order of perspectives
-        random.shuffle(persps)
         candidates[evi.id] = persps
 
     return render(request, 'step3/evidence_verification.html', {
