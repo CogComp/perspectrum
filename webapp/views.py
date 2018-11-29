@@ -462,7 +462,7 @@ def render_evidence_verification(request, batch_id):
             same_claim_cands = list(PerspectiveRelation.objects.filter(author="GOLD", claim_id=cid).
                                     exclude(comment="google").values_list("perspective_id", flat=True))
 
-            same_claim_cands = [scc for scc in valid_persp_ids]
+            same_claim_cands = [scc for scc in same_claim_cands if scc in valid_persp_ids]
 
             _keywords = json.loads(_c.keywords)
         except EvidenceRelation.DoesNotExist:
@@ -479,7 +479,7 @@ def render_evidence_verification(request, batch_id):
         persps = [Perspective.objects.get(id=i) for i in all_cands[:PERSP_NUM]]
 
         # shuffle the order of perspectives
-        persps = random.shuffle(persps)
+        random.shuffle(persps)
         candidates[evi.id] = persps
 
     return render(request, 'step3/evidence_verification.html', {
