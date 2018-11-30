@@ -37,8 +37,8 @@
         </nav>
 
         <div class="rel_option_container">
-            In this task, we would like to annotate all <font color="red">the claims</font> that are supported by the provided <font color="blue">paragraph</font>.
-            In other words, do you think the evidences provided in <font color="blue">the paragraph</font> sufficiently explain <font color="red">each claim</font> or not.
+            In this task, we would like to annotate all <font color="red">the claims</font> that are supported by the provided <font color="blue">evidence</font>.
+            In other words, do you think <font color="blue">the evidence</font> contain <b>sufficient proof</b> for<font color="red">each claim</font> or not.
             <br>
 
             Please solve the following examples, according the above instructions:
@@ -46,16 +46,16 @@
             {% for evi in evidences %}
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Indicate whether each <font color="red">claim</font> is supported by the given <font color="blue">paragraph</font>:</p>
+                    <p>Indicate whether each <font color="red">claim</font> is supported by the given <font color="blue">evidence</font>:</p>
 
                     <hr>
-                    <p>Paragraph Keywords: {% for kw in keywords|dict_get_item:evi.id %}
+                    <p>Evidence Keywords: {% for kw in keywords|dict_get_item:evi.id %}
                         <span class="badge badge badge-info">{{ kw }}</span>
                         {% endfor %}
                         </p>
                     <div class="row">
                         <div class="col-7">
-                            <strong><h6 style="color: blue">Paragraph: </h6></strong>
+                            <strong><h6 style="color: blue">Evidence: </h6></strong>
                                 <p> {{ evi.content }}
                                 </p>
 
