@@ -475,8 +475,25 @@ def render_evidence_verification(request, batch_id):
         keywords[evi.id] = _keywords
 
         all_cands = origin_cands + same_claim_cands + google_cands
-        all_cands = list(OrderedDict.fromkeys(all_cands))
-        persps = [Perspective.objects.get(id=i) for i in all_cands[:PERSP_NUM]]
+        cands = list(OrderedDict.fromkeys(all_cands))[:PERSP_NUM]
+
+        # Only enable the following lines in second pass
+        temp_cands = []
+        for p in cands:
+            try:
+                r = Step3Results.objects.get(evidence_id=evi.id, perspective_id=p)
+            except Step3Results.DoesNotExist:
+                print("Step 3 Result not found! pid={} eid={}".format(evi.id, p))
+                continue
+
+            pi = r.p_i
+            vote_count = r.vote_support + r.vote_not_support
+            if pi < 0.5 and vote_count <= 3:
+                temp_cands.append(p)
+
+        cands = temp_cands
+
+        persps = [Perspective.objects.get(id=i) for i in cands]
 
         # shuffle the order of perspectives
         candidates[evi.id] = persps
