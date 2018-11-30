@@ -30,34 +30,46 @@ def update_labels():
         r.label_5 = get_majority_vote_label(votes_5, LABEL_5)
         r.save()
 
+
+def update_high_agreement_in_persp_table():
+    results = set(ReStep1Results.objects.filter(p_i_3__gt=0.5).values_list("perspective_id", flat=True).distinct())
+    for p in Perspective.objects.all():
+        old_high_ag = p.pilot1_high_agreement
+        high_ag = p.id in results
+        if high_ag ^ old_high_ag:
+            p.pilot1_high_agreement = high_ag
+            p.save()
+
+
 if __name__ == '__main__':
 
-    if len(sys.argv) != 3:
-        print("Usage: python ... [origin_iaa_result] [google_iaa_result]", file=sys.stderr)
-        exit(1)
-
-    origin_iaa_result = sys.argv[1]
-    google_iaa_result = sys.argv[2]
-
-    google_df = pd.read_csv(google_iaa_result, engine="python")
-    origin_df = pd.read_csv(origin_iaa_result, engine="python")
-
-    origin_df.info()
-    google_df.info()
-
-    for idx, row in google_df.iterrows():
-        r = ReStep1Results.objects.create(claim_id=row["claim"], perspective_id=row["perspective"], vote_support=row["sup"],
-                                      vote_leaning_support=row["lsup"], vote_leaning_undermine=row["lund"],
-                                      vote_undermine=row["und"], vote_not_valid=row["not_valid"], p_i_5=row["P_i_5_labels"],
-                                      p_i_3=row["P_i_3_labels"])
-        r.save()
-
-    for idx, row in origin_df.iterrows():
-        cid = PerspectiveRelation.objects.get(author=PerspectiveRelation.GOLD, perspective_id=row.perspective).claim_id
-        r = ReStep1Results.objects.create(claim_id=cid, perspective_id=row["perspective"], vote_support=row["sup"],
-                                      vote_leaning_support=row["lsup"], vote_leaning_undermine=row["lund"],
-                                      vote_undermine=row["und"], vote_not_valid=row["not_valid"], p_i_5=row["P_i_5_labels"],
-                                      p_i_3=row["P_i_3_labels"])
-        r.save()
-
-    update_labels()
+    # if len(sys.argv) != 3:
+    #     print("Usage: python ... [origin_iaa_result] [google_iaa_result]", file=sys.stderr)
+    #     exit(1)
+    #
+    # origin_iaa_result = sys.argv[1]
+    # google_iaa_result = sys.argv[2]
+    #
+    # google_df = pd.read_csv(google_iaa_result, engine="python")
+    # origin_df = pd.read_csv(origin_iaa_result, engine="python")
+    #
+    # origin_df.info()
+    # google_df.info()
+    #
+    # for idx, row in google_df.iterrows():
+    #     r = ReStep1Results.objects.create(claim_id=row["claim"], perspective_id=row["perspective"], vote_support=row["sup"],
+    #                                   vote_leaning_support=row["lsup"], vote_leaning_undermine=row["lund"],
+    #                                   vote_undermine=row["und"], vote_not_valid=row["not_valid"], p_i_5=row["P_i_5_labels"],
+    #                                   p_i_3=row["P_i_3_labels"])
+    #     r.save()
+    #
+    # for idx, row in origin_df.iterrows():
+    #     cid = PerspectiveRelation.objects.get(author=PerspectiveRelation.GOLD, perspective_id=row.perspective).claim_id
+    #     r = ReStep1Results.objects.create(claim_id=cid, perspective_id=row["perspective"], vote_support=row["sup"],
+    #                                   vote_leaning_support=row["lsup"], vote_leaning_undermine=row["lund"],
+    #                                   vote_undermine=row["und"], vote_not_valid=row["not_valid"], p_i_5=row["P_i_5_labels"],
+    #                                   p_i_3=row["P_i_3_labels"])
+    #     r.save()
+    #
+    # update_labels()
+    update_high_agreement_in_persp_table()
