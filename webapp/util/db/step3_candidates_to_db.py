@@ -28,7 +28,7 @@ def update_persp_candidates():
         gold_pid = EvidenceRelation.objects.filter(author="GOLD").get(evidence_id=eid).perspective_id
         gold_p = Perspective.objects.get(id=gold_pid)
 
-        if gold_p.similar_persps:
+        if gold_p.pilot1_have_stance:
             total += 1
             if gold_pid not in origin_p_cands:
                 origin_p_cands.insert(0, gold_pid)
