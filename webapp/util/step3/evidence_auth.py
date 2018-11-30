@@ -11,7 +11,7 @@ def get_evidence_hit_session(username):
     if unfinished_sessions.count() > 0:
         session = unfinished_sessions[0]
     else:
-        claim_ids = generate_evidence_jobs_pilot(username, 1)
+        claim_ids = generate_evidence_jobs(username, 1)
         time_now = datetime.datetime.now(datetime.timezone.utc)
         session = EvidenceHITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_jobs=json.dumps([]),
                                                        instruction_complete=evidence_instr_needed(username), duration=datetime.timedelta(),
@@ -30,7 +30,7 @@ def evidence_instr_needed(username):
 
 
 # Number of assignments for each claim in the persp evidence task
-TARGET_ASSIGNMENT_COUNT = 3
+TARGET_ASSIGNMENT_COUNT = 4
 
 
 def generate_evidence_jobs(username, num_evidences):
