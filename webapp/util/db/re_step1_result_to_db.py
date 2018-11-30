@@ -41,6 +41,16 @@ def update_high_agreement_in_persp_table():
             p.save()
 
 
+def update_stances_in_persp_table():
+    results = set(ReStep1Results.objects.filter(p_i_3__gt=0.5, label_3__in=["S", "U"]).values_list("perspective_id", flat=True).distinct())
+    for p in Perspective.objects.all():
+        old_high_ag = p.pilot1_have_stance
+        high_ag = p.id in results
+        if high_ag ^ old_high_ag:
+            p.pilot1_have_stance = high_ag
+            p.save()
+
+
 if __name__ == '__main__':
 
     # if len(sys.argv) != 3:
@@ -72,4 +82,5 @@ if __name__ == '__main__':
     #     r.save()
     #
     # update_labels()
-    update_high_agreement_in_persp_table()
+    # update_high_agreement_in_persp_table()
+    update_stances_in_persp_table()

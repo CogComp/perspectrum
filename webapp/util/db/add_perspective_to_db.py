@@ -114,6 +114,14 @@ def remove_redundant_gold_persp_rel_annotation():
     print("Removed {} duplicate records. ".format(count))
 
 
+def update_persp_token_length():
+    for p in Perspective.objects.all():
+        if len(word_tokenize(p.title)) < 3:
+            print(p.id)
+            p.more_than_two_tokens = 0
+            p.save()
+
+
 if __name__ == '__main__':
 
     # google_candidates = "/home/squirrel/ccg-new/projects/perspective/data/pilot7_persp_equivalence/persp_google_cands.json"
@@ -123,4 +131,5 @@ if __name__ == '__main__':
     # lucene_perspectives_to_db(lucene_candidates)
 
     # add_persp_rel_google_perspectives(google_candidates)
-    remove_redundant_gold_persp_rel_annotation()
+    # remove_redundant_gold_persp_rel_annotation()
+    update_persp_token_length()

@@ -4,7 +4,7 @@ import json
 
 # evidence Verification Assignment counts
 
-TIMEOUT_IDLE_MINUTE = 75
+TIMEOUT_IDLE_MINUTE = 30
 
 _TIMEOUT_IDLE_MINUTE = datetime.timedelta(minutes=TIMEOUT_IDLE_MINUTE)
 
