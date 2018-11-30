@@ -15,7 +15,7 @@ def update_persp_candidates():
     with open(pilot12_result) as fin:
         pilot12_data = json.load(fin)
 
-    print(len(pilot12_data))
+    total = 0
 
     for eid, cands in pilot12_data.items():
         evi = Evidence.objects.get(id=eid)
@@ -25,15 +25,15 @@ def update_persp_candidates():
         google_p_cands = [c for c in p_cands if c > th]
 
         # Get gold perspective
-        gold_pid = EvidenceRelation.objects.get(evidence_id=eid).perspective_id
+        gold_pid = EvidenceRelation.objects.filter(author="GOLD").get(evidence_id=eid).perspective_id
+        gold_p = Perspective.objects.get(id=gold_pid)
 
-        if gold_pid not in origin_p_cands:
-            origin_p_cands.insert(0, gold_pid)
-        else:
-            origin_p_cands.insert(0, origin_p_cands.pop(origin_p_cands.index(gold_pid)))
-
-        if eid == 1:
-            print(origin_p_cands)
+        if gold_p.similar_persps:
+            total += 1
+            if gold_pid not in origin_p_cands:
+                origin_p_cands.insert(0, gold_pid)
+            else:
+                origin_p_cands.insert(0, origin_p_cands.pop(origin_p_cands.index(gold_pid)))
 
         try:
             evi.origin_candidates = json.dumps(origin_p_cands)
@@ -41,6 +41,8 @@ def update_persp_candidates():
             evi.save()
         except Exception as e:
             print(e)
+
+    print("Total gold perspective added: {}".format(total))
 
 
 def generate_evidence_batch(num_evidence_each_bin=10):
