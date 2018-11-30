@@ -5,6 +5,8 @@ class Perspective(models.Model):
     source = models.CharField(max_length=50)
     title = models.TextField()
     pilot1_high_agreement = models.BooleanField(default=False)
+    pilot1_have_stance = models.BooleanField(default=False)
+    more_than_two_tokens = models.BooleanField(default=True)
     similar_persps = models.TextField(default='[]') # Json serialized list of perspective ids
 
 
@@ -145,3 +147,18 @@ class EvidenceBatch(models.Model):
     evidence_ids = models.TextField(default="[]") # list of integer evidence ids
     assign_counts = models.IntegerField(default=0)
     finished_counts = models.IntegerField(default=0)
+
+
+# Gold Annotation from step 3
+class Step3Results(models.Model):
+    LABEL_CHOICES = (
+        ('S', 'Support'),
+        ('N', 'Not Support'),
+        ('D', 'Doesnt have Majority Vote')
+    )
+    perspective_id = models.IntegerField()
+    evidence_id = models.IntegerField()
+    vote_support = models.IntegerField(default=0)
+    vote_not_support = models.IntegerField(default=0)
+    p_i = models.FloatField(default=0)
+    label = models.CharField(default='D', max_length=1, choices=LABEL_CHOICES)
