@@ -315,7 +315,6 @@ def vis_normalize_persp(request, claim_id):
 
 
 # Step 2 apis
-
 @login_required
 def vis_persp_equivalence(request, claim_id):
     username = request.user.username
@@ -337,16 +336,19 @@ def vis_persp_equivalence(request, claim_id):
         cand_persps = Perspective.objects.filter(id__in=cand_ids)
         candidates[persp.id] = cand_persps
 
-    return render(request, 'step2/persp_equivalence.html', {
+    return render(request, 'step2b/persp_equivalence.html', {
         "claim": claim,
         "perspective_pool": perspective_pool,
         "candidates": candidates
     })
 
-def render_step2_instructions(request):
-    return render(request, "step2/instructions.html", {})
+def render_step2a_instructions(request):
+    return render(request, "step2a/instructions.html", {})
 
-def render_step2_task_list(request):
+def render_step2b_instructions(request):
+    return render(request, "step2b/instructions.html", {})
+
+def render_step2a_task_list(request):
     username = request.user.username
     session = get_equivalence_hit_session(username)
 
@@ -371,7 +373,35 @@ def render_step2_task_list(request):
 
     context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
 
-    return render(request, 'step2/task_list.html', context)
+    return render(request, 'step2a/task_list.html', context)
+
+
+def render_step2b_task_list(request):
+    username = request.user.username
+    session = get_equivalence_hit_session(username)
+
+    instr_complete = session.instruction_complete
+    jobs = json.loads(session.jobs)
+    finished = json.loads(session.finished_jobs)
+
+    task_list = []
+    for job in jobs:
+        task_list.append({
+            "id": job,
+            "done": job in finished
+        })
+
+    tasks_are_done = all(item["done"] for item in task_list)
+
+    task_id = -1
+    if tasks_are_done:  # TODO: change this condition to if the user has completed the task
+        task_id = session.id
+        session.job_complete = True
+        session.save()
+
+    context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
+
+    return render(request, 'step2b/task_list.html', context)
 
 
 @login_required
