@@ -162,3 +162,11 @@ class Step3Results(models.Model):
     vote_not_support = models.IntegerField(default=0)
     p_i = models.FloatField(default=0)
     label = models.CharField(default='D', max_length=1, choices=LABEL_CHOICES)
+
+
+# Paraphrase hints for step 2a
+class PerspectiveParaphraseHints(models.Model):
+    perspective_id = models.IntegerField()
+    content = models.TextField()
+    lucene_score = models.FloatField()
+
