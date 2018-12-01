@@ -9,9 +9,9 @@ $(document).ready(function() {
 function submit() {
     csrfSetup();
 
-    $.post("/step2/api/submit_instr/", {}, instr_callback);
+    $.post("/step2b/api/submit_instr/", {}, instr_callback);
 }
 
 function instr_callback() {
-    window.location.href = '/step2/task_list';
+    window.location.href = '/step2b/task_list';
 }

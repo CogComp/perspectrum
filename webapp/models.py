@@ -165,8 +165,25 @@ class Step3Results(models.Model):
 
 
 # Paraphrase hints for step 2a
-class PerspectiveParaphraseHints(models.Model):
+class PerspectiveParaphrase(models.Model):
     perspective_id = models.IntegerField()
-    content = models.TextField()
-    lucene_score = models.FloatField()
+    user_generated = models.TextField(default="[]")
+    session_ids = models.TextField(default="[]")
+    hints = models.TextField(default="[]")
 
+
+# Paraphrase HIT Session
+class ParaphraseHITSession(models.Model):
+    username = models.CharField(max_length=100)
+    instruction_complete = models.BooleanField(default=False)
+    job_complete = models.BooleanField(default=False)
+    jobs = models.TextField()  # a list of integer claim ids
+    finished_jobs = models.TextField()
+    duration = models.DurationField()
+    last_start_time = models.DateTimeField(null=True) # Used to calculate duration
+
+
+class ParaphraseBatch(models.Model):
+    perspective_ids = models.TextField(default="[]") # list of integer perspective ids
+    assign_counts = models.IntegerField(default=0)
+    finished_counts = models.IntegerField(default=0)

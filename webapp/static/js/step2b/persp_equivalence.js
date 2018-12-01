@@ -45,7 +45,7 @@ function submit() {
     let annos_json = JSON.stringify(annos);
 
     let claim_id = $(location).attr('href').split('/').pop();
-    $.post("/step2/api/submit_equivalence_annotation", {
+    $.post("/step2b/api/submit_equivalence_annotation", {
         "claim_id": claim_id,
         "annotations": annos_json
     }, success_callback).fail(enable_submit_button)
@@ -55,7 +55,7 @@ function submit() {
  * Callback for submission
  */
 function success_callback() {
-    window.location.href = '/step2/task_list';
+    window.location.href = '/step2b/task_list';
 }
 
 /**
