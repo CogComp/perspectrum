@@ -315,7 +315,6 @@ def vis_normalize_persp(request, claim_id):
 
 
 # Step 2 apis
-
 @login_required
 def vis_persp_equivalence(request, claim_id):
     username = request.user.username

@@ -44,7 +44,7 @@ urlpatterns = [
     path('api/submit_instr/', views.submit_instr, name="submit_instr"),
 
     # step 2a: generation of paraphrases
-    # path('step2a/perspective_equivalence/<slug:claim_id>', views.vis_persp_equivalence, name="perspective_equivalence"),
+    path('step2a/perspective_paraphrase/<slug:claim_id>', views.vis_persp_equivalence, name="perspective_equivalence"),
     path('step2a/instructions/', views.render_step2a_instructions, name="step2_instructions"),
     path('step2a/task_list/', views.render_step2a_task_list, name="step2_task_list"),
     # path('step2a/api/submit_equivalence_annotation', views.submit_equivalence_annotation, name="submit_equivalence_annotation"),
