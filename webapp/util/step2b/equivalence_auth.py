@@ -5,7 +5,7 @@ from webapp.models import HITSession, PerspectiveRelation, Claim, EquivalenceHIT
 from django.db.models import Count
 from django.shortcuts import redirect
 from django.views.decorators.csrf import csrf_protect
-from webapp.util.step2.equivalence_session_helpers import *
+from webapp.util.step2b.equivalence_session_helpers import *
 
 import json
 import datetime

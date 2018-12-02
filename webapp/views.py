@@ -11,7 +11,8 @@ from .forms import ContactForm
 
 from webapp.models import *
 from webapp.util.step1.persp_verification_auth import get_persp_hit_session
-from webapp.util.step2.equivalence_auth import get_equivalence_hit_session
+from webapp.util.step2b.equivalence_auth import get_equivalence_hit_session
+from webapp.util.step2a.paraphrase_auth import get_paraphrase_hit_session
 from webapp.util.step3.evidence_auth import get_evidence_hit_session
 
 from collections import OrderedDict
@@ -314,43 +315,19 @@ def vis_normalize_persp(request, claim_id):
     })
 
 
-# Step 2 apis
+###############################################
+#     STEP 2a APIs
+#     Perspective Paraphrase
+###############################################
 @login_required
-def vis_persp_equivalence(request, claim_id):
-    username = request.user.username
-    session = get_equivalence_hit_session(username)
-    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
-    session.save()
-
-    try:
-        claim = Claim.objects.get(id=claim_id)
-    except Claim.DoesNotExist:
-        pass  # TODO: Do something? 404?
-
-    perspective_pool = get_all_persp(claim_id)
-
-    candidates = {}
-
-    for persp in perspective_pool:
-        cand_ids = set(json.loads(Perspective.objects.get(id=persp.id).similar_persps))
-        cand_persps = Perspective.objects.filter(id__in=cand_ids)
-        candidates[persp.id] = cand_persps
-
-    return render(request, 'step2b/persp_equivalence.html', {
-        "claim": claim,
-        "perspective_pool": perspective_pool,
-        "candidates": candidates
-    })
-
 def render_step2a_instructions(request):
     return render(request, "step2a/instructions.html", {})
 
-def render_step2b_instructions(request):
-    return render(request, "step2b/instructions.html", {})
 
+@login_required
 def render_step2a_task_list(request):
     username = request.user.username
-    session = get_equivalence_hit_session(username)
+    session = get_paraphrase_hit_session(username)
 
     instr_complete = session.instruction_complete
     jobs = json.loads(session.jobs)
@@ -376,6 +353,106 @@ def render_step2a_task_list(request):
     return render(request, 'step2a/task_list.html', context)
 
 
+@login_required
+def vis_perspective_paraphrase(request, batch_id):
+    username = request.user.username
+    session = get_paraphrase_hit_session(username)
+    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
+    session.save()
+    try:
+        pb = ParaphraseBatch.objects.get(id=batch_id)
+    except ParaphraseBatch.DoesNotExist:
+        return HttpResponse(content="Batch_Id = {} Not found in the database!".format(batch_id), status=404)
+
+    ppids = json.loads(pb.paraphrase_ids)
+
+    paraphrases = [PerspectiveParaphrase.objects.get(id=i) for i in ppids]
+    perspectives = []
+    hints = {}
+    claims = {}
+
+    for pp in paraphrases:
+        pid = pp.perspective_id
+        perspectives.append(Perspective.objects.get(id=pid))
+        cid = PerspectiveRelation.objects.filter(author="GOLD").exclude(comment="google").get(perspective_id=pid).claim_id
+        c = Claim.objects.get(id=cid)
+
+        _h = json.loads(pp.hints)
+        random.shuffle(_h)
+        hints[pid] = _h
+        claims[pid] = c.title
+
+    return render(request, 'step2a/paraphrase_perspectives.html', {
+        "perspectives": perspectives,
+        "hints": hints,
+        "claims": claims
+    })
+
+@login_required
+@csrf_protect
+def step2a_submit_instr(request):
+    if request.method != 'POST':
+        raise ValueError("submit_instr API only supports POST request")
+    else:
+        username = request.user.username
+        session = get_paraphrase_hit_session(username)
+
+        session.instruction_complete = True
+        session.save()
+        return HttpResponse("Submission Success!", status=200)
+
+@login_required
+@csrf_protect
+def submit_paraphrase_annotation(request):
+    if request.method != 'POST':
+        raise ValueError("submit_rel_anno API only supports POST request")
+    else:
+        batch_id = request.POST.get('batch_id')
+        annos = json.loads(request.POST.get('annotations'))
+        username = request.user.username
+        session = get_paraphrase_hit_session(username)
+
+        # Update annotation in EquivalenceAnnotation table
+        for pid, paras in annos.items():
+            p = PerspectiveParaphrase.objects.get(perspective_id=pid)
+            user_para = json.loads(p.user_generated)
+            session_ids = json.loads(p.session_ids)
+
+            for pp in paras:
+                user_para.append(pp)
+                session_ids.append(session.id)
+
+            p.user_generated = user_para
+            p.session_ids = session_ids
+            p.save()
+
+        # Update finished jobs in user session
+        fj = set(json.loads(session.finished_jobs))
+        fj.add(int(batch_id))
+        session.finished_jobs = json.dumps(list(fj))
+
+        # increment duration in database
+        delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
+        session.duration = session.duration + delta
+        session.save()
+
+        # Increment finished assignment count in claim table, if not using test acc
+        if username != 'TEST':
+            c = ParaphraseBatch.objects.get(id=batch_id)
+            c.finished_counts += 1
+            c.save()
+
+        return HttpResponse("Submission Success!", status=200)
+
+###############################################
+#     STEP 2b APIs
+#     Perspective Equivalence
+###############################################
+@login_required
+def render_step2b_instructions(request):
+    return render(request, "step2b/instructions.html", {})
+
+@login_required
 def render_step2b_task_list(request):
     username = request.user.username
     session = get_equivalence_hit_session(username)
@@ -402,6 +479,33 @@ def render_step2b_task_list(request):
     context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
 
     return render(request, 'step2b/task_list.html', context)
+
+@login_required
+def vis_persp_equivalence(request, claim_id):
+    username = request.user.username
+    session = get_equivalence_hit_session(username)
+    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
+    session.save()
+
+    try:
+        claim = Claim.objects.get(id=claim_id)
+    except Claim.DoesNotExist:
+        pass  # TODO: Do something? 404?
+
+    perspective_pool = get_all_persp(claim_id)
+
+    candidates = {}
+
+    for persp in perspective_pool:
+        cand_ids = set(json.loads(Perspective.objects.get(id=persp.id).similar_persps))
+        cand_persps = Perspective.objects.filter(id__in=cand_ids)
+        candidates[persp.id] = cand_persps
+
+    return render(request, 'step2b/persp_equivalence.html', {
+        "claim": claim,
+        "perspective_pool": perspective_pool,
+        "candidates": candidates
+    })
 
 
 @login_required
@@ -440,7 +544,7 @@ def submit_equivalence_annotation(request):
 
 @login_required
 @csrf_protect
-def step2_submit_instr(request):
+def step2b_submit_instr(request):
     if request.method != 'POST':
         raise ValueError("submit_instr API only supports POST request")
     else:
@@ -452,9 +556,10 @@ def step2_submit_instr(request):
         return HttpResponse("Submission Success!", status=200)
 
 
-"""
-Step 3 APIs 
-"""
+###############################################
+#     STEP 3 APIs
+#     Evidence verification
+###############################################
 
 PERSP_NUM = 8
 
@@ -506,22 +611,6 @@ def render_evidence_verification(request, batch_id):
 
         all_cands = origin_cands + same_claim_cands + google_cands
         cands = list(OrderedDict.fromkeys(all_cands))[:PERSP_NUM]
-
-        # Only enable the following lines in second pass
-        # temp_cands = []
-        # for p in cands:
-        #     try:
-        #         r = Step3Results.objects.get(evidence_id=evi.id, perspective_id=p)
-        #     except Step3Results.DoesNotExist:
-        #         print("Step 3 Result not found! pid={} eid={}".format(evi.id, p))
-        #         continue
-        #
-        #     pi = r.p_i
-        #     vote_count = r.vote_support + r.vote_not_support
-        #     if pi < 0.5 and vote_count <= 3:
-        #         temp_cands.append(p)
-        #
-        # cands = temp_cands
 
         persps = [Perspective.objects.get(id=i) for i in cands]
 
@@ -578,7 +667,6 @@ evidence_label_mapping = {
 @login_required
 @csrf_protect
 def submit_evidence_annotation(request):
-    pass
     if request.method != 'POST':
         raise ValueError("submit_rel_anno API only supports POST request")
     else:

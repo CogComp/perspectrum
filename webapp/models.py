@@ -184,6 +184,6 @@ class ParaphraseHITSession(models.Model):
 
 
 class ParaphraseBatch(models.Model):
-    perspective_ids = models.TextField(default="[]") # list of integer perspective ids
+    paraphrase_ids = models.TextField(default="[]") # list of integer perspective ids
     assign_counts = models.IntegerField(default=0)
     finished_counts = models.IntegerField(default=0)

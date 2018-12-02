@@ -21,14 +21,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Perspective Annotation Interface</title>
     <script src="{% static "js/csrf_util.js" %}"></script>
-    <script src="{% static "js/step2a/instr.js" %}"></script>
+    <script src="{% static "js/step2a/perspective_paraphrase.js" %}"></script>
     {% csrf_token %}
 </head>
 <body>
     <div class="container">
         <div class="login-page-title">
             <h5>
-                Paraphrase Annotation Interface: Instructions
+                Paraphrase Annotation Interface
             </h5>
             <p>
                 Welcome, Worker ID: {{ request.user.username }}! <button type="button" class="btn btn-danger btn-sm" onclick="window.location='/logout/'">Logout</button>
@@ -42,57 +42,38 @@
           </ol>
         </nav>
 
-        <strong class="rel_option_container">
-            In this task we would like to create <font color="red">paraphrases</font> for a given input <font color="green"><stronga> opinion </strong></font> sentence.
-            <br>
-            This is how the task interface will look like:
+        <div class="rel_option_container">
+            In this task we would like to create <font color="red">paraphrases</font> for a given input <font color="green"><strong> opinion </strong></font> sentence.
+            {% for p in perspectives %}
             <div class="col persps-container rel_tile">
                 <div class="container">
                     <div class="row">
                         <div class="col-3">
-                            <h6 style="color: blue">Claim: </h6> Democracy has to be imposed, if needed.
+                            <h6 style="color: blue">Claim: </h6> {{ claims|dict_get_item:p.id }}
                         </div>
                     <div class="col-sm">
                         <div class="rel-q1">
                             <div class="col equi-cand-container">
                                 <span style="font-weight: normal; font-size: medium;">  <font color="green">
-                                    <h6>Opinion: </h6></font></span> The imposition of democracy violates national sovereignty.
+                                    <h6>Opinion: </h6></font></span> {{ p.title }}
                                 <br><br>
                                 <div style="font-weight: normal; font-size: medium"><font color="red">Paraphrase 1:
-                                  <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
+                                  <input id="para_1_{{ p.id }}" type="text" class="para form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
                                     </font>
                                 </div>
                                 <hr>
                                 <div style="font-weight: normal; font-size: medium"><font color="red">Paraphrase 2:
-                                  <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
+                                  <input id="para_2_{{ p.id }}" type="text" class="para form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
                                     </font>
-                                </div>
-                                <hr>
-                                <div style="font-weight: normal; font-size: medium">
-                                    <font color="red">Paraphrase 3:
-                                    <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
-                                </font>
                                 </div>
                                 <hr>
                             </div>
                             <div class="alert alert-light" style="overflow:scroll; height:300px;" role="alert">
                                 <font color="purple"><strong>Hints:</strong></font>
                                 <ul>
-                                     <li>H1: The imposition of democracy violates national sovereignty </li>
-                                     <li>H2: Democracy Cannot be Imposed </li>
-                                     <li>H3: Imposed Democracy? </li>
-                                     <li>H4: Vogt: Democracy Cannot Be Imposed </li>
-                                     <li>H5: Democracy Cannot be Imposed by Force </li>
-                                     <li>H6: THE IMPOSITION OF DEMOCRACY: JAPAN AFTER WWII </li>
-                                     <li>H7: Sovereignty and Democracy </li>
-                                     <li>H8: Democracy must be imposed on nations </li>
-                                     <li>H9: Institutions Needed to Sustain Democracy </li>
-                                     <li>H10: Democracy , by definition , can never be imposed </li>
-                                     <li>H11: Should democracy be imposed or grow naturally? </li>
-                                     <li>H12: Should democracy be imposed on all countries? </li>
-                                     <li>H13: Can a Democracy be imposed from the outside? </li>
-                                     <li>H14: Liberal democracy cannot be imposed from outside </li>
-                                     <li>H15: Democracy Cannot be Imposed by Force No </li>
+                                    {% for hint in hints|dict_get_item:p.id %}
+                                     <li> {{ hint }}</li>
+                                    {% endfor %}
                                 </ul>
                             </div>
                         </div>
@@ -100,319 +81,12 @@
                   </div>
                 </div>
             </div>
-
-            When generating paraphrases, there are two critical criteria that we have to focus on:
-            <ul>
-                <li>A) Make sure that your generated paraphrase conveys the same meaning as <font color="green"><strong> opinion </strong></font> (with respect to the given <font color="blue"><strong> claim </strong></font>) </li>
-                <li>B) Make sure your generated opinion phrase is free of any grammatical or logical errors. </li>
-            </ul>
-
-            <strong>Note: </strong> The purpose of providing <font color="purple"><strong>Hints</strong></font>
-            is to help you come up with different ways of wording your paraphrases.
-            Not that these "hint" sentences are not necessarily proper sentences or paraphrases;
-            they are just random relevant sentences and many of them contain grammatical issues.
-
-            <br>
-
-            To demonstrate these points we are providing a few examples below:
-            <div class="col persps-container rel_tile">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-3">
-                            <h6 style="color: blue">Claim: </h6> <p>It is crucial to explore the universe.</p>
-                        </div>
-                    <div class="col-sm">
-                        <div class="rel-q1">
-                            <div class="col equi-cand-container">
-                                <span style="font-weight: normal; font-size: medium;">  <font color="green">
-                                    <h6>Opinion: </h6></font></span> Space exploration takes resources away from more worthy causes.
-                                <br><br>
-                                <div style="font-weight: normal; font-size: medium"><font color="red">Paraphrase 1:
-                                  <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1" value="Space exploration is expensive and a wasteful way use of resources ">
-                                    </font>
-                                </div>
-                                <hr>
-                                <div style="font-weight: normal; font-size: medium"><font color="red">Paraphrase 2:
-                                  <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1" value="Exploring space takes away the resources that could very well benefit other causes that require more attention ">
-                                    </font>
-                                </div>
-                                <hr>
-                                <div style="font-weight: normal; font-size: medium">
-                                    <font color="red">Paraphrase 3:
-                                    <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1" value="Space exploration is a huge waste of resources">
-                                </font>
-                                </div>
-                                <hr>
-                            </div>
-                            <div class="alert alert-light" style="overflow:scroll; height:300px;" role="alert">
-                                <font color="purple"><strong>Hints:</strong></font>
-                                <ul>
-                                     <li>H1: Space exploration takes resources away from more worthy causes </li>
-                                     <li>H2: The Universe and Space Exploration </li>
-                                     <li>H3: Explore the Universe </li>
-                                     <li>H4: Space Exploration Our Universe Episode 01 </li>
-                                     <li>H5: The Space Engine universe is beautiful what will you explore </li>
-                                     <li>H6: Space exploration is worth it </li>
-                                     <li>H7: ems explore universe </li>
-                                     <li>H8: Debate: Is space exploration a waste of resources? </li>
-                                     <li>H9: CMV: Space exploration is a huge waste of resources </li>
-                                     <li>H10: See more space exploration news </li>
-                                     <li>H11: Space Exploration: From the Past to the Future </li>
-                                     <li>H12: Benefits Stemming from Space Exploration </li>
-                                     <li>H13: Why explore space? </li>
-                                     <li>H14: Understanding space is crucial to understanding our place within it </li>
-                                     <li>H15: Essay Space Exploration Worth It </li>
-                                     <li>H16: Space exploration is expensive </li>
-                                     <li>H17: It takes away freedom of expression </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                  </div>
-                </div>
-            </div>
-
-
-
-            Now in order to verify your understanding, please solve the following examples,
-        according the above instructions where we test to make sure you have read (A) and (B):
-
-            <div class="col persps-container rel_tile">
-                <div class="container">
-                    <p>Indicate the <font color="red">candidate paraphrases</font> that express the <strong>exact same</strong> idea as the original <font color="green">opinion</font> (in response to the given <font color="blue">claim</font>). </p>
-                  <hr>
-                    <div class="row">
-                        <div class="col-4">
-                            <h6 style="color: blue">Claim: </h6>Democracy has to be imposed, if needed.
-                        </div>
-                    <div class="col-sm">
-                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><h6> Argument: </h6></font> </span> The imposition of democracy violates national sovereignty.
-                        <br><br>
-                        <hr>
-                        <div class="rel-q1" id="q1">
-                            <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Paraphrase:</strong> </font> <p>Forcing democracy and national sovereignty are in contradiction.</p> </div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check1" type="radio" id="check1_same" value="same" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>A good paraphrase</b>
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check1" type="radio" id="check1_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Not a good paraphrase</b>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="alert alert-success" id="q1-succc" role="alert" style="display: none">
-                                    Correct! This is a good paraphrase, since it conveys the same meaning and has a proper wording.
-                                </div>
-                                <div class="alert alert-danger"  id="q1-fail" role="alert" style="display: none">
-                                  Not correct!
-                                    <br>
-                                    Give it another try ...
-                                </div>
-                                <hr>
-                            </div>
-                            <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Paraphrase:</strong> </font> <p>Forcing democracy and national sovereignty are not in contradiction </p></div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check2" type="radio" id="check=2_same" value="same" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>A good paraphrase</b>
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check2" type="radio" id="check2_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Not a good paraphrase</b>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="alert alert-success" id="q2-succc" role="alert" style="display: none">
-                                    Correct! Although a grammatical sentence, it logically contradicts the origin opiion.
-                                </div>
-                                <div class="alert alert-danger"  id="q2-fail" role="alert" style="display: none">
-                                  Not correct!
-                                    <br>
-                                    Give it another try ...
-                                </div>
-                                <hr>
-                            </div>
-                            <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Paraphrase:</strong> </font> <p>Forcing democracy contradicts democratic ideals such as respect for national sovereignty.</p></div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check3" type="radio" id="check13_same" value="same" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>A good paraphrase</b>
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check3" type="radio" id="check13_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Not a good paraphrase</b>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="alert alert-success" id="q3-succc" role="alert" style="display: none">
-                                    Correct! This is a good paraphrase, since it conveys the same meaning and has a proper wording.
-                                </div>
-                                <div class="alert alert-danger"  id="q3-fail" role="alert" style="display: none">
-                                  Not correct!
-                                    <br>
-                                    Give it another try ...
-                                </div>
-                                <hr>
-                            </div>
-                            <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Paraphrase:</strong> </font> <p>Liberal democracy cannot impose from outside since it violates sovergnty of the nations.</p></div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check4" type="radio" id="check14_same" value="same" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>A good paraphrase</b>
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check4" type="radio" id="check14_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Not a good paraphrase</b>
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="alert alert-success" id="q4-succc" role="alert" style="display: none">
-                                    Correct! This problem has grammatical issues ("impose" has to be changed to "to be imposed").
-                                </div>
-                                <div class="alert alert-danger"  id="q4-fail" role="alert" style="display: none">
-                                  Not correct!
-                                    <br>
-                                    Give it another try ...
-                                </div>
-                                <hr>
-                            </div>
-                        </div>
-                    </div>
-                  </div>
-                </div>
-            </div>
-
-            <div style="align-self: center; align-content: center; text-align: center">
-                You have to answer the above samples correctly in order for the bottom to be activated. <br>
-                <button id="instr_submit" type="button" class="btn btn-success" disabled>Finish the instructions</button>
-            </div>
-
-            <br><br>
-
+            {% endfor %}
         </div>
-    </div>
-
-</body>
-<script>
-    showFirst = false;
-    showSecond = false;
-
-    answers = {
-        "check1": null,
-        "check2": null,
-        "check3": null,
-        "check4": null,
-    };
-
-    radio_checked = {
-        "check1": false,
-        "check2": false,
-        "check3": false,
-        "check4": false,
-    };
-
-    $('input[type="radio"]').on('click change', function(e) {
-        answers[$(this).attr('name')] = ($(this).val() === 'same');
-        radio_checked[$(this).attr('name')] = true;
-        //console.log(radio_checked)
-        console.log(answers)
-    });
-
-    // if all the options are answered correctly, turn the botton active
-    $('#q1').on('click change', function(e) {
-
-        //showFirst = radio_checked['check11'] & radio_checked['check12'] & radio_checked['check13'] & radio_checked['check14'];
-
-        if (answers['check1'] && radio_checked['check1'] ) {
-            $("#q1-fail").css("display", "none");
-            $("#q1-succc").css("display", "block");
-        }
-
-        if (!answers['check1'] && radio_checked['check1']) {
-            $("#q1-succc").css("display", "none");
-            $("#q1-fail").css("display", "block");
-        }
-
-        // -------
-        if (!answers['check2'] && radio_checked['check2']) {
-            $("#q2-fail").css("display", "none");
-            $("#q2-succc").css("display", "block");
-        }
-
-        if (answers['check2'] && radio_checked['check2']) {
-            $("#q2-succc").css("display", "none");
-            $("#q2-fail").css("display", "block");
-        }
-
-        // ---------
-        if (answers['check3'] && radio_checked['check3']) {
-            $("#q3-fail").css("display", "none");
-            $("#q3-succc").css("display", "block");
-        }
-        if (!answers['check3'] && radio_checked['check3']) {
-            $("#q3-succc").css("display", "none");
-            $("#q3-fail").css("display", "block");
-        }
-
-        // ---------
-
-        if (!answers['check4'] && radio_checked['check4']) {
-            $("#q4-fail").css("display", "none");
-            $("#q4-succc").css("display", "block");
-        }
-
-        if (answers['check4'] && radio_checked['check4']) {
-            $("#q4-succc").css("display", "none");
-            $("#q4-fail").css("display", "block");
-        }
-
-        if (!answers['check4'] && answers['check3'] && !answers['check2'] && answers['check1'] && radio_checked['check4'] && radio_checked['check2'] ) {
-            $("#instr_submit").prop('disabled', false);
-        }
-        else {
-            $("#instr_submit").prop('disabled', true);
-        }
-    });
-
-</script>
-
-    <!--<style>-->
-        <!--::-webkit-scrollbar {-->
-          <!-- -webkit-appearance: none;-->
-          <!--width: 10px;-->
-        <!--}-->
-
-        <!--::-webkit-scrollbar-thumb {-->
-          <!--border-radius: 5px;-->
-          <!--background-color: rgba(0,0,0,.5);-->
-          <!-- -webkit-box-shadow: 0 0 1px rgba(255,255,255,.5);-->
-        <!--}-->
-    <!--</style>-->
+        <div class="row">
+            <div class="col">
+                <button id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</button>
+            </div>
+        </div>
 
 </html>
