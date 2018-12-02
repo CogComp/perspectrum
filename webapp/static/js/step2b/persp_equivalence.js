@@ -22,7 +22,7 @@ function submit() {
     let checked = radios.filter(':checked');
 
     if (checked.length !== $(".equi-cand-container").length) {
-        alert("Please finish all annotations!");
+        alert("Please finish all paraphrases!");
         return enable_submit_button();
     }
 
