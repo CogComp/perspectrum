@@ -11,7 +11,7 @@ def get_paraphrase_hit_session(username):
     if unfinished_sessions.count() > 0:
         session = unfinished_sessions[0]
     else:
-        claim_ids = generate_paraphrase_jobs(username, 3)
+        claim_ids = generate_paraphrase_jobs(username, 4)
         time_now = datetime.datetime.now(datetime.timezone.utc)
         session = ParaphraseHITSession.objects.create(username=username, jobs=json.dumps(claim_ids), finished_jobs=json.dumps([]),
                                                       instruction_complete=paraphrase_instr_needed(username), duration=datetime.timedelta(),
