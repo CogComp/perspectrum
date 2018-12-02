@@ -31,7 +31,7 @@ def paraphrase_instr_needed(username):
 
 
 # Number of assignments for each claim in the persp paraphrase task
-TARGET_ASSIGNMENT_COUNT = 1
+TARGET_ASSIGNMENT_COUNT = 3
 
 
 def generate_paraphrase_jobs(username, num_paraphrases):
