@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Perspective Annotation Interface</title>
     <script src="{% static "js/csrf_util.js" %}"></script>
-    <script src="{% static "js/step2/instr.js" %}"></script>
+    <script src="{% static "js/step2a/instr.js" %}"></script>
     {% csrf_token %}
 </head>
 <body>
@@ -37,7 +37,7 @@
 
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/step2/task_list/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/step2a/task_list/">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Instructions</li>
           </ol>
         </nav>
@@ -45,7 +45,7 @@
         <strong class="rel_option_container">
             In this task we would like to create <font color="red">paraphrases</font> for a given input <font color="green"><stronga> opinion </strong></font> sentence.
             <br>
-            This is how the task interface will look like:
+            This is how the task interface <b>will look like</b> (You don't have to read through this example or write anything down):
             <div class="col persps-container rel_tile">
                 <div class="container">
                     <div class="row">
@@ -66,12 +66,6 @@
                                 <div style="font-weight: normal; font-size: medium"><font color="red">Paraphrase 2:
                                   <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
                                     </font>
-                                </div>
-                                <hr>
-                                <div style="font-weight: normal; font-size: medium">
-                                    <font color="red">Paraphrase 3:
-                                    <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
-                                </font>
                                 </div>
                                 <hr>
                             </div>
@@ -105,11 +99,13 @@
             <ul>
                 <li>A) Make sure that your generated paraphrase conveys the same meaning as <font color="green"><strong> opinion </strong></font> (with respect to the given <font color="blue"><strong> claim </strong></font>) </li>
                 <li>B) Make sure your generated opinion phrase is free of any grammatical or logical errors. </li>
+                <li>C) Please be as creative as possible in your paraphrasing.  </li>
+
             </ul>
 
             <strong>Note: </strong> The purpose of providing <font color="purple"><strong>Hints</strong></font>
             is to help you come up with different ways of wording your paraphrases.
-            Not that these "hint" sentences are not necessarily proper sentences or paraphrases;
+            Note that these "hint" sentences are not necessarily proper sentences or paraphrases;
             they are just random relevant sentences and many of them contain grammatical issues.
 
             <br>
@@ -135,12 +131,6 @@
                                 <div style="font-weight: normal; font-size: medium"><font color="red">Paraphrase 2:
                                   <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1" value="Exploring space takes away the resources that could very well benefit other causes that require more attention ">
                                     </font>
-                                </div>
-                                <hr>
-                                <div style="font-weight: normal; font-size: medium">
-                                    <font color="red">Paraphrase 3:
-                                    <input type="text" class="form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1" value="Space exploration is a huge waste of resources">
-                                </font>
                                 </div>
                                 <hr>
                             </div>

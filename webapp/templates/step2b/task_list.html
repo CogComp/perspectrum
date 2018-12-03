@@ -39,11 +39,11 @@
         <div class="alert alert-secondary" role="alert">
             Here are the list of tasks. You have to read and pass the instructions in order to move on the annotation tasks.
 
-            <button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location='/step2/instructions/'">Instructions</button>
+            <button type="button" class="btn btn-primary btn-lg btn-block" onclick="window.location='/step2b/instructions/'">Instructions</button>
 
             {% if instr_complete%}
                 {% for item in task_list %}
-                    <button type="button" class="btn btn-info btn-lg btn-block" onclick="window.location='/step2/perspective_equivalence/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
+                    <button type="button" class="btn btn-info btn-lg btn-block" onclick="window.location='/step2b/perspective_equivalence/{{ item.id }}'" {% if item.done%} disabled {% endif %} >Task {{ forloop.counter }}</button>
                 {% endfor %}
             {% else %}
                 <br>
@@ -57,7 +57,7 @@
                 </div>
                 <br>
                 {% for item in task_list %}
-                    <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="window.location='/step2/perspective_equivalence/{{ item.id }}'" disabled>Task {{ forloop.counter }}</button>
+                    <button type="button" class="btn btn-secondary btn-lg btn-block" onclick="window.location='/step2b/perspective_equivalence/{{ item.id }}'" disabled>Task {{ forloop.counter }}</button>
                 {% endfor %}
             {% endif %}
         </div>

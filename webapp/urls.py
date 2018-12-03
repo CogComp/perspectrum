@@ -44,18 +44,18 @@ urlpatterns = [
     path('api/submit_instr/', views.submit_instr, name="submit_instr"),
 
     # step 2a: generation of paraphrases
-    path('step2a/perspective_paraphrase/<slug:claim_id>', views.vis_persp_equivalence, name="perspective_equivalence"),
-    path('step2a/instructions/', views.render_step2a_instructions, name="step2_instructions"),
-    path('step2a/task_list/', views.render_step2a_task_list, name="step2_task_list"),
-    # path('step2a/api/submit_equivalence_annotation', views.submit_equivalence_annotation, name="submit_equivalence_annotation"),
-    # path('step2a/api/submit_instr/', views.step2_submit_instr, name="step2_submit_instr"),
+    path('step2a/perspective_paraphrase/<slug:batch_id>', views.vis_perspective_paraphrase, name="perspective_paraphrase"),
+    path('step2a/instructions/', views.render_step2a_instructions, name="step2a_instructions"),
+    path('step2a/task_list/', views.render_step2a_task_list, name="step2a_task_list"),
+    path('step2a/api/submit_annotation', views.submit_paraphrase_annotation, name="submit_paraphrase_annotation"),
+    path('step2a/api/submit_instr/', views.step2a_submit_instr, name="step2a_submit_instr"),
 
     # step 2b: verification of paraphrases
-    path('step2b/perspective_equivalence/<slug:claim_id>', views.vis_persp_equivalence, name="perspective_equivalence"),
-    path('step2b/instructions/', views.render_step2b_instructions, name="step2_instructions"),
-    path('step2b/task_list/', views.render_step2b_task_list, name="step2_task_list"),
+    path('step2b/perspective_equivalence/<slug:claim_id>', views.vis_persp_equivalence, name="persp_equivalence"),
+    path('step2b/instructions/', views.render_step2b_instructions, name="step2b_instructions"),
+    path('step2b/task_list/', views.render_step2b_task_list, name="step2b_task_list"),
     path('step2b/api/submit_equivalence_annotation', views.submit_equivalence_annotation, name="submit_equivalence_annotation"),
-    path('step2b/api/submit_instr/', views.step2_submit_instr, name="step2_submit_instr"),
+    path('step2b/api/submit_instr/', views.step2b_submit_instr, name="step2b_submit_instr"),
 
     # step 3
     path('step3/verify_evidence/<slug:batch_id>', views.render_evidence_verification, name="verify_evidence"),

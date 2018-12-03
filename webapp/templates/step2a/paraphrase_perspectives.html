@@ -1,0 +1,93 @@
+{% load static %}
+{% load claim_filter %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
+          integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Perspective Annotation Interface</title>
+    <script src="{% static "js/csrf_util.js" %}"></script>
+    <script src="{% static "js/step2a/perspective_paraphrase.js" %}"></script>
+    {% csrf_token %}
+</head>
+<body>
+    <div class="container">
+        <div class="login-page-title">
+            <h5>
+                Paraphrase Annotation Interface
+            </h5>
+            <p>
+                Welcome, Worker ID: {{ request.user.username }}! <button type="button" class="btn btn-danger btn-sm" onclick="window.location='/logout/'">Logout</button>
+            </p>
+        </div>
+
+        <nav aria-label="breadcrumb">
+          <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/step2a/task_list/">Home</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Task</li>
+          </ol>
+        </nav>
+
+        <div class="rel_option_container">
+            In this task we would like to create <font color="red">paraphrases</font> for a given input <font color="green"><strong> opinion </strong></font> sentence.
+            <p>Note that this is <strong>NOT a survey</strong>. We are <strong>NOT</strong> asking for your <strong>personal opinions</strong>;
+            {% for p in perspectives %}
+            <div class="col persps-container rel_tile">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-3">
+                            <h6 style="color: blue">Claim: </h6> {{ claims|dict_get_item:p.id }}
+                        </div>
+                    <div class="col-sm">
+                        <div class="rel-q1">
+                            <div class="col equi-cand-container">
+                                <span style="font-weight: normal; font-size: medium;">  <font color="green">
+                                    <h6>Opinion: </h6></font></span> {{ p.title }}
+                                <br><br>
+                                <div style="font-weight: normal; font-size: medium"><font color="red">Paraphrase 1:
+                                  <input id="para_1_{{ p.id }}" type="text" class="para form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
+                                    </font>
+                                </div>
+                                <hr>
+                                <div style="font-weight: normal; font-size: medium"><font color="red">Paraphrase 2:
+                                  <input id="para_2_{{ p.id }}" type="text" class="para form-control" placeholder="Write a paraphrase to the above opinion here" aria-label="Username" aria-describedby="basic-addon1">
+                                    </font>
+                                </div>
+                                <hr>
+                            </div>
+                            <div class="alert alert-light" style="overflow:scroll; height:300px;" role="alert">
+                                <font color="purple"><strong>Hints:</strong></font>
+                                <ul>
+                                    {% for hint in hints|dict_get_item:p.id %}
+                                     <li> {{ hint }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                  </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <div class="row">
+            <div class="col">
+                <button id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</button>
+            </div>
+        </div>
+
+</html>
