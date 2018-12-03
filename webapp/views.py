@@ -415,15 +415,19 @@ def submit_paraphrase_annotation(request):
         # Update annotation in EquivalenceAnnotation table
         for pid, paras in annos.items():
             p = PerspectiveParaphrase.objects.get(perspective_id=pid)
-            user_para = json.loads(p.user_generated)
-            session_ids = json.loads(p.session_ids)
+            user_para_str = p.user_generated.replace('[\'', '["').replace('\']', '"]').replace('\', \'', '", "')\
+                .replace('\', "', '", "').replace('", \'', '", "')
+            print(user_para_str)
+            user_para = json.loads(user_para_str)
+            sid_str = p.session_ids.replace('[\'', '["').replace('\']', '"]').replace('\', \'', '", "')
+            session_ids = json.loads(sid_str)
 
             for pp in paras:
                 user_para.append(pp)
                 session_ids.append(session.id)
 
-            p.user_generated = user_para
-            p.session_ids = session_ids
+            p.user_generated = json.dumps(user_para)
+            p.session_ids = json.dumps(session_ids)
             p.save()
 
         # Update finished jobs in user session
