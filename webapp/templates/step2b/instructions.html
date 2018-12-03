@@ -37,31 +37,31 @@
 
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/step2/task_list/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/step2b/task_list/">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Instructions</li>
           </ol>
         </nav>
 
         <div class="rel_option_container">
-            For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an argument</font> with respect to it (either supporting or undermining it).
-            In addition, you are given a list of <font color="red">candidate arguments</font> that are topically relevant to the given problem. <br>
-            We want you to select all the items (from the list of given <font color="green">candidate arguments</font>) that convey the same points, as to the given <font color="green">argument</font>.
-
-            Please solve the following examples, according the above instructions:
+            For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an opinions</font> with respect to it (either supporting or opposing it).
+            <br>In addition, you are given a list of <font color="red">candidate opinions</font> that are similar to the given opinion.
+            <br>We want you to select all <font color="red">opinions</font> that convey the exact same idea, as the given <font color="green">opinion</font>.
+            <br>
+            <br>Please solve the following examples, according the above instructions:
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Among the following <font color="red"> candidate arguments</font>, select the one(s) that express the <strong>exact same</strong> idea as <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                    <p>Among the following <font color="red"> candidate opinions</font>, select the one(s) that are valid <strong>paraphrases</strong> to <font color="green">the given opinion</font> </p>
                   <hr>
                     <div class="row">
                         <div class="col-4">
                             <strong><h6 style="color: blue">Claim: </h6>The use of child performers should be banned. </strong>
                         </div>
                     <div class="col-sm">
-                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> Being a performer can make the child physically vulnerable. </span>
+                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Opinion: </strong></font> Being a performer can make the child physically vulnerable. </span>
                         <hr>
                         <div class="rel-q1" id="q1">
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Are Children Who Appear on Reality Television Adequately Protected by Federal and State Law?</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinion:</strong> </font> A child becomes physically vulnerable when they become a child performer.</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
@@ -81,7 +81,7 @@
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Why Congress Should Protect Children in Reality Programming</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinion:</strong> </font> Working as a performer can make a child vulnerable.</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
@@ -101,7 +101,7 @@
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Keep Out of Reach of Children</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinion:</strong> </font> Child performers are exposed to the risk of physical injuries. </div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
@@ -120,35 +120,15 @@
                                 </div>
                                 <hr>
                             </div>
-                            <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Forced child performance could physically harm children.</div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check14" type="radio" id="check14_same" value="same" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check14" type="radio" id="check14_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
-                                        </label>
-                                    </div>
-                                </div>
-                                <hr>
-                            </div>
                         </div>
                     </div>
                   </div>
                 </div>
                 <div class="alert alert-success" id="q1-succc" role="alert" style="display: none">
-                    Correct! Only the fourth argument expresses the <b>exact same</b> idea as the given argument.
+                    Correct! All of them are correct paraphrases!
                 </div>
                 <div class="alert alert-danger"  id="q1-fail" role="alert" style="display: none">
-                  Not correct! Give it another try ...
+                  Not correct! Try again?
                 </div>
             </div>
 
@@ -156,18 +136,18 @@
 
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Among the following <font color="red"> candidate arguments</font>, select the one(s) that express the <strong>exact same</strong> idea as <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
+                    <p>Among the following <font color="red"> candidate opinions</font>, select the one(s) that are valid <strong>paraphrases</strong> to <font color="green">the given opinion</font> </p>
                   <hr>
                     <div class="row">
                         <div class="col-4">
                             <strong><h6 style="color: blue">Claim: </h6>Trade is better than aid.  </strong>
                         </div>
                     <div class="col-sm">
-                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> Trade does not allocate resources effectively. </span>
+                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Opinion: </strong></font> Trade does not allocate resources effectively. </span>
                         <hr>
                         <div class="rel-q1" id="q2">
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> How Economic Systems Allocate Resources Effectively</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinion:</strong> </font> Free trade promotes better allocation of resources. </div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
@@ -187,7 +167,7 @@
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Trade not Aid</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinion:</strong> </font> Resources are best allocated with aid instead of free trade. </div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
@@ -207,7 +187,7 @@
                                 <hr>
                             </div>
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Trade is unlikely to result in an effective end.</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinion:</strong> </font> Aid uses resources more efficiently than free trade.</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
@@ -226,35 +206,15 @@
                                 </div>
                                 <hr>
                             </div>
-                            <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> Trade is unlikely to result in an effective end.</div>
-                                <div class="row">
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check24" type="radio" id="check24_same" value="same" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Same</b>
-                                        </label>
-                                    </div>
-                                    <div class="col-4">
-                                        <label class="radio rel_option_radio">
-                                            <input name="check24" type="radio" id="check24_diff" value="diff" data-toggle="radio" class="custom-radio equi_option">
-                                            <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
-                                            <b>Different</b>
-                                        </label>
-                                    </div>
-                                </div>
-                                <hr>
-                            </div>
                         </div>
                     </div>
                   </div>
                 </div>
                 <div class="alert alert-success" id="q2-succc" role="alert" style="display: none">
-                    Correct! Only the third argument expresses the <b>exact same</b> idea as the given argument.
+                    Correct! The first opinion is different because it negated the given opinion.
                 </div>
                 <div class="alert alert-danger"  id="q2-fail" role="alert" style="display: none">
-                  Not correct! Give it another try ...
+                    Not correct! Try to spot the difference in the <b>first</b> opinion ...
                 </div>
             </div>
 
@@ -307,10 +267,10 @@
     // if all the options are answered correctly, turn the botton active
     $('#q1').on('click change', function(e) {
 
-        showFirst = radio_checked['check11'] & radio_checked['check12'] & radio_checked['check13'] & radio_checked['check14'];
+        showFirst = radio_checked['check11'] & radio_checked['check12'] & radio_checked['check13'];
 
         if (showFirst) {
-            if (answers['check14'] && !answers['check13'] && !answers['check12'] && !answers['check11'] ) {
+            if (answers['check13'] && answers['check12'] && answers['check11'] ) {
                 $("#q1-fail").css("display", "none");
                 $("#q1-succc").css("display", "block");
                 firstCorrect = true
@@ -332,10 +292,10 @@
 
     $('#q2').on('click change', function(e) {
 
-        showSecond = radio_checked['check21'] & radio_checked['check22'] & radio_checked['check23'] & radio_checked['check24'];
+        showSecond = radio_checked['check21'] & radio_checked['check22'] & radio_checked['check23'];
 
         if (showSecond) {
-            if (!answers['check24'] && answers['check23'] && !answers['check22'] && !answers['check21'] ) {
+            if (answers['check23'] && answers['check22'] && !answers['check21'] ) {
                 $("#q2-fail").css("display", "none");
                 $("#q2-succc").css("display", "block");
                 secondCorrect = true;

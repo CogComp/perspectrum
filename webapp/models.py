@@ -187,3 +187,10 @@ class ParaphraseBatch(models.Model):
     paraphrase_ids = models.TextField(default="[]") # list of integer perspective ids
     assign_counts = models.IntegerField(default=0)
     finished_counts = models.IntegerField(default=0)
+
+
+# Equivalence Batches
+class EquivalenceBatch(models.Model):
+    perspective_ids = models.TextField(default="[]") # list of integer perspective ids
+    assign_counts = models.IntegerField(default=0)
+    finished_counts = models.IntegerField(default=0)
