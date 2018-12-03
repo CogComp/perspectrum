@@ -1,14 +1,12 @@
 from webapp.models import *
 import datetime
 import json
-import collections
 
 # Equivalence Verification Assignment counts
 
-TIMEOUT_IDLE_MINUTE = 30
+TIMEOUT_IDLE_MINUTE = 60
 
 _TIMEOUT_IDLE_MINUTE = datetime.timedelta(minutes=TIMEOUT_IDLE_MINUTE)
-
 
 
 def clean_equivalence_idle_sessions():
@@ -22,27 +20,41 @@ def clean_equivalence_idle_sessions():
             decrease_equivalence_assign_counts(jobs)
             s.delete()
 
-def increment_equivalence_assign_counts(claim_ids):
+
+def increment_equivalence_assign_counts(batch_ids):
     """
     increase by assignment counts of the claim ids by 1
     :param claim_ids:
     :return:
     """
-    return _offset_equivalence_assign_counts(claim_ids, 1)
+    return _offset_equivalence_assign_counts(batch_ids, 1)
 
 
-def decrease_equivalence_assign_counts(claim_ids):
+def decrease_equivalence_assign_counts(batch_ids):
     """
     decrease by assignment counts of the claim ids by 1
     :param claim_ids:
     :return:
     """
-    return _offset_equivalence_assign_counts(claim_ids, -1)
+    return _offset_equivalence_assign_counts(batch_ids, -1)
 
 
-def _offset_equivalence_assign_counts(claim_ids, offset):
-    for cid in claim_ids:
-        claim = Claim.objects.get(id=cid)
-        claim.equivalence_assign_counts += offset
-        claim.save()
+def _offset_equivalence_assign_counts(batch_ids, offset):
+    for cid in batch_ids:
+        eb = EquivalenceBatch.objects.get(id=cid)
+        target = eb.assign_counts + offset
+        if target >= 0:
+            eb.assign_counts = target
+        else:
+            eb.assign_counts = 0
 
+        eb.save()
+
+
+def get_all_finished_equivalence_batches(username):
+    _jobs = EquivalenceHITSession.objects.filter(username=username).values_list("jobs", flat=True)
+    jobs = []
+    for j in _jobs:
+        jobs += json.loads(j)
+
+    return jobs
