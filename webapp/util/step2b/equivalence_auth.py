@@ -31,7 +31,7 @@ def equivalence_instr_needed(username):
 
 
 # Number of assignments for each claim in the persp equivalence task
-TARGET_ASSIGNMENT_COUNT = 3
+TARGET_ASSIGNMENT_COUNT = 2
 
 
 def generate_equivalence_jobs(username, num_batch):
