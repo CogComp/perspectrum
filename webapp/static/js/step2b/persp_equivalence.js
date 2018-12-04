@@ -1,10 +1,5 @@
 $(document).ready(function () {
     csrfSetup();
-    let submitted = false;
-    let alerted = false;
-    $('#rel_option_clear').click(function() {
-        $('.custom-checkbox').prop('checked', false);
-    });
     $('#rel_option_submit').click(function (){
         disable_submit_button();
         submit();
