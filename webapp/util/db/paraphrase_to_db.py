@@ -79,10 +79,32 @@ def remove_trivial_paraphrases():
             pp.delete()
 
 
+def remove_non_paraphrase_candidates():
+    """
+    We decided not to do other perspectives than the paraphrase candidates for now.
+    :return:
+    """
+
+    th = 20799 # Any persp id less than this is not paraphrase
+
+    q = Perspective.objects.exclude(source__in=['paraphrase', 'google']).exclude(similar_persps='[]')
+    print(len(q))
+
+    for p in q:
+        cands = json.loads(p.similar_persps)
+        _cands = [_p for _p in cands if _p >= th]
+
+        if len(cands) != len(_cands):
+            print("Removed a candidate! pid = {}".format(p.id))
+            p.similar_persps = json.dumps(_cands)
+            p.save()
+
+
 if __name__ == '__main__':
 
     # clean_similar_persps()
     # import_paraphrase()
     # import_potentially_equivalent_perspectives()
-    # import_equivalence_batches()
-    remove_trivial_paraphrases()
+    import_equivalence_batches()
+    # remove_trivial_paraphrases()
+    # remove_non_paraphrase_candidates()
