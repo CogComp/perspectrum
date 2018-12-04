@@ -497,25 +497,20 @@ def vis_persp_equivalence(request, batch_id):
         return HttpResponse(content="Batch_Id = {} Not found in the database!".format(batch_id), status=404)
 
     persp_ids = json.loads(eb.perspective_ids)
-    persps = [Perspective.objects.get(id=pid) for pid in persp_ids]
 
-    rstep1_r = ReStep1Results.objects.filter(p_i_3__gt=0.5, label_3__in=["S", "U"])
-
+    persps = []
     claims = {}
     candidates = {}
 
-    for p in persps:
-        _r = rstep1_r.filter(perspective_id=p.id).order_by('-p_i_3')
+    for cid, pid in persp_ids:
+        persp = Perspective.objects.get(id=pid)
+        persps.append(persp)
 
-        if len(_r) > 0:
-            cid = _r[0].claim_id
-            claims[p.id] = Claim.objects.get(id=cid).title
-        else:
-            claims[p.id] = ""
+        claims[pid] = Claim.objects.get(id=cid).title
 
-        cand_ids = set(json.loads(Perspective.objects.get(id=p.id).similar_persps))
+        cand_ids = set(json.loads(Perspective.objects.get(id=pid).similar_persps))
         cand_persps = Perspective.objects.filter(id__in=cand_ids)
-        candidates[p.id] = cand_persps
+        candidates[pid] = cand_persps
 
     return render(request, 'step2b/persp_equivalence.html', {
         "claims": claims,

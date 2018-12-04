@@ -53,12 +53,12 @@
                             <strong><h6 style="color: blue">Claim: </h6>{{ claims|dict_get_item:persp.id }} </strong>
                         </div>
                     <div class="col-sm">
-                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Opinions: </strong></font> {{ persp.title }} </span>
+                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Opinion: </strong></font> {{ persp.title }} </span>
                         <hr>
                         <div class="rel-q1">
                             {% for cand in candidates|dict_get_item:persp.id%}
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinions:</strong> </font> {{ cand.title }}</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinion:</strong> </font> {{ cand.title }}</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
@@ -86,10 +86,7 @@
             {% endfor %}
 
             <div class="row">
-                <div class="col-4">
-                    <button id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</button>
-                </div>
-                <div class="col-8">
+                <div class="col">
                     <button id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</button>
                 </div>
             </div>
