@@ -547,7 +547,7 @@ def submit_equivalence_annotation(request):
 
         # Increment finished assignment count in claim table, if not using test acc
         if username != 'TEST':
-            eb = EquivalenceBatch.objects.get(claim_id=claim_id)
+            eb = EquivalenceBatch.objects.get(id=claim_id)
             eb.finished_counts += 1
             eb.save()
 
