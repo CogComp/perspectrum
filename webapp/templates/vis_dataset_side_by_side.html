@@ -46,7 +46,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Add perspective to the other claim
+                        Add cluster to other claim
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <div class="form-inline my-2 my-lg-0">
@@ -61,7 +61,7 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Delete perspective
+                        Delete cluster
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <div class="form-inline my-2 my-lg-0">
@@ -74,7 +74,20 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Merge perspective pair
+                        Delete a perspective
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <div class="form-inline my-2 my-lg-0">
+                            <input id='sbs-del-persp-cid' class="form-control mr-sm-2" type="search" placeholder="Claim ID" aria-label="Search">
+                            <input id='sbs-del-persp-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
+                            <button id='sbs-delete-persp' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Delete persp</button>
+                        </div>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Merge clusters
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <div class="form-inline my-2 my-lg-0">
@@ -202,6 +215,16 @@
         let cid = $('#sbs-del-cid').val();
         let pid = $('#sbs-del-pid').val();
         let url = '/dataset/side_by_side/delete_cluster/' + cid + '/' + pid;
+        $.get(url, function (){
+            window.location.href = window.location.href;
+        });
+    });
+
+    $('#sbs-delete-persp').click(function() {
+        console.log("Delete!");
+        let cid = $('#sbs-del-persp-cid').val();
+        let pid = $('#sbs-del-persp-pid').val();
+        let url = '/dataset/side_by_side/delete_persp/' + cid + '/' + pid;
         $.get(url, function (){
             window.location.href = window.location.href;
         });
