@@ -129,11 +129,11 @@ def vis_spectrum(request, claim_id):
     return render(request, 'step1/vis_spectrum.html', context)
 
 @login_required
-def vis_dataset_side_by_side(request):
+def vis_dataset_side_by_side(request, claim_id1, claim_id2):
     persps = load_json(file_names["perspective"])
     claims = load_json(file_names["claim_annotation"])
 
-    claim_id1 = 300
+    # claim_id1 = 300
     claim_id1 = int(claim_id1)
     persp_dict = {}
     claim_dict = {}
@@ -154,7 +154,7 @@ def vis_dataset_side_by_side(request):
         elif cluster['stance_label_3'] == "UNDERMINE":
             persp_und1.append(titles)
 
-    claim_id2 = 1
+    # claim_id2 = 1
     claim_id2 = int(claim_id2)
 
     c_title2 = claim_dict[claim_id2]["text"]
