@@ -167,8 +167,33 @@ def vis_spectrum_js(request, claim_id):
 
     return render(request, 'vis_dataset_js.html', context)
 
+STANCE_FLIP_MAPPING = {
+    "SUPPORT": "UNDERMINE",
+    "MILDLY_SUPPORT": "MILDLY_UNDERMINE",
+    "MILDLY_UNDERMINE": "MILDLY_SUPPORT",
+    "UNDERMINE": "SUPPORT",
+}
+
 ## utils functions for the side-by-side view
-def add_perspective_to_claim(request, cid_from, pid, cid_to):
+def unify_persps(request, cid1, cid2, flip_stance):
+    if cid1 == cid2:
+        return HttpResponse("Success", status=200)
+
+    claim1 = claim_dict[cid1]
+    claim2 = claim_dict[cid2]
+
+    for pp in claim1['perspectives']:
+        pid = pp["pids"][0]
+        add_perspective_to_claim(request, cid1, pid, cid2, flip_stance)
+
+    for pp in claim2['perspectives']:
+        pid = pp["pids"][0]
+        add_perspective_to_claim(request, cid2, pid, cid1, flip_stance)
+
+    return HttpResponse("Success", status=200)
+
+
+def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
     if cid_from == cid_to:
         return HttpResponse("Success", status=200)
 
@@ -181,14 +206,23 @@ def add_perspective_to_claim(request, cid_from, pid, cid_to):
             c1_idx = idx
 
     c2_contains_pid = False
-    for idx, p in enumerate(claim_from['perspectives']):
+    for idx, p in enumerate(claim_to['perspectives']):
         if pid in p['pids']:
             c2_contains_pid = True
             break
 
     if (c1_idx != None) and not c2_contains_pid:
         claim_to['perspectives'].append(claim_from['perspectives'][c1_idx])
+        if flip_stance:
+            lbl3 = claim_to['perspectives'][-1]['stance_label_3']
+            if lbl3 in STANCE_FLIP_MAPPING:
+                claim_to['perspectives'][-1]['stance_label_3'] = STANCE_FLIP_MAPPING[lbl3]
 
+            lbl5 = claim_to['perspectives'][-1]['stance_label_5']
+            if lbl5 in STANCE_FLIP_MAPPING:
+                claim_to['perspectives'][-1]['stance_label_5'] = STANCE_FLIP_MAPPING[lbl5]
+
+            claim_to['perspectives'][-1]['voter_counts'].reverse()
 
     return HttpResponse("Success", status=200)
 
@@ -270,7 +304,6 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
         elif cluster['stance_label_3'] == "UNDERMINE":
             persp_und1.append(titles)
 
-    #claim_id2 = 1
     claim_id2 = int(claim_id2)
 
     c_title2 = claim_dict[claim_id2]["text"]
@@ -285,9 +318,11 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
             persp_und2.append(titles)
 
     context = {
+        "cid1": claim_id1,
         "claim1": c_title1,
         "persp_sup1": persp_sup1,
         "persp_und1": persp_und1,
+        "cid2": claim_id2,
         "claim2": c_title2,
         "persp_sup2": persp_sup2,
         "persp_und2": persp_und2,

@@ -33,8 +33,15 @@
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
 
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-                <li class="nav-item">
-                    <a class="nav-link" href="#">Unify the claims</a>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Unify the claims
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <input id='sbs-unify-flip-stance' type="checkbox"> Flip Stance??<br>
+                        <button id='sbs-unify' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Unify</button>
+                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -42,13 +49,13 @@
                         Add perspective to the other claim
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <form class="form-inline my-2 my-lg-0">
+                        <div class="form-inline my-2 my-lg-0">
                             <input id='sbs-add-cid-from' class="form-control mr-sm-2" type="search" placeholder="From Claim ID" aria-label="Search">
                             <input id='sbs-add-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
                             <input id='sbs-add-cid-to' class="form-control mr-sm-2" type="search" placeholder="To Claim ID" aria-label="Search">
-                            <button id='sbs-add' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Add</button>
-                        </form>
-                        <a class="dropdown-item" href="#">Add</a>
+                        </div>
+                        <input id='sbs-add-flip-stance' type="checkbox"> Flip Stance??<br>
+                        <button id='sbs-add' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Add</button>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -167,6 +174,10 @@
 
 </body>
 <script type="application/javascript">
+
+    var cid_left = {{ cid1 }};
+    var cid_right = {{ cid2 }};
+
     $('#sbs-redirect').click(function() {
         let cid1 = $('#sbs-cid1').val();
         let cid2 = $('#sbs-cid2').val();
@@ -174,6 +185,15 @@
         console.log(url);
         $.get(url, function (){
             window.location.href = url;
+        });
+    });
+
+    $('#sbs-unify').click(function() {
+        let flip = $('#sbs-unify-flip-stance').prop('checked') ? 1 : 0;
+        let url = '/dataset/side_by_side/unify/' + cid_left + '/' + cid_right + '/' + flip;
+        console.log(url);
+        $.get(url, function (){
+            window.location.href = window.location.href;
         });
     });
 
@@ -191,8 +211,9 @@
         let cid_from = $('#sbs-add-cid-from').val();
         let cid_to = $('#sbs-add-cid-to').val();
         let pid = $('#sbs-add-pid').val();
-        let url = '/dataset/side_by_side/add/' + cid_from + '/' + pid + '/' + cid_to;
-        console.log(url)
+        let flip = $('#sbs-add-flip-stance').prop('checked') ? 1 : 0;
+        let url = '/dataset/side_by_side/add/' + cid_from + '/' + pid + '/' + cid_to + '/' + flip;
+        console.log(url);
         $.get(url, function (){
             window.location.href = window.location.href;
         });
