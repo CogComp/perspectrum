@@ -167,8 +167,15 @@ def vis_spectrum_js(request, claim_id):
 
     return render(request, 'vis_dataset_js.html', context)
 
+STANCE_FLIP_MAPPING = {
+    "SUPPORT": "UNDERMINE",
+    "MILDLY_SUPPORT": "MILDLY_UNDERMINE",
+    "MILDLY_UNDERMINE": "MILDLY_SUPPORT",
+    "UNDERMINE": "SUPPORT",
+}
+
 ## utils functions for the side-by-side view
-def add_perspective_to_claim(request, cid_from, pid, cid_to):
+def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
     if cid_from == cid_to:
         return HttpResponse("Success", status=200)
 
@@ -181,14 +188,23 @@ def add_perspective_to_claim(request, cid_from, pid, cid_to):
             c1_idx = idx
 
     c2_contains_pid = False
-    for idx, p in enumerate(claim_from['perspectives']):
+    for idx, p in enumerate(claim_to['perspectives']):
         if pid in p['pids']:
             c2_contains_pid = True
             break
 
     if (c1_idx != None) and not c2_contains_pid:
         claim_to['perspectives'].append(claim_from['perspectives'][c1_idx])
+        if flip_stance:
+            lbl3 = claim_to['perspectives'][-1]['stance_label_3']
+            if lbl3 in STANCE_FLIP_MAPPING:
+                claim_to['perspectives'][-1]['stance_label_3'] = STANCE_FLIP_MAPPING[lbl3]
 
+            lbl5 = claim_to['perspectives'][-1]['stance_label_5']
+            if lbl5 in STANCE_FLIP_MAPPING:
+                claim_to['perspectives'][-1]['stance_label_5'] = STANCE_FLIP_MAPPING[lbl5]
+
+            claim_to['perspectives'][-1]['voter_counts'].reverse()
 
     return HttpResponse("Success", status=200)
 
