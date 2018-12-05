@@ -72,6 +72,7 @@ urlpatterns = [
 
     # side by side apis
     path('dataset/side_by_side/<int:claim_id1>/<int:claim_id2>', views.vis_dataset_side_by_side),
+    path('dataset/side_by_side/unify/<int:cid1>/<int:cid2>/<int:flip_stance>', views.unify_persps),
     path('dataset/side_by_side/delete_cluster/<int:claim_id>/<int:perspective_id>', views.delete_perspective),
     path('dataset/side_by_side/add/<int:cid_from>/<int:pid>/<int:cid_to>/<int:flip_stance>', views.add_perspective_to_claim),
     path('dataset/side_by_side/merge/<int:cid1>/<int:pid1>/<int:cid2>/<int:pid2>', views.merge_perspectives),
