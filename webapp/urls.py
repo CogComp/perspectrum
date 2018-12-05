@@ -70,4 +70,7 @@ urlpatterns = [
 
     # step 4
     path('step4/task_list/', views.render_step4_task_list, name="step4_topic_annotation"),
+
+    # side by side apis
+    path('delete_cluster/<int:claim_id>/<int:perspective_id>', views.delete_perspective, name="delete_perspective")
 ]
