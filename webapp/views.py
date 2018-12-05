@@ -155,9 +155,13 @@ for c in claims:
     claim_dict[c["cId"]] = c
 
 @login_required
-def vis_dataset_side_by_side(request):
-    claim_id1 = 300
+def vis_dataset_side_by_side(request, claim_id1, claim_id2):
+    persps = load_json(file_names["perspective"])
+    claims = load_json(file_names["claim_annotation"])
+
+    # claim_id1 = 300
     claim_id1 = int(claim_id1)
+
     c_title1 = claim_dict[claim_id1]["text"]
     persp_sup1 = []
     persp_und1 = []
@@ -169,7 +173,7 @@ def vis_dataset_side_by_side(request):
         elif cluster['stance_label_3'] == "UNDERMINE":
             persp_und1.append(titles)
 
-    claim_id2 = 1
+    #claim_id2 = 1
     claim_id2 = int(claim_id2)
 
     c_title2 = claim_dict[claim_id2]["text"]

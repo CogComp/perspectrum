@@ -28,10 +28,10 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('main/', views.main_page, name="main_page"),
     path('dataset/<slug:claim_id>', views.vis_dataset),
-    path('dataset/side_by_side/', views.vis_dataset_side_by_side),
+    path('dataset/side_by_side/<int:claim_id1>/<int:claim_id2>', views.vis_dataset_side_by_side),
     path('claims/', views.vis_claims),
     path('personality/', views.personality),
-    path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives"),
+    path('perspectives/<int:claim_id1>', views.vis_persps, name="perspectives"),
     path('vis_spectrum/<slug:claim_id>', views.vis_spectrum, name="vis_spectrum"),
 
     # step 1
