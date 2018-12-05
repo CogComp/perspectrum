@@ -132,17 +132,16 @@ def vis_spectrum(request, claim_id):
 def add_perspective_to_claim(perspective_id, claim_id):
     pass
 
-def delete_perspective(perspective_id, claim_id):
+def delete_perspective(request, perspective_id, claim_id):
     # in the claim file, drop the link to the perspective
-    for cluster_idx, cluster in enumerate(claim_dict[claim_id]["perspectives"]):
-        new_pid = [pid for pid in cluster["pids"] if pid != perspective_id]
-        claim_dict[claim_id]["perspectives"][cluster_idx]["pids"] = new_pid
+    claim = claim_dict[claim_id]
+    claim['perspectives'] = [p for p in claim['perspectives'] if perspective_id not in p["pids"]]
 
-    # drop all the clusters with empty perspectives
-    claim_dict[claim_id]["perspectives"] = [cluster for cluster in claim_dict[claim_id]["perspectives"] if len(cluster["pids"]) == 0]
+    return HttpResponse("Success", status=200)
 
 def merge_perspectives(perspective_id1, perspective_id2):
     pass
+
 
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
