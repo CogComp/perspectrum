@@ -28,7 +28,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('main/', views.main_page, name="main_page"),
     path('dataset/<slug:claim_id>', views.vis_dataset),
-    path('dataset/side_by_side/<int:claim_id1>/<int:claim_id2>', views.vis_dataset_side_by_side),
     path('claims/', views.vis_claims),
     path('personality/', views.personality),
     path('perspectives/<int:claim_id1>', views.vis_persps, name="perspectives"),
@@ -72,5 +71,7 @@ urlpatterns = [
     path('step4/task_list/', views.render_step4_task_list, name="step4_topic_annotation"),
 
     # side by side apis
-    path('delete_cluster/<int:claim_id>/<int:perspective_id>', views.delete_perspective, name="delete_perspective")
+    path('dataset/side_by_side/<int:claim_id1>/<int:claim_id2>', views.vis_dataset_side_by_side),
+    path('delete_cluster/<int:claim_id>/<int:perspective_id>', views.delete_perspective, name="delete_perspective"),
+    path('save_annotation_file/<str:file_name>', views.save_updated_claim_on_disk, name="save annotatin file")
 ]
