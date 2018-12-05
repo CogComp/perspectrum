@@ -68,12 +68,11 @@
                         Merge perspective pair
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <form class="form-inline my-2 my-lg-0">
+                        <div class="form-inline my-2 my-lg-0">
                             <input id='sbs-merge-pid1' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 1" aria-label="Search">
                             <input id='sbs-merge-pid2' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 2" aria-label="Search">
-                            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Merge</button>
-                        </form>
-                        <a class="dropdown-item" href="#">Delete</a>
+                            <button id='sbs-merge' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Merge</button>
+                        </div>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -82,11 +81,10 @@
                         Save
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <form class="form-inline my-2 my-lg-0">
-                            <input class="form-control mr-sm-2" type="search" placeholder="File Name" aria-label="Search">
-                            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Save</button>
-                        </form>
-                        <a class="dropdown-item" href="#">Save</a>
+                        <div class="form-inline my-2 my-lg-0">
+                            <input id='sbs-save-fname' class="form-control mr-sm-2" type="search" placeholder="File Name" aria-label="Search">
+                            <button id='sbs-save' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Save</button>
+                        </div>
                     </div>
                 </li>
 
@@ -179,9 +177,28 @@
         console.log("Delete!");
         let cid = $('#sbs-del-cid').val();
         let pid = $('#sbs-del-pid').val();
-        let url = '/delete_cluster/' + cid + '/' + pid;
+        let url = '/dataset/side_by_side/delete_cluster/' + cid + '/' + pid;
         $.get(url, function (){
             window.location.href = window.location.href;
+        });
+    })
+
+    $('#sbs-merge').click(function() {
+        console.log("Merge!");
+        let cid = $('#sbs-del-cid').val();
+        let pid = $('#sbs-del-pid').val();
+        let url = '/dataset/side_by_side/merge_cluster/' + cid + '/' + pid;
+        $.get(url, function (){
+            window.location.href = window.location.href;
+        });
+    })
+
+    $('#sbs-save').click(function() {
+        console.log("Save!");
+        let fname = $('sbs-save-fname').val();
+        let url = '/dataset/side_by_side/save/' + fname;
+        $.get(url, function (){
+            alert("Save success!");
         });
     })
 </script>

@@ -15,6 +15,8 @@ from webapp.util.step2b.equivalence_auth import get_equivalence_hit_session
 from webapp.util.step2a.paraphrase_auth import get_paraphrase_hit_session
 from webapp.util.step3.evidence_auth import get_evidence_hit_session
 
+from django.core.files import File
+
 from collections import OrderedDict
 import datetime
 import random
@@ -32,7 +34,8 @@ def load_json(file_name):
 
 def save_json(data, file_name):
     with open(file_name, 'w') as data_file:
-        json.dump(data, data_file)
+        _df = File(data_file)
+        _df.write(json.dumps(data))
 
 def get_pool_from_claim_id(claim_id):
     """
@@ -175,13 +178,15 @@ def delete_perspective(request, perspective_id, claim_id):
 
     return HttpResponse("Success", status=200)
 
-def merge_perspectives(perspective_id1, perspective_id2):
-    pass
+def merge_perspectives(request, perspective_id1, perspective_id2):
+    claim = claim_dict[c]
 
-def save_updated_claim_on_disk(file_name):
+def save_updated_claim_on_disk(request, file_name):
     # convert map to list before saving
     claims_local = [claim_dict[k] for k in claim_dict.keys()]
     save_json(claims_local, "data/dataset/" + file_name)
+
+    return HttpResponse("Save Success", status=200)
 
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
