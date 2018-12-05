@@ -27,7 +27,7 @@ urlpatterns = [
     path('success/', views.successView, name='success'),
     path('admin/', admin.site.urls),
     path('main/', views.main_page, name="main_page"),
-    path('get_json/', views.get_json),
+    path('dataset/<slug:claim_id>', views.vis_dataset),
     path('claims/', views.vis_claims),
     path('personality/', views.personality),
     path('perspectives/<slug:claim_id>', views.vis_persps, name="perspectives"),
