@@ -235,10 +235,21 @@ def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
     return HttpResponse("Success", status=200)
 
 
-def delete_perspective(request, perspective_id, claim_id):
+def delete_cluster(request, claim_id, perspective_id):
     # in the claim file, drop the link to the perspective
     claim = claim_dict[claim_id]
     claim['perspectives'] = [p for p in claim['perspectives'] if perspective_id not in p["pids"]]
+
+    return HttpResponse("Success", status=200)
+
+
+def delete_perspective(request, claim_id, perspective_id):
+    # in the claim file, drop the link to the perspective
+    claim = claim_dict[claim_id]
+
+    for persp in claim['perspectives']:
+        if perspective_id in persp["pids"]:
+            del persp["pids"][persp["pids"].index(perspective_id)]
 
     return HttpResponse("Success", status=200)
 
