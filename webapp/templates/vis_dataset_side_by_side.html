@@ -43,10 +43,12 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <form class="form-inline my-2 my-lg-0">
-                            <input class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
-                            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Duplicate</button>
+                            <input id='sbs-add-cid-from' class="form-control mr-sm-2" type="search" placeholder="From Claim ID" aria-label="Search">
+                            <input id='sbs-add-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
+                            <input id='sbs-add-cid-to' class="form-control mr-sm-2" type="search" placeholder="To Claim ID" aria-label="Search">
+                            <button id='sbs-add' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Add</button>
                         </form>
-                        <a class="dropdown-item" href="#">Duplicate</a>
+                        <a class="dropdown-item" href="#">Add</a>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -68,12 +70,13 @@
                         Merge perspective pair
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <form class="form-inline my-2 my-lg-0">
+                        <div class="form-inline my-2 my-lg-0">
+                            <input id='sbs-merge-cid1' class="form-control mr-sm-2" type="search" placeholder="Claim ID 1" aria-label="Search">
                             <input id='sbs-merge-pid1' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 1" aria-label="Search">
+                            <input id='sbs-merge-cid2' class="form-control mr-sm-2" type="search" placeholder="Claim ID 2" aria-label="Search">
                             <input id='sbs-merge-pid2' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 2" aria-label="Search">
-                            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Merge</button>
-                        </form>
-                        <a class="dropdown-item" href="#">Delete</a>
+                            <button id='sbs-merge' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Merge</button>
+                        </div>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -82,10 +85,10 @@
                         Save
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <form class="form-inline my-2 my-lg-0">
-                            <input id='save-file-name' class="form-control mr-sm-2" type="search" placeholder="File Name" aria-label="Search">
+                        <div class="form-inline my-2 my-lg-0">
+                            <input id='sbs-save-fname' class="form-control mr-sm-2" type="search" placeholder="File Name" aria-label="Search">
                             <button id='sbs-save' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Save</button>
-                        </form>
+                        </div>
                     </div>
                 </li>
 
@@ -178,19 +181,44 @@
         console.log("Delete!");
         let cid = $('#sbs-del-cid').val();
         let pid = $('#sbs-del-pid').val();
-        let url = '/delete_cluster/' + cid + '/' + pid;
+        let url = '/dataset/side_by_side/delete_cluster/' + cid + '/' + pid;
+        $.get(url, function (){
+            window.location.href = window.location.href;
+        });
+    });
+
+    $('#sbs-add').click(function() {
+        let cid_from = $('#sbs-add-cid-from').val();
+        let cid_to = $('#sbs-add-cid-to').val();
+        let pid = $('#sbs-add-pid').val();
+        let url = '/dataset/side_by_side/add/' + cid_from + '/' + pid + '/' + cid_to;
+        console.log(url)
+        $.get(url, function (){
+            window.location.href = window.location.href;
+        });
+    });
+
+    $('#sbs-merge').click(function() {
+        console.log("Merge!");
+        let cid1= $('#sbs-merge-cid1').val();
+        let cid2 = $('#sbs-merge-cid2').val();
+        let pid1 = $('#sbs-merge-pid1').val();
+        let pid2 = $('#sbs-merge-pid2').val();
+        let url = '/dataset/side_by_side/merge/' + cid1 + '/' + pid1 + '/' + cid2 + '/' + pid2;
+
         $.get(url, function (){
             window.location.href = window.location.href;
         });
     });
 
     $('#sbs-save').click(function() {
-        console.log("Save!");
-        let fileName = $('#save-file-name').val();
-        let url = '/save_annotation_file/' + fileName;
+        let fname = $('#sbs-save-fname').val();
+        console.log("Save to " + fname);
+        let url = '/dataset/side_by_side/save/' + fname;
         $.get(url, function (){
-            window.location.href = window.location.href;
+            alert("Save success!");
         });
-    });
+    })
+
 </script>
 </html>
