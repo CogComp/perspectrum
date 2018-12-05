@@ -15,6 +15,8 @@ from webapp.util.step2b.equivalence_auth import get_equivalence_hit_session
 from webapp.util.step2a.paraphrase_auth import get_paraphrase_hit_session
 from webapp.util.step3.evidence_auth import get_evidence_hit_session
 
+from django.core.files import File
+
 from collections import OrderedDict
 import datetime
 import random
@@ -33,7 +35,8 @@ def load_json(file_name):
 
 def save_json(data, file_name):
     with open(file_name, 'w') as data_file:
-        json.dump(data, data_file)
+        _df = File(data_file)
+        _df.write(json.dumps(data))
 
 def get_pool_from_claim_id(claim_id):
     """
@@ -172,9 +175,65 @@ def vis_spectrum_js(request, claim_id):
 
     return render(request, 'vis_dataset_js.html', context)
 
+STANCE_FLIP_MAPPING = {
+    "SUPPORT": "UNDERMINE",
+    "MILDLY_SUPPORT": "MILDLY_UNDERMINE",
+    "MILDLY_UNDERMINE": "MILDLY_SUPPORT",
+    "UNDERMINE": "SUPPORT",
+}
+
 ## utils functions for the side-by-side view
-def add_perspective_to_claim(perspective_id, claim_id):
-    pass
+def unify_persps(request, cid1, cid2, flip_stance):
+    if cid1 == cid2:
+        return HttpResponse("Success", status=200)
+
+    claim1 = claim_dict[cid1]
+    claim2 = claim_dict[cid2]
+
+    for pp in claim1['perspectives']:
+        pid = pp["pids"][0]
+        add_perspective_to_claim(request, cid1, pid, cid2, flip_stance)
+
+    for pp in claim2['perspectives']:
+        pid = pp["pids"][0]
+        add_perspective_to_claim(request, cid2, pid, cid1, flip_stance)
+
+    return HttpResponse("Success", status=200)
+
+
+def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
+    if cid_from == cid_to:
+        return HttpResponse("Success", status=200)
+
+    claim_from = claim_dict[cid_from]
+    claim_to = claim_dict[cid_to]
+
+    c1_idx = None
+    for idx, p in enumerate(claim_from['perspectives']):
+        if pid in p['pids']:
+            c1_idx = idx
+
+    c2_contains_pid = False
+    for idx, p in enumerate(claim_to['perspectives']):
+        if pid in p['pids']:
+            c2_contains_pid = True
+            break
+
+    if (c1_idx != None) and not c2_contains_pid:
+        claim_to['perspectives'].append(claim_from['perspectives'][c1_idx])
+        if flip_stance:
+            lbl3 = claim_to['perspectives'][-1]['stance_label_3']
+            if lbl3 in STANCE_FLIP_MAPPING:
+                claim_to['perspectives'][-1]['stance_label_3'] = STANCE_FLIP_MAPPING[lbl3]
+
+            lbl5 = claim_to['perspectives'][-1]['stance_label_5']
+            if lbl5 in STANCE_FLIP_MAPPING:
+                claim_to['perspectives'][-1]['stance_label_5'] = STANCE_FLIP_MAPPING[lbl5]
+
+            claim_to['perspectives'][-1]['voter_counts'].reverse()
+
+    return HttpResponse("Success", status=200)
+
 
 def delete_perspective(request, perspective_id, claim_id):
     # in the claim file, drop the link to the perspective
@@ -183,8 +242,39 @@ def delete_perspective(request, perspective_id, claim_id):
 
     return HttpResponse("Success", status=200)
 
-def merge_perspectives(perspective_id1, perspective_id2):
-    pass
+
+def merge_perspectives(request, cid1, pid1, cid2, pid2):
+
+    if (cid1 == cid2) and (pid1 == pid2):
+        return HttpResponse("Success", status=200)
+
+    claim1 = claim_dict[cid1]
+    claim2 = claim_dict[cid2]
+
+    c1_idx = None
+    for idx, p in enumerate(claim1['perspectives']):
+        if pid1 in p['pids']:
+            c1_idx = idx
+
+    c2_idx = None
+    for idx, p in enumerate(claim2['perspectives']):
+        if pid2 in p['pids']:
+            c2_idx = idx
+
+    print(c1_idx, c2_idx)
+    if (c1_idx != None) and (c2_idx != None):
+        print(pid1, pid2)
+        merged_pid = list(set(claim1['perspectives'][c1_idx]['pids'] + claim2['perspectives'][c2_idx]['pids']))
+        merged_evi_ids = list(set(claim1['perspectives'][c1_idx]['evidence'] + claim2['perspectives'][c2_idx]['evidence']))
+        claim1['perspectives'][c1_idx]['pids'] = merged_pid
+        claim2['perspectives'][c2_idx]['pids'] = merged_pid
+        claim1['perspectives'][c1_idx]['evidence'] = merged_evi_ids
+        claim2['perspectives'][c2_idx]['evidence'] = merged_evi_ids
+
+    if cid1 == cid2:
+        del claim2['perspectives'][c2_idx]
+
+    return HttpResponse("Success", status=200)
 
 def save_updated_claim_on_disk(request, file_name):
     # convert map to list before saving
@@ -192,6 +282,7 @@ def save_updated_claim_on_disk(request, file_name):
     save_json(claims_local, "data/dataset/" + file_name)
     return HttpResponse("Success", status=200)
 
+    return HttpResponse("Save Success", status=200)
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
 evidence = load_json(file_names["evidence"])
@@ -225,7 +316,6 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
         elif cluster['stance_label_3'] == "UNDERMINE":
             persp_und1.append(titles)
 
-    #claim_id2 = 1
     claim_id2 = int(claim_id2)
 
     c_title2 = claim_dict[claim_id2]["text"]
@@ -240,9 +330,11 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
             persp_und2.append(titles)
 
     context = {
+        "cid1": claim_id1,
         "claim1": c_title1,
         "persp_sup1": persp_sup1,
         "persp_und1": persp_und1,
+        "cid2": claim_id2,
         "claim2": c_title2,
         "persp_sup2": persp_sup2,
         "persp_und2": persp_und2,
