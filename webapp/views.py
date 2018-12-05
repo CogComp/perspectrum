@@ -30,6 +30,9 @@ def load_json(file_name):
         data = json.loads(data_file.read())
         return data
 
+def save_json(data, file_name):
+    with open(file_name, 'w') as data_file:
+        json.dump(data, data_file)
 
 def get_pool_from_claim_id(claim_id):
     """
@@ -128,6 +131,39 @@ def vis_spectrum(request, claim_id):
     }
     return render(request, 'step1/vis_spectrum.html', context)
 
+@login_required
+def vis_spectrum_js(request, claim_id):
+    persps = load_json(file_names["perspective"])
+    claims = load_json(file_names["claim_annotation"])
+
+    claim_id = int(claim_id)
+    persp_dict = {}
+    claim_dict = {}
+    for p in persps:
+        persp_dict[p["pId"]] = p["text"]
+
+    for c in claims:
+        claim_dict[c["cId"]] = c
+
+    c_title = claim_dict[claim_id]["text"]
+    persp_sup = []
+    persp_und = []
+    for cluster in claim_dict[claim_id]["perspectives"]:
+        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+
+        if cluster['stance_label_3'] == "SUPPORT":
+            persp_sup.append(titles)
+        elif cluster['stance_label_3'] == "UNDERMINE":
+            persp_und.append(titles)
+
+    context = {
+        "claim": c_title,
+        "persp_sup": persp_sup,
+        "persp_und": persp_und,
+    }
+
+    return render(request, 'vis_dataset_js.html', context)
+
 ## utils functions for the side-by-side view
 def add_perspective_to_claim(perspective_id, claim_id):
     pass
@@ -143,6 +179,11 @@ def delete_perspective(perspective_id, claim_id):
 
 def merge_perspectives(perspective_id1, perspective_id2):
     pass
+
+def save_updated_claim_on_disk(file_name):
+    # convert map to list before saving
+    claims_local = [claim_dict[k] for k in claim_dict.keys()]
+    save_json(claims_local, "data/dataset/" + file_name)
 
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
