@@ -74,6 +74,34 @@ def get_top_sentences(text):
 
     return output
 
+def get_claims(text):
+    res = es.search(index="claim_with_paraphrases", doc_type="text", body={"query": {"match": {"concat": text}}}, size=10)
+    # print("%d documents found:" % res['hits']['total'])
+    output = []
+    for doc in res['hits']['hits']:
+        # id = doc['_source']["perspective_id"]
+        score = doc['_score']
+        concat = doc['_source']["concat"]
+        id = doc['_source']["claim_id"]
+        claim_title = doc['_source']["claim_title"]
+        output.append((concat, claim_title, id, score))
+
+    return output
+
+def get_claims_with_claim_surface(text):
+    res = es.search(index="claim_with_paraphrases", doc_type="text", body={"query": {"match": {"claim_title": text}}}, size=10)
+    # print("%d documents found:" % res['hits']['total'])
+    output = []
+    for doc in res['hits']['hits']:
+        # id = doc['_source']["perspective_id"]
+        score = doc['_score']
+        concat = doc['_source']["concat"]
+        id = doc['_source']["claim_id"]
+        claim_title = doc['_source']["claim_title"]
+        output.append((concat, claim_title, id, score))
+
+    return output
+
 if __name__ == '__main__':
     # data = get_top_re_step1_perspectives("The content of public speech is informed as much by the ideas and convictions of individuals engaged in free expression as it is by the concurrent acts of expression engaged in by other individuals. Free speech is a product of society and the processes driving the development and growth of society. The environment in which free speech is currently exercised is characterised by pervasive acts of expression – television commercials, billboards, spam email and advertisements on social media sites. Each of these forms of media is aimed at influencing opinions and behaviours. Active engagement with a book or a movie is often a prerequisite if an individual is to be influenced by its content.. The audience for the content contained in an advert does not necessarily choose to engage with its message. As a result of this, adverts are uniquely placed to bring issues and perspectives to the attention of individuals who might otherwise have been unaware of them. Advertising is a powerful political tool. For this reason the manner in which political causes can be advertised and the amount of funding spent on those adverts is, almost without exception, strictly regulated in most liberal democracies. Commercial content carried by for-profit organisations such as newspapers and television channels is expensive. The prominence of a message is affected by the amount of money that can be spent on increasing its length, rebroadcasting it and showing it to new audiences. When it comes to political speech, spending money is the best way to increase the efficacy and persuasiveness of a message. Irrespective of the qualities of a particular campaign, the qualifications of its candidates or the evidence underlying its policy proposals, its effectiveness will still be measured in the amount of money that it is able to spend on advertising. Legal restrictions on political spending are intended to prevent political speech from becoming a battle of budget rather than ideas – campaign finance laws are designed to protect the integrity, quality and efficacy of speech. In the USA the Bi-partisan Campaign Reform Act achieved this goal by preventing corporations from funding “electioneering communications” within 30 days of a caucus or 60 days of a general election. The Act prevented interest groups indirectly affiliated with particular candidates from spending money to support a candidates’ message. Although there are limits on the income that a politician can directly receive from donors, different rules apply to organisations that are not directly affiliated with that politician. And although a politician may receive criticism for receiving corporate money, corporations can contribute to causes indirectly, by providing funds of issue groups.", num_cands=2000)
     # print(json.dumps(data))
