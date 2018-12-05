@@ -128,21 +128,36 @@ def vis_spectrum(request, claim_id):
     }
     return render(request, 'step1/vis_spectrum.html', context)
 
+## utils functions for the side-by-side view
+def add_perspective_to_claim(perspective_id, claim_id):
+    pass
+
+def delete_perspective(perspective_id, claim_id):
+    # in the claim file, drop the link to the perspective
+    for cluster_idx, cluster in enumerate(claim_dict[claim_id]["perspectives"]):
+        new_pid = [pid for pid in cluster["pids"] if pid != perspective_id]
+        claim_dict[claim_id]["perspectives"][cluster_idx]["pids"] = new_pid
+
+    # drop all the clusters with empty perspectives
+    claim_dict[claim_id]["perspectives"] = [cluster for cluster in claim_dict[claim_id]["perspectives"] if len(cluster["pids"]) == 0]
+
+def merge_perspectives(perspective_id1, perspective_id2):
+    pass
+
+persps = load_json(file_names["perspective"])
+claims = load_json(file_names["claim_annotation"])
+persp_dict = {}
+claim_dict = {}
+for p in persps:
+    persp_dict[p["pId"]] = p["text"]
+
+for c in claims:
+    claim_dict[c["cId"]] = c
+
 @login_required
 def vis_dataset_side_by_side(request):
-    persps = load_json(file_names["perspective"])
-    claims = load_json(file_names["claim_annotation"])
-
     claim_id1 = 300
     claim_id1 = int(claim_id1)
-    persp_dict = {}
-    claim_dict = {}
-    for p in persps:
-        persp_dict[p["pId"]] = p["text"]
-
-    for c in claims:
-        claim_dict[c["cId"]] = c
-
     c_title1 = claim_dict[claim_id1]["text"]
     persp_sup1 = []
     persp_und1 = []
