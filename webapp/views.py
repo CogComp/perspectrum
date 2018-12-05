@@ -178,10 +178,11 @@ def delete_perspective(request, perspective_id, claim_id):
 def merge_perspectives(perspective_id1, perspective_id2):
     pass
 
-def save_updated_claim_on_disk(file_name):
+def save_updated_claim_on_disk(request, file_name):
     # convert map to list before saving
     claims_local = [claim_dict[k] for k in claim_dict.keys()]
     save_json(claims_local, "data/dataset/" + file_name)
+    return HttpResponse("Success", status=200)
 
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
