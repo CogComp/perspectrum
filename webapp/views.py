@@ -20,7 +20,8 @@ import datetime
 import random
 
 file_names = {
-    "iDebate": '../data/idebate/idebate.json'
+    'perspective': 'data/dataset/perspective_pool_v0.1.json',
+    'claim_annotation': 'data/dataset/perspectrum_with_answers_v0.1.json'
 }
 
 """Helper functions"""
@@ -81,10 +82,6 @@ def get_all_original_persp(claim_id):
 
 
 """ APIs """
-def get_json(request):
-    data = load_json(file_names["iDebate"])
-    return JsonResponse({"data": data})
-
 def personality(request):
     context = { }
     return render(request, 'personality.html', context)
@@ -130,6 +127,41 @@ def vis_spectrum(request, claim_id):
         "nv": categories[4],
     }
     return render(request, 'step1/vis_spectrum.html', context)
+
+@login_required
+def vis_dataset(request, claim_id):
+    persps = load_json(file_names["perspective"])
+    claims = load_json(file_names["claim_annotation"])
+
+    claim_id = int(claim_id)
+    persp_dict = {}
+    claim_dict = {}
+    for p in persps:
+        persp_dict[p["pId"]] = p["text"]
+
+    for c in claims:
+        claim_dict[c["cId"]] = c
+
+
+    c_title = claim_dict[claim_id]["text"]
+    persp_sup = []
+    persp_und = []
+    for cluster in claim_dict[claim_id]["perspectives"]:
+        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+
+        if cluster['stance_label_3'] == "SUPPORT":
+            persp_sup.append(titles)
+        elif cluster['stance_label_3'] == "UNDERMINE":
+            persp_und.append(titles)
+
+    context = {
+        "claim": c_title,
+        "persp_sup": persp_sup,
+        "persp_und": persp_und,
+    }
+
+    return render(request, 'vis_dataset.html', context)
+
 
 
 @login_required
