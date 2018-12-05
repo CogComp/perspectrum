@@ -415,7 +415,7 @@ def submit_paraphrase_annotation(request):
         # Update annotation in EquivalenceAnnotation table
         for pid, paras in annos.items():
             p = PerspectiveParaphrase.objects.get(perspective_id=pid)
-            user_para_str = p.user_generated.replace('[\'', '["').replace('\']', '"]').replace('\', \'', '", "')\
+            user_para_str = p.user_generated.replace('"','\\"').replace('[\'', '["').replace('\']', '"]').replace('\', \'', '", "')\
                 .replace('\', "', '", "').replace('", \'', '", "')
             print(user_para_str)
             user_para = json.loads(user_para_str)
@@ -485,29 +485,36 @@ def render_step2b_task_list(request):
     return render(request, 'step2b/task_list.html', context)
 
 @login_required
-def vis_persp_equivalence(request, claim_id):
+def vis_persp_equivalence(request, batch_id):
     username = request.user.username
     session = get_equivalence_hit_session(username)
     session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
     session.save()
 
     try:
-        claim = Claim.objects.get(id=claim_id)
-    except Claim.DoesNotExist:
-        pass  # TODO: Do something? 404?
+        eb = EquivalenceBatch.objects.get(id=batch_id)
+    except EquivalenceBatch.DoesNotExist:
+        return HttpResponse(content="Batch_Id = {} Not found in the database!".format(batch_id), status=404)
 
-    perspective_pool = get_all_persp(claim_id)
+    persp_ids = json.loads(eb.perspective_ids)
 
+    persps = []
+    claims = {}
     candidates = {}
 
-    for persp in perspective_pool:
-        cand_ids = set(json.loads(Perspective.objects.get(id=persp.id).similar_persps))
+    for cid, pid in persp_ids:
+        persp = Perspective.objects.get(id=pid)
+        persps.append(persp)
+
+        claims[pid] = Claim.objects.get(id=cid).title
+
+        cand_ids = set(json.loads(Perspective.objects.get(id=pid).similar_persps))
         cand_persps = Perspective.objects.filter(id__in=cand_ids)
-        candidates[persp.id] = cand_persps
+        candidates[pid] = cand_persps
 
     return render(request, 'step2b/persp_equivalence.html', {
-        "claim": claim,
-        "perspective_pool": perspective_pool,
+        "claims": claims,
+        "perspective_pool": persps,
         "candidates": candidates
     })
 
@@ -540,9 +547,9 @@ def submit_equivalence_annotation(request):
 
         # Increment finished assignment count in claim table, if not using test acc
         if username != 'TEST':
-            c = Claim.objects.get(claim_id=claim_id)
-            c.equivalence_finished_counts += 1
-            c.save()
+            eb = EquivalenceBatch.objects.get(id=claim_id)
+            eb.finished_counts += 1
+            eb.save()
 
         return HttpResponse("Submission Success!", status=200)
 

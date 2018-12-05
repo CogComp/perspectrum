@@ -4,38 +4,50 @@
 ### Task description
 Given a claim and a pool of perspectives, find all perspectives that either support or undermine the claim.
 ### Dataset Format
-There are three json files in the folder -- `claim.json`, `perspective.json`, `gold_annotation.json`. 
+3 json files 
+- perspective_pool_v1.0.json
+- evidence_pool_v1.0.json
+- perspectrum_annotations_v1.0.json
 
-`claim.json`: A list of claims, each claim have an unique id.
+
+`perspective_pool_v1.0.json`:
 ```json
-{   
-    "id": 2,
-    "title": "We ban child performers."
-}
+  {
+    "pId": 0,
+    "text": "universal healthcare is a right",
+    "source": "idebate"
+  }
+
 ```
 
-`perspective.json`: A list of perspective, each perspective have an unique id.
+`evidence_pool_v1.0.json`:
 ```json
-{
-    "id": 8134,
-    "title": "We Should Have a Quota for Women on Corporate Boards. Quotas are Inherently Helpful"
-}
+  {
+    "eId": 0,
+    "text": "according the internal human rights council ...",
+    "source": "procon"
+  }
+
 ```
 
-`gold_annotation.json`: A list of pairwise gold annotations between an perspective and an claim:
+`perspectrum_with_answers_v1.0.json`: 
 ```python
-{   
-	"claim_id":233,
-    "perspective_id":8133,
-	"stance": "S"
-} 
-```
+  {
+    "cId": 0,
+    "text": "according the internal human rights council ...",
+    "source": "debatewise",
+    "perspectives": [
+      {
+        "pids": [2, 3, 4],
+        "stance_label_3": "support",
+        "stance_label_5": "mildly_support",
+        "voter_counts": [0, 0, 0, 4, 0],  
+        "evidence": [
+          10,
+          20
+        ]
+      }
+    ]
+  }
 
-How to read them? refer to the snippet below. 
-```python
->>> import json
->>> fin = open("perspective.json", 'r')
->>> perspective_list = json.load(fin)
->>> perspective_list[0]
-{"id":1,"title":"Being a performer limits a child\u2019s formal education"}
 ```

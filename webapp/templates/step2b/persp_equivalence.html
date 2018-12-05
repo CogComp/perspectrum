@@ -27,38 +27,38 @@
 <body>
     <div class="container">
         <h4 class="rel_claim_title pallete pallete-peter-river">
-            Perspective Equivalence Annotation Interface
+            Paraphrase Annotation Interface
         </h4>
         <nav aria-label="breadcrumb">
           <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/step2/task_list/">Home</a></li>
+            <li class="breadcrumb-item"><a href="/step2b/task_list/">Home</a></li>
             <li class="breadcrumb-item active" aria-current="page">Task</li>
           </ol>
         </nav>
 
         <div class="rel_instr_container">
-            For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an argument</font> with respect to it (either supporting or undermining it).
-            In addition, you are given a list of <font color="red">candidate arguments</font> that are topically relevant to the given problem. <br>
-            We want you to select all the items (from the list of given <font color="green">candidate arguments</font>) that convey the same points, as to the given <font color="green">argument</font>.
+            For each of the following tasks, you are given <font color="blue">a claim</font> and <font color="green">an opinions</font> with respect to it (either supporting or opposing it).
+            <br>In addition, you are given a list of <font color="red">candidate opinions</font> that are similar to the given opinion.
+            <br>We want you to select all <font color="red">opinions</font> that convey the exact same idea, as the given <font color="green">opinion</font>.
+            <br>
         </div>
 
         <div class="rel_option_container">
             {% for persp in perspective_pool %}
             <div class="col persps-container rel_tile">
                 <div class="container">
-                    <p>Among the following <font color="red">arguments</font>, select the one(s) that express the <strong>exact same</strong> idea as <font color="green">the given argument</font> in response to <font color="blue">the given claim</font>. </p>
-                  <hr>
+                    <p>Among the following <font color="red"> candidate opinions</font>, select the one(s) that are valid <strong>paraphrases</strong> to <font color="green">the given opinion</font> </p>                  <hr>
                     <div class="row">
                         <div class="col-4">
-                            <strong><h6 style="color: blue">Claim: </h6>{{ claim.title }} </strong>
+                            <strong><h6 style="color: blue">Claim: </h6>{{ claims|dict_get_item:persp.id }} </strong>
                         </div>
                     <div class="col-sm">
-                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Argument: </strong></font> {{ persp.title }} </span>
+                        <span style="font-weight: normal; font-size: medium;">  <font color="green"><strong> Opinion: </strong></font> {{ persp.title }} </span>
                         <hr>
                         <div class="rel-q1">
                             {% for cand in candidates|dict_get_item:persp.id%}
                             <div class="col equi-cand-container">
-                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Argument:</strong> </font> {{ cand.title }}</div>
+                                <div style="font-weight: normal; font-size: medium"><font color="red"><strong>Opinion:</strong> </font> {{ cand.title }}</div>
                                 <div class="row">
                                     <div class="col-4">
                                         <label class="radio rel_option_radio">
@@ -86,10 +86,7 @@
             {% endfor %}
 
             <div class="row">
-                <div class="col-4">
-                    <button id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</button>
-                </div>
-                <div class="col-8">
+                <div class="col">
                     <button id="rel_option_submit" class="btn btn-block btn-lg btn-primary">Submit</button>
                 </div>
             </div>
