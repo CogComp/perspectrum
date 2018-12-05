@@ -234,14 +234,13 @@ def merge_perspectives(request, cid1, pid1, cid2, pid2):
 
     return HttpResponse("Success", status=200)
 
-
 def save_updated_claim_on_disk(request, file_name):
     # convert map to list before saving
     claims_local = [claim_dict[k] for k in claim_dict.keys()]
     save_json(claims_local, "data/dataset/" + file_name)
+    return HttpResponse("Success", status=200)
 
     return HttpResponse("Save Success", status=200)
-
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
 persp_dict = {}
