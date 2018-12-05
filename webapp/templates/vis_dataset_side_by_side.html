@@ -1,0 +1,117 @@
+{% load static %}
+{% load claim_filter %}
+
+<!DOCTYPE html>
+<html lang="en">
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+        integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+        integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+      integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
+      integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous"/>
+<link rel="stylesheet" href="{% static "css/style.css" %}">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Perspective Annotation Interface</title>
+<script src="{% static "js/persp.js" %}"></script>
+</head>
+<body>
+<div class="container-fluid">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
+                aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand" href="#">Menu</a>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Link</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link disabled" href="#">Disabled</a>
+                </li>
+            </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <input class="form-control mr-sm-2" type="search" placeholder="Claim ID 1" aria-label="Search">
+                <input class="form-control mr-sm-2" type="search" placeholder="Claim ID 2" aria-label="Search">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Lookup</button>
+            </form>
+        </div>
+    </nav>
+    <div class="row">
+        <div class="col">
+            <h4 class="persp-claim-title pallete pallete-peter-river">
+                {{ claim1 }}
+            </h4>
+        </div>
+        <div class="col">
+            <h4 class="persp-claim-title pallete pallete-peter-river">
+                {{ claim2 }}
+            </h4>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col persps-container tile">
+            <h6>
+                Perspectives For
+            </h6>
+            {% for cluster in persp_sup1 %}
+                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
+                    {% for p in cluster %}
+                        {{ p }} <br>
+                    {% endfor %}
+                </a>
+            {% endfor %}
+        </div>
+        <div class="col persps-container tile">
+            <h6>
+                Perspectives Against
+            </h6>
+            {% for cluster in persp_und1 %}
+                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">
+                    {% for p in cluster %}
+                        {{ p }} <br>
+                    {% endfor %}
+                </a>
+            {% endfor %}
+        </div>
+        <div class="col persps-container tile">
+            <h6>
+                Perspectives For
+            </h6>
+            {% for cluster in persp_sup2 %}
+                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
+                    {% for p in cluster %}
+                        {{ p }} <br>
+                    {% endfor %}
+                </a>
+            {% endfor %}
+        </div>
+        <div class="col persps-container tile">
+            <h6>
+                Perspectives Against
+            </h6>
+            {% for cluster in persp_und2 %}
+                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">
+                    {% for p in cluster %}
+                        {{ p }} <br>
+                    {% endfor %}
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

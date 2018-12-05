@@ -129,6 +129,57 @@ def vis_spectrum(request, claim_id):
     return render(request, 'step1/vis_spectrum.html', context)
 
 @login_required
+def vis_dataset_side_by_side(request):
+    persps = load_json(file_names["perspective"])
+    claims = load_json(file_names["claim_annotation"])
+
+    claim_id1 = 300
+    claim_id1 = int(claim_id1)
+    persp_dict = {}
+    claim_dict = {}
+    for p in persps:
+        persp_dict[p["pId"]] = p["text"]
+
+    for c in claims:
+        claim_dict[c["cId"]] = c
+
+    c_title1 = claim_dict[claim_id1]["text"]
+    persp_sup1 = []
+    persp_und1 = []
+    for cluster in claim_dict[claim_id1]["perspectives"]:
+        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+
+        if cluster['stance_label_3'] == "SUPPORT":
+            persp_sup1.append(titles)
+        elif cluster['stance_label_3'] == "UNDERMINE":
+            persp_und1.append(titles)
+
+    claim_id2 = 1
+    claim_id2 = int(claim_id2)
+
+    c_title2 = claim_dict[claim_id2]["text"]
+    persp_sup2 = []
+    persp_und2 = []
+    for cluster in claim_dict[claim_id2]["perspectives"]:
+        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+
+        if cluster['stance_label_3'] == "SUPPORT":
+            persp_sup2.append(titles)
+        elif cluster['stance_label_3'] == "UNDERMINE":
+            persp_und2.append(titles)
+
+    context = {
+        "claim1": c_title1,
+        "persp_sup1": persp_sup1,
+        "persp_und1": persp_und1,
+        "claim2": c_title2,
+        "persp_sup2": persp_sup2,
+        "persp_und2": persp_und2,
+    }
+
+    return render(request, 'vis_dataset_side_by_side.html', context)
+
+@login_required
 def vis_dataset(request, claim_id):
     persps = load_json(file_names["perspective"])
     claims = load_json(file_names["claim_annotation"])
