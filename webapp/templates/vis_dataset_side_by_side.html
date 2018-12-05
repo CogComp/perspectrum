@@ -55,11 +55,11 @@
                         Delete perspective
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <form class="form-inline my-2 my-lg-0">
-                            <input class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
-                            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Delete</button>
-                        </form>
-                        <a class="dropdown-item" href="#">Delete</a>
+                        <div class="form-inline my-2 my-lg-0">
+                            <input id='sbs-del-cid' class="form-control mr-sm-2" type="search" placeholder="Claim ID" aria-label="Search">
+                            <input id='sbs-del-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
+                            <button id='sbs-delete' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Delete</button>
+                        </div>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
@@ -69,9 +69,9 @@
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                         <form class="form-inline my-2 my-lg-0">
-                            <input class="form-control mr-sm-2" type="search" placeholder="Perspective ID 1" aria-label="Search">
-                            <input class="form-control mr-sm-2" type="search" placeholder="Perspective ID 2" aria-label="Search">
-                            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Delete</button>
+                            <input id='sbs-merge-pid1' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 1" aria-label="Search">
+                            <input id='sbs-merge-pid2' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 2" aria-label="Search">
+                            <button class="btn btn-outline-danger my-2 my-sm-0" type="submit">Merge</button>
                         </form>
                         <a class="dropdown-item" href="#">Delete</a>
                     </div>
@@ -172,6 +172,16 @@
         console.log(url);
         $.get(url, function (){
             window.location.href = url;
+        });
+    })
+
+    $('#sbs-delete').click(function() {
+        console.log("Delete!");
+        let cid = $('#sbs-del-cid').val();
+        let pid = $('#sbs-del-pid').val();
+        let url = '/delete_cluster/' + cid + '/' + pid;
+        $.get(url, function (){
+            window.location.href = window.location.href;
         });
     })
 </script>
