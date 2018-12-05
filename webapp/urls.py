@@ -33,6 +33,7 @@ urlpatterns = [
     path('personality/', views.personality),
     path('perspectives/<int:claim_id1>', views.vis_persps, name="perspectives"),
     path('vis_spectrum/<slug:claim_id>', views.vis_spectrum, name="vis_spectrum"),
+    path('dataset_js/<slug:claim_id>', views.vis_spectrum_js),
 
     # step 1
     path('step1/task_list/', views.render_list_page, name="task_list"),

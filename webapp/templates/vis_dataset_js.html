@@ -1,0 +1,169 @@
+{% load static %}
+{% load claim_filter %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
+          integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <script type="text/javascript" src="{% static "js/vis.js" %}"></script>
+    <link href="{% static "css/vis-network.min.css" %}" rel="stylesheet" type="text/css" />
+
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Perspective Annotation Interface</title>
+    <script src="{% static "js/persp.js" %}"></script>
+
+    <style type="text/css">
+    #mynetwork {
+      width: 900px;
+      height: 400px;
+      border: 1px solid lightgray;
+    }
+    code {
+      font-size: 14px;
+      background: #dddddd;
+    }
+    p {
+      max-width: 600px;
+    }
+    .indented {
+      margin-left: 30px;
+    }
+    .sep {
+      height: 1px;
+      width: 35%;
+      margin-left: 40px;
+      background-color: #dddddd;
+    }
+  </style>
+
+</head>
+<body>
+    <div class="container-fluid">
+        <h4 class="persp-claim-title pallete pallete-peter-river">
+            {{ claim }}
+        </h4>
+        <div class="row">
+            <div class="col persps-container tile">
+                <h6>
+                    Perspectives For
+                </h6>
+                {% for cluster in persp_sup %}
+                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
+                     {% for p in cluster %}
+                    {{ p }} <br>
+                    {% endfor %}
+                </a>
+                {% endfor %}
+            </div>
+            <div class="col persps-container tile">
+                <h6>
+                    Perspectives Against
+                </h6>
+                {% for cluster in persp_und %}
+                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">
+                    {% for p in cluster %}
+                    {{ p }} <br>
+                    {% endfor %}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+<div id="mynetwork"></div>
+
+<script type="text/javascript">
+  var claim_text = "University education should be free"
+
+  var perspectives = [
+    {
+
+      "perspective_text":  "Individuals have a right to the experience of higher  education. ",
+      "evidences": [
+        {"evidence_text": "This is a reminder that today MindCORE is hosting another professional development workshop. The workshop is from 2-3pm in the SAIL room at Levin. We will have coffee, tea, and snacks. The topic of this workshop is Negotiating your job offer and starting a lab. We are excited to have Dr. Nazli Bhatia, who is a cross-appointed research fellow in the Department of Psychology and a lecturer in the Wharton School of Business, share her expertise on negotiation Come with all your questions!!  Looking forward to seeing you all there,The Professional Development and Technical Skills steering committee:  Stephanie Bugden, postdoc (Brannon lab)  Corey Cusimano, graduate student (Goodwin lab) Julia Leonard, MindCORE postdoc fellow  Colin Twomey, MindCORE postdoc fellowAnna Leshinskaya, postdoc (Thompson-Schill lab) Keana Richards, graduate student (Apicella Lab) Meghan Healey, graduate student Nick DeWind, postdoc (Brannon lab) Javier Gomez-Lavin, postdoc (Miracchi lab)" }
+      ]
+    },
+    {
+      "perspective_text": "individuals have a right to equal opportunities that free university provides. ",
+      "evidences": [
+        {"evidence_text": " The Golden Globe Awards historically have a taste for star power, hit movies, musicals, and international talent. Happily for the broader awards-industrial complex, this year's roster of contenders includes an abundance of all of them, in a year where the Oscars flirted with creating a popular film category."},
+        {"evidence_text": " The Golden Globe Awards historically have a taste for star power, hit movies, musicals, and international talent. Happily for the broader awards-industrial complex, this year's roster of contenders includes an abundance of all of them, in a year where the Oscars flirted with creating a popular film category."}
+      ]
+    },
+    {
+      "perspective_text": "The burden of fees and loads are too great to expect toung people to shoulder",
+      "evidences": [
+      ]
+    }
+  ]
+
+  var nodes = [
+    { id: 0, label: "<b>Claim:</b> \n" + claim_text, widthConstraint: { maximum: 200 }, group: 0, font: { multi: 'html'}},
+
+    // perspectives
+    //{ id: 210, widthConstraint: { minimum: 120 }, label: 'This node has a mimimum width', x: -400, y: -200 },
+    //{ id: 211, widthConstraint: { minimum: 120 }, label: '...so does this', x: -500, y: -50 },
+    //{ id: 220, widthConstraint: { maximum: 170 }, label: 'This node has a maximum width and breaks have been automatically inserted into the label', x: -150, y: -150 },
+    //{ id: 221, widthConstraint: { maximum: 170 }, label: '...this too', x: -100, y: 0 },
+    //{ id: 200, font: { multi: true }, widthConstraint: 150, label: '<b>This</b> node has a fixed width and breaks have been automatically inserted into the label', x: -300, y: 50 },
+    //{ id: 201, widthConstraint: 150, label: '...this as well', x: -300, y: 200 },
+    //{ id: 300, heightConstraint: { minimum: 70 }, label: 'This node\nhas a\nminimum\nheight', x: 100, y: -150 },
+    //{ id: 301, heightConstraint: { minimum: 70 }, label: '...this one here too', x: 100, y: 0 },
+    //{ id: 400, heightConstraint: { minimum: 100, valign: 'top' }, label: 'Minimum height\nvertical alignment\nmay be top', x: 300, y: -200 },
+    //{ id: 401, heightConstraint: { minimum: 100, valign: 'middle' }, label: 'Minimum height\nvertical alignment\nmay be middle\n(default)', x: 300, y: 0 },
+    //{ id: 402, heightConstraint: { minimum: 100, valign: 'bottom' }, label: 'Minimum height\nvertical alignment\nmay be bottom', x: 300, y: 200 }
+  ];
+
+  nodes = nodes.concat(perspectives.map(function(x, i){ return { id: i+1, widthConstraint: { maximum: 200 }, label: "<b>Perspective:</b> \n" + x["perspective_text"], group: i+1, font: { multi: 'html'}}}))
+
+  var edges = [
+    { from: 0, to: 1, label: "stance: support"},
+    { from: 0, to: 2, label: "stance: undermine"},
+    { from: 0, to: 3, label: "stance: support"},
+    //{ from: 401, to: 402, widthConstraint: { maximum: 150 }, label: "middle valign to bottom valign"},
+  ];
+
+  var container = document.getElementById('mynetwork');
+  var data = {
+    nodes: nodes,
+    edges: edges
+  };
+  var options = {
+    edges: {
+      font: {
+        size: 12
+      },
+      widthConstraint: {
+        maximum: 90
+      }
+    },
+    nodes: {
+      shape: 'box',
+      margin: 10,
+      widthConstraint: {
+        maximum: 200
+      }
+    },
+    physics: {
+      enabled: true
+    }
+  };
+  var network = new vis.Network(container, data, options);
+</script>
+
+
+</body>
+</html>
