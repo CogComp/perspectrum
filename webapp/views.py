@@ -245,7 +245,10 @@ def delete_perspective(request, claim_id, perspective_id):
 
     for persp in claim['perspectives']:
         if perspective_id in persp["pids"]:
-            del persp["pids"][persp["pids"].index(perspective_id)]
+            if len(persp["pids"]) == 1:
+                delete_cluster(request, claim_id, perspective_id)
+            else:
+                del persp["pids"][persp["pids"].index(perspective_id)]
 
     return HttpResponse("Success", status=200)
 
@@ -292,10 +295,10 @@ def merge_perspectives(request, cid1, pid1, cid2, pid2):
         merged_pid = list(set(cluster_1['pids'] + cluster_2['pids']))
         print(merged_pid)
         merged_evi_ids = list(set(cluster_1['evidence'] + cluster_2['evidence']))
-        cluster_1['pids'] = merged_pid
-        cluster_2['pids'] = merged_pid
-        cluster_1['evidence'] = merged_evi_ids
-        cluster_2['evidence'] = merged_evi_ids
+        cluster_1['pids'] = deepcopy(merged_pid)
+        cluster_2['pids'] = deepcopy(merged_pid)
+        cluster_1['evidence'] = deepcopy(merged_evi_ids)
+        cluster_2['evidence'] = deepcopy(merged_evi_ids)
 
     if cid1 == cid2:
         claim1['perspectives'].pop(claim1['perspectives'].index(cluster_1))
