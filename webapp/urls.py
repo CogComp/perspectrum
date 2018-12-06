@@ -32,7 +32,9 @@ urlpatterns = [
     path('personality/', views.personality),
     path('perspectives/<int:claim_id1>', views.vis_persps, name="perspectives"),
     path('vis_spectrum/<slug:claim_id>', views.vis_spectrum, name="vis_spectrum"),
-    path('dataset_js/<slug:claim_id>', views.vis_spectrum_js),
+    path('dataset_js/id=<slug:claim_id>', views.vis_spectrum_js_index),
+    path('dataset_js/list=<slug:claim_id_list>', views.vis_spectrum_js_list),
+    path('dataset_js/range=<slug:claim_id_range>', views.vis_spectrum_js_range),
 
     # step 1
     path('step1/task_list/', views.render_list_page, name="task_list"),
