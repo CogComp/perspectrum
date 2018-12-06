@@ -246,6 +246,19 @@ def delete_perspective(request, claim_id, perspective_id):
     return HttpResponse("Success", status=200)
 
 
+def add_perspective_to_cluster(request, claim_id, perspective_id, persp_id_to_add):
+    # in the claim file, drop the link to the
+    claim = claim_dict[claim_id]
+
+    delete_perspective(request, claim_id, persp_id_to_add)
+
+    for persp in claim['perspectives']:
+        if perspective_id in persp["pids"]:
+            persp["pids"].append(persp_id_to_add)
+
+    return HttpResponse("Success", status=200)
+
+
 def merge_perspectives(request, cid1, pid1, cid2, pid2):
 
     if (cid1 == cid2) and (pid1 == pid2):
