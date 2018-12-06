@@ -261,15 +261,34 @@ def delete_perspective(request, claim_id, perspective_id):
     return HttpResponse("Success", status=200)
 
 
-def add_perspective_to_cluster(request, claim_id, perspective_id, persp_id_to_add):
+def add_perspective_to_cluster(request, claim_id, cluster_id, persp_id_to_add):
     # in the claim file, drop the link to the
     claim = claim_dict[claim_id]
 
     delete_perspective(request, claim_id, persp_id_to_add)
 
     for persp in claim['perspectives']:
-        if perspective_id in persp["pids"]:
+        if cluster_id in persp["pids"]:
             persp["pids"].append(persp_id_to_add)
+
+    return HttpResponse("Success", status=200)
+
+
+def split_perspective_from_cluster(request, claim_id, perspective_id):
+    claim = claim_dict[claim_id]
+
+    new_cluster = None
+    for persp in claim['perspectives']:
+        if perspective_id in persp["pids"]:
+            new_cluster = deepcopy(persp)
+            if len(persp["pids"]) == 1:
+                delete_cluster(request, claim_id, perspective_id)
+            else:
+                del persp["pids"][persp["pids"].index(perspective_id)]
+            new_cluster["pids"] = [perspective_id]
+
+    if new_cluster:
+        claim['perspectives'].append(new_cluster)
 
     return HttpResponse("Success", status=200)
 

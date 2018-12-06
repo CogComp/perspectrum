@@ -53,6 +53,16 @@
                     </div>
                 </li>
                 <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
+                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Add perspective to cluster
+                    </a>
+                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                        <input id='sbs-add-persp-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID to add" aria-label="Search">
+                        <button id='sbs-add-persp' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Add perspective</button>
+                    </div>
+                </li>
+                <li class="nav-item dropdown">
                     <a class="nav-link" href="javascript:void(0)" id="sbs-delete">
                         Delete cluster
                     </a>
@@ -67,6 +77,12 @@
                         Merge clusters
                     </a>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-split">
+                        Split perspective from cluster
+                    </a>
+                </li>
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -278,6 +294,30 @@
         });
     });
 
+    $('#sbs-add-persp').click(function() {
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        if (selected_cpid.length != 1) {
+            alert("Pls only select one for adding perspective to cluster; (For safefy)");
+            return;
+        }
+
+        let persp_to_add_id = $('#sbs-add-persp-pid').val();
+        let url = '/dataset/side_by_side/add_persp/' + selected_cpid[0][0] + '/' + selected_cpid[0][1] + '/' + persp_to_add_id;
+        console.log(url);
+        $.get(url, function (){
+            window.location.href = window.location.href;
+        });
+    });
+
+
     $('#sbs-merge').click(function() {
         console.log("Delete Persp!");
 
@@ -295,6 +335,28 @@
         }
 
         let url = '/dataset/side_by_side/merge/' + selected_cpid[0][0] + '/' + selected_cpid[0][1] + '/' + selected_cpid[1][0] + '/' + selected_cpid[1][1];
+        $.get(url, function() {
+            window.location.href = window.location.href;
+        });
+    });
+
+    $('#sbs-split').click(function() {
+        console.log("Splitng Persp from cluster!");
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        if (selected_cpid.length != 1) {
+            alert("Pls only select one for spliting; (For safefy)");
+            return;
+        }
+
+        let url = '/dataset/side_by_side/split_persp/' + selected_cpid[0][0] + '/' + selected_cpid[0][1];
         $.get(url, function() {
             window.location.href = window.location.href;
         });
