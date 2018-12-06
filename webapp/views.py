@@ -348,9 +348,6 @@ for c in claims:
 
 @login_required
 def vis_dataset_side_by_side(request, claim_id1, claim_id2):
-    persps = load_json(file_names["perspective"])
-    claims = load_json(file_names["claim_annotation"])
-
     # claim_id1 = 300
     claim_id1 = int(claim_id1)
 
