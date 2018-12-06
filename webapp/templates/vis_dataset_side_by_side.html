@@ -28,7 +28,6 @@
                 aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="#">Menu</a>
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
 
@@ -49,55 +48,24 @@
                         Add cluster to other claim
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <div class="form-inline my-2 my-lg-0">
-                            <input id='sbs-add-cid-from' class="form-control mr-sm-2" type="search" placeholder="From Claim ID" aria-label="Search">
-                            <input id='sbs-add-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
-                            <input id='sbs-add-cid-to' class="form-control mr-sm-2" type="search" placeholder="To Claim ID" aria-label="Search">
-                        </div>
                         <input id='sbs-add-flip-stance' type="checkbox"> Flip Stance??<br>
                         <button id='sbs-add' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Add</button>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-delete">
                         Delete cluster
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <div class="form-inline my-2 my-lg-0">
-                            <input id='sbs-del-cid' class="form-control mr-sm-2" type="search" placeholder="Claim ID" aria-label="Search">
-                            <input id='sbs-del-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
-                            <button id='sbs-delete' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Delete</button>
-                        </div>
-                    </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Delete a perspective
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-delete-persp">
+                        Delete Perspective
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <div class="form-inline my-2 my-lg-0">
-                            <input id='sbs-del-persp-cid' class="form-control mr-sm-2" type="search" placeholder="Claim ID" aria-label="Search">
-                            <input id='sbs-del-persp-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
-                            <button id='sbs-delete-persp' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Delete persp</button>
-                        </div>
-                    </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-merge">
                         Merge clusters
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <div class="form-inline my-2 my-lg-0">
-                            <input id='sbs-merge-cid1' class="form-control mr-sm-2" type="search" placeholder="Claim ID 1" aria-label="Search">
-                            <input id='sbs-merge-pid1' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 1" aria-label="Search">
-                            <input id='sbs-merge-cid2' class="form-control mr-sm-2" type="search" placeholder="Claim ID 2" aria-label="Search">
-                            <input id='sbs-merge-pid2' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 2" aria-label="Search">
-                            <button id='sbs-merge' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Merge</button>
-                        </div>
-                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -141,7 +109,14 @@
             {% for cluster in persp_sup1 %}
                 <a class="persp-title btn-block btn-lg  palette-turquoise">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ cid1 }}_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -153,7 +128,14 @@
             {% for cluster in persp_und1 %}
                 <a class="persp-title btn-block btn-lg palette-carrot">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ cid1 }}_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -165,7 +147,14 @@
             {% for cluster in persp_sup2 %}
                 <a class="persp-title btn-block btn-lg palette-turquoise">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ cid2 }}_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -177,7 +166,14 @@
             {% for cluster in persp_und2 %}
                 <a class="persp-title btn-block btn-lg palette-carrot">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ cid2 }}_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -212,30 +208,70 @@
 
     $('#sbs-delete').click(function() {
         console.log("Delete!");
-        let cid = $('#sbs-del-cid').val();
-        let pid = $('#sbs-del-pid').val();
-        let url = '/dataset/side_by_side/delete_cluster/' + cid + '/' + pid;
-        $.get(url, function (){
-            window.location.href = window.location.href;
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        let count = 0;
+        selected_cpid.forEach(function(entry) {
+            let url = '/dataset/side_by_side/delete_cluster/' + entry[0] + '/' + entry[1];
+            count += 1;
+            $.get(url, function() {
+                if (count === selected_cpid.length) {
+                    window.location.href = window.location.href;
+                }
+            })
         });
     });
 
     $('#sbs-delete-persp').click(function() {
-        console.log("Delete!");
-        let cid = $('#sbs-del-persp-cid').val();
-        let pid = $('#sbs-del-persp-pid').val();
-        let url = '/dataset/side_by_side/delete_persp/' + cid + '/' + pid;
-        $.get(url, function (){
-            window.location.href = window.location.href;
+        console.log("Delete Persp!");
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
         });
+        let count = 0;
+        selected_cpid.forEach(function(entry) {
+            let url = '/dataset/side_by_side/delete_persp/' + entry[0] + '/' + entry[1];
+            count += 1;
+            $.get(url, function() {
+                if (count === selected_cpid.length) {
+                    window.location.href = window.location.href;
+                }
+            })
+        });
+
+
     });
 
     $('#sbs-add').click(function() {
-        let cid_from = $('#sbs-add-cid-from').val();
-        let cid_to = $('#sbs-add-cid-to').val();
-        let pid = $('#sbs-add-pid').val();
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        if (selected_cpid.length != 1) {
+            alert("Pls only select one for adding; (For safefy)");
+            return;
+        }
+
         let flip = $('#sbs-add-flip-stance').prop('checked') ? 1 : 0;
-        let url = '/dataset/side_by_side/add/' + cid_from + '/' + pid + '/' + cid_to + '/' + flip;
+        let int_cid = parseInt(selected_cpid[0][0]);
+        let cid_to = (int_cid === cid_left) ? cid_right : cid_left;
+        let url = '/dataset/side_by_side/add/' + selected_cpid[0][0] + '/' + selected_cpid[0][1] + '/' + cid_to + '/' + flip;
         console.log(url);
         $.get(url, function (){
             window.location.href = window.location.href;
@@ -243,25 +279,44 @@
     });
 
     $('#sbs-merge').click(function() {
-        console.log("Merge!");
-        let cid1= $('#sbs-merge-cid1').val();
-        let cid2 = $('#sbs-merge-cid2').val();
-        let pid1 = $('#sbs-merge-pid1').val();
-        let pid2 = $('#sbs-merge-pid2').val();
-        let url = '/dataset/side_by_side/merge/' + cid1 + '/' + pid1 + '/' + cid2 + '/' + pid2;
+        console.log("Delete Persp!");
 
-        $.get(url, function (){
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        if (selected_cpid.length != 2) {
+            alert("Pls only select two for mergeing; (For safefy)");
+            return;
+        }
+
+        let url = '/dataset/side_by_side/merge/' + selected_cpid[0][0] + '/' + selected_cpid[0][1] + '/' + selected_cpid[1][0] + '/' + selected_cpid[1][1];
+        $.get(url, function() {
             window.location.href = window.location.href;
         });
     });
 
     $('#sbs-save').click(function() {
         let fname = $('#sbs-save-fname').val();
-        console.log("Save to " + fname);
-        let url = '/dataset/side_by_side/save/' + fname;
-        $.get(url, function (){
-            alert("Save success!");
-        });
+        if (fname) {
+            console.log("Save to " + fname);
+            let url = '/dataset/side_by_side/save/' + fname;
+            $.get(url, function (){
+                alert("Save success!");
+            });
+        }
+        else {
+            console.log("Overwriting the content");
+            let url = '/dataset/side_by_side/save_default';
+            $.get(url, function (){
+                alert("Save (Overwrite) success!");
+            });
+        }
+
     })
 
 </script>

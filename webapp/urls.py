@@ -66,7 +66,6 @@ urlpatterns = [
          name="submit_evidence_annotation"),
     path('step3/api/submit_instr/', views.step3_submit_instr, name="step3_submit_instr"),
 
-
     # step 4
     path('step4/task_list/', views.render_step4_task_list, name="step4_topic_annotation"),
 
@@ -79,5 +78,5 @@ urlpatterns = [
     path('dataset/side_by_side/add_persp/<int:claim_id>/<int:perspective_id>/<int:persp_id_to_add>', views.add_perspective_to_cluster),
     path('dataset/side_by_side/merge/<int:cid1>/<int:pid1>/<int:cid2>/<int:pid2>', views.merge_perspectives),
     path('dataset/side_by_side/save/<str:file_name>', views.save_updated_claim_on_disk),
-
+    path('dataset/side_by_side/save_default', views.save_defualt_on_disk),
 ]

@@ -20,6 +20,7 @@ from django.core.files import File
 from collections import OrderedDict
 import datetime
 import random
+from copy import deepcopy
 
 file_names = {
     'evidence': 'data/dataset/evidence_pool_v0.1.json',
@@ -202,6 +203,7 @@ def unify_persps(request, cid1, cid2, flip_stance):
 
 
 def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
+
     if cid_from == cid_to:
         return HttpResponse("Success", status=200)
 
@@ -220,17 +222,19 @@ def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
             break
 
     if (c1_idx != None) and not c2_contains_pid:
-        claim_to['perspectives'].append(claim_from['perspectives'][c1_idx])
+        cluster_cpy = deepcopy(claim_from['perspectives'][c1_idx])
+        print(cluster_cpy)
+        claim_to['perspectives'].append(cluster_cpy)
         if flip_stance:
-            lbl3 = claim_to['perspectives'][-1]['stance_label_3']
+            lbl3 = cluster_cpy['stance_label_3']
             if lbl3 in STANCE_FLIP_MAPPING:
-                claim_to['perspectives'][-1]['stance_label_3'] = STANCE_FLIP_MAPPING[lbl3]
+                cluster_cpy['stance_label_3'] = STANCE_FLIP_MAPPING[lbl3]
 
-            lbl5 = claim_to['perspectives'][-1]['stance_label_5']
+            lbl5 = cluster_cpy['stance_label_5']
             if lbl5 in STANCE_FLIP_MAPPING:
-                claim_to['perspectives'][-1]['stance_label_5'] = STANCE_FLIP_MAPPING[lbl5]
+                cluster_cpy['stance_label_5'] = STANCE_FLIP_MAPPING[lbl5]
 
-            claim_to['perspectives'][-1]['voter_counts'].reverse()
+                cluster_cpy['voter_counts'].reverse()
 
     return HttpResponse("Success", status=200)
 
@@ -276,29 +280,40 @@ def merge_perspectives(request, cid1, pid1, cid2, pid2):
     claim2 = claim_dict[cid2]
 
     c1_idx = None
+    cluster_1 = None
     for idx, p in enumerate(claim1['perspectives']):
         if pid1 in p['pids']:
+            cluster_1 = p
             c1_idx = idx
 
     c2_idx = None
+    cluster_2 = None
     for idx, p in enumerate(claim2['perspectives']):
         if pid2 in p['pids']:
+            cluster_2 = p
             c2_idx = idx
 
-    print(c1_idx, c2_idx)
+    print(cluster_1, cluster_2)
     if (c1_idx != None) and (c2_idx != None):
         print(pid1, pid2)
-        merged_pid = list(set(claim1['perspectives'][c1_idx]['pids'] + claim2['perspectives'][c2_idx]['pids']))
-        merged_evi_ids = list(set(claim1['perspectives'][c1_idx]['evidence'] + claim2['perspectives'][c2_idx]['evidence']))
-        claim1['perspectives'][c1_idx]['pids'] = merged_pid
-        claim2['perspectives'][c2_idx]['pids'] = merged_pid
-        claim1['perspectives'][c1_idx]['evidence'] = merged_evi_ids
-        claim2['perspectives'][c2_idx]['evidence'] = merged_evi_ids
+
+        merged_pid = list(set(cluster_1['pids'] + cluster_2['pids']))
+        print(merged_pid)
+        merged_evi_ids = list(set(cluster_1['evidence'] + cluster_2['evidence']))
+        cluster_1['pids'] = merged_pid
+        cluster_2['pids'] = merged_pid
+        cluster_1['evidence'] = merged_evi_ids
+        cluster_2['evidence'] = merged_evi_ids
 
     if cid1 == cid2:
-        del claim2['perspectives'][c2_idx]
+        claim1['perspectives'].pop(claim1['perspectives'].index(cluster_1))
 
     return HttpResponse("Success", status=200)
+
+
+def save_defualt_on_disk(request):
+    return save_updated_claim_on_disk(request, "perspectrum_with_answers_v0.1.json")
+
 
 def save_updated_claim_on_disk(request, file_name):
     # convert map to list before saving
@@ -306,7 +321,7 @@ def save_updated_claim_on_disk(request, file_name):
     save_json(claims_local, "data/dataset/" + file_name)
     return HttpResponse("Success", status=200)
 
-    return HttpResponse("Save Success", status=200)
+
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
 evidence = load_json(file_names["evidence"])
@@ -333,7 +348,7 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
     persp_sup1 = []
     persp_und1 = []
     for cluster in claim_dict[claim_id1]["perspectives"]:
-        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+        titles = [(pid, persp_dict[pid]) for pid in cluster["pids"]]
 
         if cluster['stance_label_3'] == "SUPPORT":
             persp_sup1.append(titles)
@@ -346,7 +361,7 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
     persp_sup2 = []
     persp_und2 = []
     for cluster in claim_dict[claim_id2]["perspectives"]:
-        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+        titles = [(pid, persp_dict[pid]) for pid in cluster["pids"]]
 
         if cluster['stance_label_3'] == "SUPPORT":
             persp_sup2.append(titles)
