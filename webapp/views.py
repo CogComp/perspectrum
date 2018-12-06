@@ -23,6 +23,7 @@ import random
 from copy import deepcopy
 
 file_names = {
+    'evidence': 'data/dataset/evidence_pool_v0.1.json',
     'perspective': 'data/dataset/perspective_pool_v0.1.json',
     'claim_annotation': 'data/dataset/perspectrum_with_answers_v0.1.json'
 }
@@ -87,7 +88,6 @@ def get_all_original_persp(claim_id):
 
     return related_persps
 
-
 """ APIs """
 def personality(request):
     context = { }
@@ -149,21 +149,29 @@ def vis_spectrum_js(request, claim_id):
     for c in claims:
         claim_dict[c["cId"]] = c
 
+    used_evidences = []
     c_title = claim_dict[claim_id]["text"]
     persp_sup = []
     persp_und = []
-    for cluster in claim_dict[claim_id]["perspectives"]:
-        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+    for cluster_id, cluster in enumerate(claim_dict[claim_id]["perspectives"]):
+        # titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+        evidences = cluster["evidence"]
+        for pid in cluster["pids"]:
+            title = str(pid) + ": " + persp_dict[pid]
+            if cluster['stance_label_3'] == "SUPPORT":
+                persp_sup.append((title, pid, cluster_id+1, evidences))
+                used_evidences.extend(evidences)
+            elif cluster['stance_label_3'] == "UNDERMINE":
+                persp_und.append((title, pid, cluster_id+1, evidences))
+                used_evidences.extend(evidences)
 
-        if cluster['stance_label_3'] == "SUPPORT":
-            persp_sup.append(titles)
-        elif cluster['stance_label_3'] == "UNDERMINE":
-            persp_und.append(titles)
+    used_evidences_and_texts = [(e, evidence_dict[e]) for e in set(used_evidences)]
 
     context = {
         "claim": c_title,
         "persp_sup": persp_sup,
         "persp_und": persp_und,
+        "used_evidences_and_texts": used_evidences_and_texts
     }
 
     return render(request, 'vis_dataset_js.html', context)
@@ -338,16 +346,23 @@ def save_updated_claim_on_disk(request, file_name):
 
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
+evidence = load_json(file_names["evidence"])
+
 persp_dict = {}
 claim_dict = {}
+evidence_dict = {}
 for p in persps:
     persp_dict[p["pId"]] = p["text"]
+
+for e in evidence:
+    evidence_dict[e["eId"]] = e["text"]
 
 for c in claims:
     claim_dict[c["cId"]] = c
 
 @login_required
 def vis_dataset_side_by_side(request, claim_id1, claim_id2):
+  
     # claim_id1 = 300
     claim_id1 = int(claim_id1)
 
