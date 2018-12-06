@@ -20,6 +20,7 @@ from django.core.files import File
 from collections import OrderedDict
 import datetime
 import random
+from copy import deepcopy
 
 file_names = {
     'perspective': 'data/dataset/perspective_pool_v0.1.json',
@@ -212,17 +213,18 @@ def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
             break
 
     if (c1_idx != None) and not c2_contains_pid:
-        claim_to['perspectives'].append(claim_from['perspectives'][c1_idx])
+        cluster_cpy = deepcopy(claim_from['perspectives'][c1_idx])
+        claim_to['perspectives'].append(cluster_cpy)
         if flip_stance:
-            lbl3 = claim_to['perspectives'][-1]['stance_label_3']
+            lbl3 = cluster_cpy['stance_label_3']
             if lbl3 in STANCE_FLIP_MAPPING:
-                claim_to['perspectives'][-1]['stance_label_3'] = STANCE_FLIP_MAPPING[lbl3]
+                cluster_cpy['stance_label_3'] = STANCE_FLIP_MAPPING[lbl3]
 
-            lbl5 = claim_to['perspectives'][-1]['stance_label_5']
+            lbl5 = cluster_cpy['stance_label_5']
             if lbl5 in STANCE_FLIP_MAPPING:
-                claim_to['perspectives'][-1]['stance_label_5'] = STANCE_FLIP_MAPPING[lbl5]
+                cluster_cpy['stance_label_5'] = STANCE_FLIP_MAPPING[lbl5]
 
-            claim_to['perspectives'][-1]['voter_counts'].reverse()
+                cluster_cpy['voter_counts'].reverse()
 
     return HttpResponse("Success", status=200)
 
@@ -321,7 +323,7 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
     persp_sup1 = []
     persp_und1 = []
     for cluster in claim_dict[claim_id1]["perspectives"]:
-        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+        titles = [(pid, persp_dict[pid]) for pid in cluster["pids"]]
 
         if cluster['stance_label_3'] == "SUPPORT":
             persp_sup1.append(titles)
@@ -334,7 +336,7 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
     persp_sup2 = []
     persp_und2 = []
     for cluster in claim_dict[claim_id2]["perspectives"]:
-        titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+        titles = [(pid, persp_dict[pid]) for pid in cluster["pids"]]
 
         if cluster['stance_label_3'] == "SUPPORT":
             persp_sup2.append(titles)

@@ -28,7 +28,6 @@
                 aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="#">Menu</a>
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
 
@@ -59,17 +58,9 @@
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-delete">
                         Delete cluster
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <div class="form-inline my-2 my-lg-0">
-                            <input id='sbs-del-cid' class="form-control mr-sm-2" type="search" placeholder="Claim ID" aria-label="Search">
-                            <input id='sbs-del-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
-                            <button id='sbs-delete' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Delete</button>
-                        </div>
-                    </div>
                 </li>
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -141,7 +132,14 @@
             {% for cluster in persp_sup1 %}
                 <a class="persp-title btn-block btn-lg  palette-turquoise">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -153,7 +151,14 @@
             {% for cluster in persp_und1 %}
                 <a class="persp-title btn-block btn-lg palette-carrot">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -165,7 +170,14 @@
             {% for cluster in persp_sup2 %}
                 <a class="persp-title btn-block btn-lg palette-turquoise">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -177,7 +189,14 @@
             {% for cluster in persp_und2 %}
                 <a class="persp-title btn-block btn-lg palette-carrot">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -212,12 +231,19 @@
 
     $('#sbs-delete').click(function() {
         console.log("Delete!");
+
+
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            $(this).prop("id").split(_)
+        });
+
         let cid = $('#sbs-del-cid').val();
         let pid = $('#sbs-del-pid').val();
         let url = '/dataset/side_by_side/delete_cluster/' + cid + '/' + pid;
-        $.get(url, function (){
-            window.location.href = window.location.href;
-        });
+
+        //$.get(url, function (){
+        //    window.location.href = window.location.href;
+        //});
     });
 
     $('#sbs-delete-persp').click(function() {
