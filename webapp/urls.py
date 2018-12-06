@@ -68,16 +68,18 @@ urlpatterns = [
          name="submit_evidence_annotation"),
     path('step3/api/submit_instr/', views.step3_submit_instr, name="step3_submit_instr"),
 
-
     # step 4
     path('step4/task_list/', views.render_step4_task_list, name="step4_topic_annotation"),
 
     # side by side apis
     path('dataset/side_by_side/<int:claim_id1>/<int:claim_id2>', views.vis_dataset_side_by_side),
     path('dataset/side_by_side/unify/<int:cid1>/<int:cid2>/<int:flip_stance>', views.unify_persps),
-    path('dataset/side_by_side/delete_cluster/<int:claim_id>/<int:perspective_id>', views.delete_perspective),
+    path('dataset/side_by_side/delete_cluster/<int:claim_id>/<int:perspective_id>', views.delete_cluster),
+    path('dataset/side_by_side/delete_persp/<int:claim_id>/<int:perspective_id>', views.delete_perspective),
+    path('dataset/side_by_side/split_persp/<int:claim_id>/<int:perspective_id>', views.split_perspective_from_cluster),
     path('dataset/side_by_side/add/<int:cid_from>/<int:pid>/<int:cid_to>/<int:flip_stance>', views.add_perspective_to_claim),
+    path('dataset/side_by_side/add_persp/<int:claim_id>/<int:cluster_id>/<int:persp_id_to_add>', views.add_perspective_to_cluster),
     path('dataset/side_by_side/merge/<int:cid1>/<int:pid1>/<int:cid2>/<int:pid2>', views.merge_perspectives),
     path('dataset/side_by_side/save/<str:file_name>', views.save_updated_claim_on_disk),
-
+    path('dataset/side_by_side/save_default', views.save_defualt_on_disk),
 ]

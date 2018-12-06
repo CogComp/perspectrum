@@ -23,12 +23,11 @@
 </head>
 <body>
 <div class="container-fluid">
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <nav style="position: fixed; z-index: 10000; width: 100%" class="navbar navbar-expand-lg navbar-light bg-light">
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03"
                 aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
-        <a class="navbar-brand" href="#">Menu</a>
 
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
 
@@ -46,14 +45,9 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Add perspective to the other claim
+                        Add cluster to other claim
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <div class="form-inline my-2 my-lg-0">
-                            <input id='sbs-add-cid-from' class="form-control mr-sm-2" type="search" placeholder="From Claim ID" aria-label="Search">
-                            <input id='sbs-add-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
-                            <input id='sbs-add-cid-to' class="form-control mr-sm-2" type="search" placeholder="To Claim ID" aria-label="Search">
-                        </div>
                         <input id='sbs-add-flip-stance' type="checkbox"> Flip Stance??<br>
                         <button id='sbs-add' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Add</button>
                     </div>
@@ -61,31 +55,34 @@
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Delete perspective
+                        Add perspective to cluster
                     </a>
                     <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <div class="form-inline my-2 my-lg-0">
-                            <input id='sbs-del-cid' class="form-control mr-sm-2" type="search" placeholder="Claim ID" aria-label="Search">
-                            <input id='sbs-del-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID" aria-label="Search">
-                            <button id='sbs-delete' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Delete</button>
-                        </div>
+                        <input id='sbs-add-persp-pid' class="form-control mr-sm-2" type="search" placeholder="Perspective ID to add" aria-label="Search">
+                        <button id='sbs-add-persp' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Add perspective</button>
                     </div>
                 </li>
                 <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                       data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        Merge perspective pair
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-delete">
+                        Delete cluster
                     </a>
-                    <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                        <div class="form-inline my-2 my-lg-0">
-                            <input id='sbs-merge-cid1' class="form-control mr-sm-2" type="search" placeholder="Claim ID 1" aria-label="Search">
-                            <input id='sbs-merge-pid1' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 1" aria-label="Search">
-                            <input id='sbs-merge-cid2' class="form-control mr-sm-2" type="search" placeholder="Claim ID 2" aria-label="Search">
-                            <input id='sbs-merge-pid2' class="form-control mr-sm-2" type="search" placeholder="Perspective ID 2" aria-label="Search">
-                            <button id='sbs-merge' class="btn btn-outline-danger my-2 my-sm-0" type="submit">Merge</button>
-                        </div>
-                    </div>
                 </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-delete-persp">
+                        Delete Perspective
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-merge">
+                        Merge clusters
+                    </a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link" href="javascript:void(0)" id="sbs-split">
+                        Split perspective from cluster
+                    </a>
+                </li>
+
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -108,15 +105,15 @@
         </div>
     </nav>
     <br>
-    <div class="row">
+    <div style="padding-top: 70px" class="row">
         <div class="col">
             <h4 class="persp-claim-title pallete pallete-peter-river">
-                {{ claim1 }}
+                {{ cid1 }} : {{ claim1 }}
             </h4>
         </div>
         <div class="col">
             <h4 class="persp-claim-title pallete pallete-peter-river">
-                {{ claim2 }}
+                {{ cid2 }} : {{ claim2 }}
             </h4>
         </div>
     </div>
@@ -126,9 +123,16 @@
                 Perspectives For
             </h6>
             {% for cluster in persp_sup1 %}
-                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
+                <a class="persp-title btn-block btn-lg  palette-turquoise">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ cid1 }}_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -138,9 +142,16 @@
                 Perspectives Against
             </h6>
             {% for cluster in persp_und1 %}
-                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">
+                <a class="persp-title btn-block btn-lg palette-carrot">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ cid1 }}_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -150,9 +161,16 @@
                 Perspectives For
             </h6>
             {% for cluster in persp_sup2 %}
-                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
+                <a class="persp-title btn-block btn-lg palette-turquoise">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ cid2 }}_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -162,9 +180,16 @@
                 Perspectives Against
             </h6>
             {% for cluster in persp_und2 %}
-                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">
+                <a class="persp-title btn-block btn-lg palette-carrot">
                     {% for p in cluster %}
-                        {{ p }} <br>
+                    <div class="row">
+                        <div class="col-1">
+                            <input class='sbs_persp_checkbox' id='sbs_{{ cid2 }}_{{ p.0 }}' type="checkbox">
+                        </div>
+                        <div class="col-11">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
                     {% endfor %}
                 </a>
             {% endfor %}
@@ -199,46 +224,161 @@
 
     $('#sbs-delete').click(function() {
         console.log("Delete!");
-        let cid = $('#sbs-del-cid').val();
-        let pid = $('#sbs-del-pid').val();
-        let url = '/dataset/side_by_side/delete_cluster/' + cid + '/' + pid;
-        $.get(url, function (){
-            window.location.href = window.location.href;
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        let count = 0;
+        selected_cpid.forEach(function(entry) {
+            let url = '/dataset/side_by_side/delete_cluster/' + entry[0] + '/' + entry[1];
+            count += 1;
+            $.get(url, function() {
+                if (count === selected_cpid.length) {
+                    window.location.href = window.location.href;
+                }
+            })
         });
     });
 
+    $('#sbs-delete-persp').click(function() {
+        console.log("Delete Persp!");
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+        let count = 0;
+        selected_cpid.forEach(function(entry) {
+            let url = '/dataset/side_by_side/delete_persp/' + entry[0] + '/' + entry[1];
+            count += 1;
+            $.get(url, function() {
+                if (count === selected_cpid.length) {
+                    window.location.href = window.location.href;
+                }
+            })
+        });
+
+
+    });
+
     $('#sbs-add').click(function() {
-        let cid_from = $('#sbs-add-cid-from').val();
-        let cid_to = $('#sbs-add-cid-to').val();
-        let pid = $('#sbs-add-pid').val();
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        if (selected_cpid.length != 1) {
+            alert("Pls only select one for adding; (For safefy)");
+            return;
+        }
+
         let flip = $('#sbs-add-flip-stance').prop('checked') ? 1 : 0;
-        let url = '/dataset/side_by_side/add/' + cid_from + '/' + pid + '/' + cid_to + '/' + flip;
+        let int_cid = parseInt(selected_cpid[0][0]);
+        let cid_to = (int_cid === cid_left) ? cid_right : cid_left;
+        let url = '/dataset/side_by_side/add/' + selected_cpid[0][0] + '/' + selected_cpid[0][1] + '/' + cid_to + '/' + flip;
         console.log(url);
         $.get(url, function (){
             window.location.href = window.location.href;
         });
     });
 
-    $('#sbs-merge').click(function() {
-        console.log("Merge!");
-        let cid1= $('#sbs-merge-cid1').val();
-        let cid2 = $('#sbs-merge-cid2').val();
-        let pid1 = $('#sbs-merge-pid1').val();
-        let pid2 = $('#sbs-merge-pid2').val();
-        let url = '/dataset/side_by_side/merge/' + cid1 + '/' + pid1 + '/' + cid2 + '/' + pid2;
+    $('#sbs-add-persp').click(function() {
 
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        if (selected_cpid.length != 1) {
+            alert("Pls only select one for adding perspective to cluster; (For safefy)");
+            return;
+        }
+
+        let persp_to_add_id = $('#sbs-add-persp-pid').val();
+        let url = '/dataset/side_by_side/add_persp/' + selected_cpid[0][0] + '/' + selected_cpid[0][1] + '/' + persp_to_add_id;
+        console.log(url);
         $.get(url, function (){
+            window.location.href = window.location.href;
+        });
+    });
+
+
+    $('#sbs-merge').click(function() {
+        console.log("Delete Persp!");
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        if (selected_cpid.length != 2) {
+            alert("Pls only select two for mergeing; (For safefy)");
+            return;
+        }
+
+        let url = '/dataset/side_by_side/merge/' + selected_cpid[0][0] + '/' + selected_cpid[0][1] + '/' + selected_cpid[1][0] + '/' + selected_cpid[1][1];
+        $.get(url, function() {
+            window.location.href = window.location.href;
+        });
+    });
+
+    $('#sbs-split').click(function() {
+        console.log("Splitng Persp from cluster!");
+
+        let selected_cpid = [];
+        $('input.sbs_persp_checkbox:checked').each(function() {
+            let id_parts = $(this).prop("id").split('_');
+            let pid = id_parts.pop();
+            let cid = id_parts.pop();
+            selected_cpid.push([cid, pid]);
+        });
+
+        if (selected_cpid.length != 1) {
+            alert("Pls only select one for spliting; (For safefy)");
+            return;
+        }
+
+        let url = '/dataset/side_by_side/split_persp/' + selected_cpid[0][0] + '/' + selected_cpid[0][1];
+        $.get(url, function() {
             window.location.href = window.location.href;
         });
     });
 
     $('#sbs-save').click(function() {
         let fname = $('#sbs-save-fname').val();
-        console.log("Save to " + fname);
-        let url = '/dataset/side_by_side/save/' + fname;
-        $.get(url, function (){
-            alert("Save success!");
-        });
+        if (fname) {
+            console.log("Save to " + fname);
+            let url = '/dataset/side_by_side/save/' + fname;
+            $.get(url, function (){
+                alert("Save success!");
+            });
+        }
+        else {
+            console.log("Overwriting the content");
+            let url = '/dataset/side_by_side/save_default';
+            $.get(url, function (){
+                alert("Save (Overwrite) success!");
+            });
+        }
+
     })
 
 </script>
