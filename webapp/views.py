@@ -134,12 +134,28 @@ def vis_spectrum(request, claim_id):
     }
     return render(request, 'step1/vis_spectrum.html', context)
 
+# separated by commas
 @login_required
-def vis_spectrum_js(request, claim_id):
+def vis_spectrum_js_list(request, claim_id_list):
+    ids = claim_id_list.split('-')
+    return vis_spectrum_js(request, [int(x) for x in ids])
+
+@login_required
+def vis_spectrum_js_range(request, claim_id_range):
+    split = claim_id_range.split('-')
+    return vis_spectrum_js(request, list(range(int(split[0]), int(split[1]))))
+
+@login_required
+def vis_spectrum_js_index(request, claim_id):
+    # print(claim_id)
+    # if claim_id != None and int(claim_id) >= 0:
+    return vis_spectrum_js(request, [int(claim_id)])
+
+@login_required
+def vis_spectrum_js(request, claim_ids_all):
     persps = load_json(file_names["perspective"])
     claims = load_json(file_names["claim_annotation"])
 
-    claim_id = int(claim_id)
     persp_dict = {}
     claim_dict = {}
     for p in persps:
@@ -148,28 +164,49 @@ def vis_spectrum_js(request, claim_id):
     for c in claims:
         claim_dict[c["cId"]] = c
 
+    # if claim_id != None and type(claim_id) == int and int(claim_id) >= 0:
+    #     print("type 1: ")
+    #     print(claim_id)
+    #     print(int(claim_id))
+    #     claim_ids_all = [int(claim_id)]
+    # else:
+    #     print("typ 2:")
+    #     claim_ids_all = [142, 17] # list(claim_dict.keys())[20:3]
+
+    print(claim_ids_all)
+
     used_evidences = []
-    c_title = claim_dict[claim_id]["text"]
-    persp_sup = []
-    persp_und = []
-    for cluster_id, cluster in enumerate(claim_dict[claim_id]["perspectives"]):
-        # titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
-        evidences = cluster["evidence"]
-        for pid in cluster["pids"]:
-            title = str(pid) + ": " + persp_dict[pid]
-            if cluster['stance_label_3'] == "SUPPORT":
-                persp_sup.append((title, pid, cluster_id+1, evidences))
-                used_evidences.extend(evidences)
-            elif cluster['stance_label_3'] == "UNDERMINE":
-                persp_und.append((title, pid, cluster_id+1, evidences))
-                used_evidences.extend(evidences)
+    claim_persp_bundled = []
+    for claim_id  in claim_ids_all:
+        c_title = claim_dict[claim_id]["text"]
+        persp_sup = []
+        persp_und = []
+        for cluster_id, cluster in enumerate(claim_dict[claim_id]["perspectives"]):
+            # titles = [str(pid) + ": " + persp_dict[pid] for pid in cluster["pids"]]
+            evidences = cluster["evidence"]
+            for pid in cluster["pids"]:
+                title = str(pid) + ": " + persp_dict[pid]
+                if cluster['stance_label_3'] == "SUPPORT":
+                    persp_sup.append((title, pid, cluster_id+1, evidences))
+                    used_evidences.extend(evidences)
+                elif cluster['stance_label_3'] == "UNDERMINE":
+                    persp_und.append((title, pid, cluster_id+1, evidences))
+                    used_evidences.extend(evidences)
+        claim_persp_bundled.append((c_title, persp_sup, persp_und))
 
     used_evidences_and_texts = [(e, evidence_dict[e]) for e in set(used_evidences)]
 
+    # print(claim_persp_bundled)
+    # print(used_evidences_and_texts)
+
+    # context = {
+    #     "claim": c_title,
+    #     "persp_sup": persp_sup,
+    #     "persp_und": persp_und,
+    #     "used_evidences_and_texts": used_evidences_and_texts
+    # }
     context = {
-        "claim": c_title,
-        "persp_sup": persp_sup,
-        "persp_und": persp_und,
+        "claim_persp_bundled": claim_persp_bundled,
         "used_evidences_and_texts": used_evidences_and_texts
     }
 
@@ -283,6 +320,7 @@ def save_updated_claim_on_disk(request, file_name):
     return HttpResponse("Success", status=200)
 
     return HttpResponse("Save Success", status=200)
+
 persps = load_json(file_names["perspective"])
 claims = load_json(file_names["claim_annotation"])
 evidence = load_json(file_names["evidence"])

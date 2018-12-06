@@ -86,86 +86,135 @@
 <div class="container-fluid">
     <div class="row">
         <div class="tile" style="margin: 100px;">
-            <div id="mynetwork" style="float: left; width: 1800px;" ></div>
+            <div id="mynetwork" style="float: left; width: 1800px;"></div>
         </div>
     </div>
 </div>
 
 <script type="text/javascript">
-    var claim_text = "{{ claim }}";
-
-    var nodes = [
-        {
-            id: 0,
-            label: "<b>Claim:</b> \n" + claim_text,
-            widthConstraint: {maximum: 200},
-            group: 0,
-            font: {multi: 'html'}
+    Array.prototype.contains = function (v) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] === v) return true;
         }
-    ];
+        return false;
+    };
 
-    // perspective nodes
-    {% for p, pid, cluster_id, evidences  in persp_sup %}
-        nodes.push(
-            {
-                id: {{ pid }},
-                widthConstraint: {maximum: 200},
-                label: "<b>Perspective:</b> \n {{ p }}",
-                group: {{ cluster_id }},
-                font: {multi: 'html'}
-            });
-    {% endfor %}
+    Array.prototype.unique = function () {
+        var arr = [];
+        for (var i = 0; i < this.length; i++) {
+            if (!arr.includes(this[i])) {
+                arr.push(this[i]);
+            }
+        }
+        return arr;
+    };
 
-    {% for p, pid, cluster_id, evidences  in persp_und %}
-        nodes.push(
-            {
-                id: {{ pid }},
-                widthConstraint: {maximum: 200},
-                label: "<b>Perspective:</b> \n {{ p }}",
-                group: {{ cluster_id }},
-                font: {multi: 'html'}
-            });
-    {% endfor %}
-
-    // evidence nodes
-    {% for eId, evidences in used_evidences_and_texts %}
-        nodes.push(
-            {
-                id: (10000 + {{ eId }}),
-                widthConstraint: {maximum: 300},
-                label: "<b>Evidence:</b> {{ evidences }}",
-                group: -1,
-                font: {multi: 'html', size: 7}
-            });
-    {% endfor %}
-
-
+    var nodes = [];
     var edges = [];
+    var nodeIds = [];
+    var evidenceIds = [];
+    var offset = 100000;
 
-    // adding claim to perspective edges
-    {% for p, pid, cluster_id, evidences  in persp_und %}
-        edges.push({from: 0, to: {{ pid }}, label: "<b>Stance:</b> Oppose", font: {multi: 'html'}});
-    {% endfor %}
+    {% for claim, persp_sup, persp_und in claim_persp_bundled %}
+        var claimID = -{{ forloop.counter }};
 
-    {% for p, pid, cluster_id, evidences in persp_sup %}
-        edges.push({from: 0, to: {{ pid }}, label: "<b>Stance:</b> Support", font: {multi: 'html'}});
-    {% endfor %}
+        // adding claim
+        var claim_text = "{{ claim }}";
+        nodes.push({
+                id: claimID,
+                label: "<b>Claim:</b> \n" + claim_text,
+                widthConstraint: {maximum: 200},
+                group: 0,
+                font: {multi: 'html'}
+            }
+        );
 
-    // adding edges between perspectives
-    {% for p1, pid1, cluster_id1, evidences1 in persp_und %}
-        {% for p2, pid2, cluster_id2, evidences2 in persp_und %}
-            {% if pid2 > pid1 and cluster_id2 == cluster_id1 %}
-                edges.push({from: {{ pid1 }}, to: {{ pid2 }}, label: "", font: {multi: 'html'}});
-            {% endif %}
+        // perspective nodes: support
+        {% for p, pid, cluster_id, evidences  in persp_sup %}
+            if (!nodeIds.includes({{ pid }})) {
+                nodes.push({
+                    id: {{ pid }},
+                    widthConstraint: {maximum: 200},
+                    label: "<b>Perspective:</b> \n {{ p }}",
+                    group: {{ cluster_id }},
+                    font: {multi: 'html'}
+                });
+                nodeIds.push({{ pid }})
+            }
+        {% endfor %}
+
+        // perspective nodes: undermine
+        {% for p, pid, cluster_id, evidences  in persp_und %}
+            if (!nodeIds.includes({{ pid }})) {
+                nodes.push({
+                    id: {{ pid }},
+                    widthConstraint: {maximum: 200},
+                    label: "<b>Perspective:</b> \n {{ p }}",
+                    group: {{ cluster_id }},
+                    font: {multi: 'html'}
+                });
+                nodeIds.push({{ pid }})
+            }
+        {% endfor %}
+
+        // evidence nodes
+{#        {% for eId, evidences in used_evidences_and_texts %}#}
+{#            if (!evidenceIds.includes(offset + {{ eId }})) {#}
+{#                nodes.push({#}
+{#                    id: (offset + {{ eId }}),#}
+{#                    widthConstraint: {maximum: 300},#}
+{#                    label: "<b>Evidence:</b> {{ evidences }}",#}
+{#                    group: -1,#}
+{#                    font: {multi: 'html', size: 7}#}
+{#                });#}
+{#                evidenceIds.push(offset + {{ eId }});#}
+{#            }#}
+{#        {% endfor %}#}
+
+        // adding claim to perspective edges: undermine
+        {% for p, pid, cluster_id, evidences in persp_und %}
+            edges.push({
+                from: claimID,
+                to: {{ pid }},
+                label: "<b>Stance:</b> Oppose",
+                font: {multi: 'html'}
+            });
+        {% endfor %}
+
+        // adding claim to perspective edges: support
+        {% for p, pid, cluster_id, evidences in persp_sup %}
+            edges.push({
+                from: claimID,
+                to: {{ pid }},
+                label: "<b>Stance:</b> Support",
+                font: {multi: 'html'}
+            });
+        {% endfor %}
+
+        // adding edges between perspectives
+        {% for p1, pid1, cluster_id1, evidences1 in persp_und %}
+            {% for p2, pid2, cluster_id2, evidences2 in persp_und %}
+                {% if pid2 > pid1 and cluster_id2 == cluster_id1 %}
+                    edges.push({from: {{ pid1 }}, to: {{ pid2 }}, label: "", font: {multi: 'html'}});
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+
+        // adding perspective to evidence edges
+        {% for p, pid, cluster_id, evidences in persp_sup %}
+            {% for eId in evidences %}
+                edges.push({from: {{ pid }}, to: (offset + {{ eId }}), label: "", font: {multi: 'html'}});
+            {% endfor %}
+        {% endfor %}
+
+        {% for p, pid, cluster_id, evidences in persp_und %}
+            {% for eId in evidences %}
+                edges.push({from: {{ pid }}, to: (offset + {{ eId }}), label: "", font: {multi: 'html'}});
+            {% endfor %}
         {% endfor %}
     {% endfor %}
 
-    // adding perspective to evidence edges
-    {% for p, pid, cluster_id, evidences in persp_sup %}
-        {% for eId in evidences %}
-            edges.push({from: {{ pid }}, to: (10000 + {{ eId }}), label: "", font: {multi: 'html'}});
-        {% endfor %}
-    {% endfor %}
+    nodes = nodes.unique();
 
     var container = document.getElementById('mynetwork');
     var data = {
