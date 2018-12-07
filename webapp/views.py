@@ -4,9 +4,14 @@ from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_protect
-
 from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render, redirect
+from django.core.files import File
+
+from experiment.query_elasticsearch import get_perspective_from_pool
+from experiment.query_elasticsearch import get_evidence_from_pool
+from pulp import LpVariable, LpProblem, LpMaximize, LpStatus, value
+
 from .forms import ContactForm
 
 from webapp.models import *
@@ -14,8 +19,6 @@ from webapp.util.step1.persp_verification_auth import get_persp_hit_session
 from webapp.util.step2b.equivalence_auth import get_equivalence_hit_session
 from webapp.util.step2a.paraphrase_auth import get_paraphrase_hit_session
 from webapp.util.step3.evidence_auth import get_evidence_hit_session
-
-from django.core.files import File
 
 from collections import OrderedDict
 import datetime
@@ -188,10 +191,10 @@ def vis_spectrum_js(request, claim_ids_all):
             for pid in cluster["pids"]:
                 title = str(pid) + ": " + persp_dict[pid]
                 if cluster['stance_label_3'] == "SUPPORT":
-                    persp_sup.append((title, pid, cluster_id+1, evidences))
+                    persp_sup.append((title, pid, cluster_id+1, evidences, 1.0))
                     used_evidences.extend(evidences)
                 elif cluster['stance_label_3'] == "UNDERMINE":
-                    persp_und.append((title, pid, cluster_id+1, evidences))
+                    persp_und.append((title, pid, cluster_id+1, evidences, 1.0))
                     used_evidences.extend(evidences)
         claim_persp_bundled.append((c_title, persp_sup, persp_und))
 
@@ -1067,3 +1070,135 @@ def step3_submit_instr(request):
         session.instruction_complete = True
         session.save()
         return HttpResponse("Submission Success!", status=200)
+
+@login_required
+def lucene_baseline(request, claim_text=""):
+    print(claim_text)
+    if claim_text != "":
+        claim = claim_text #
+
+        prob = LpProblem("perspectiveOptimization", LpMaximize)
+
+        # given a claim, extract perspectives
+        perspective_given_claim = get_perspective_from_pool(claim, 30)
+
+        # create binary variables per perspective
+        perspective_variables = []
+        perspective_weights = []
+        perspective_ids = []
+
+        for (pIdx, (p_text, pId, pScore)) in enumerate(perspective_given_claim):
+            if pScore > 9.0:
+                x = LpVariable("p" + str(pIdx), 0, 1)
+                perspective_variables.append(x)
+                perspective_weights.append(pScore)
+                perspective_ids.append(pId)
+                # print(pScore)
+
+        # print(len(perspective_variables))
+
+        total_obj = sum(x * obj for x, obj in zip(perspective_variables, perspective_weights))
+
+        # maximum and minimum number of perspectives selected
+        total_weight = sum(x * 1.0 for x in perspective_variables)
+        prob += total_weight <= 10
+        # prob += total_weight >= 5
+
+        assert (len(perspective_variables) == len(perspective_weights))
+
+        # given a perspective, retrieve relevant perspectives
+        # create a map of clustering similarity
+        # offset = 7
+        # pp_threshold = 10
+        # lucene_perspective_pair_cache = {}
+        # for p_text1, pId1, _ in perspective_given_claim:
+        #     lucene_perspectives = get_perspective_from_pool(p_text1, 30)
+        #     for p_text2, pId2, pScore2 in lucene_perspectives:
+        #         # print(f"text1: {p_text1} - text2: {p_text2}:  {pScore2}")
+        #         lucene_perspective_pair_cache[(pId1, pId2)] = pScore2 # / (1.0 * len(p_text2.split(" ")))
+
+        # print(lucene_perspective_pair_cache)
+
+        # perspective_pair_variables = []
+        # perspective_pair_weights = []
+        # # perspective_pair_variables_map = {}
+        # for i1, (_, pId1, _) in enumerate(perspective_given_claim):
+        #     # perspective_pair_variables_map[pId1] = []
+        #     for i2, (_, pId2, _) in enumerate(perspective_given_claim):
+        #         if pId1 == pId2 or (pId1, pId2) not in lucene_perspective_pair_cache:
+        #             continue
+        #         y = LpVariable("p" + str(pId1) + "-" + str(pId2), 0, 1)
+        #         if (pId1, pId2) in lucene_perspective_pair_cache:
+        #             # print("negative . . . ")
+        #             score = lucene_perspective_pair_cache[(pId1, pId2)]
+        #             if score > pp_threshold:
+        #                 perspective_pair_variables.append(y)
+        #                 perspective_pair_weights.append(7- 0.0001 * score)
+        #                 # perspective_pair_variables_map[(pId1, pId2)] = score
+        #                 prob += perspective_variables[i1] >= y
+        #                 prob += perspective_variables[i2] >= y
+        #                 prob += y >= (perspective_variables[i2] + perspective_variables[i1] - 1)
+        #
+        # total_obj += sum(x * obj for x, obj in zip(perspective_pair_variables, perspective_pair_weights))
+
+        # print(perspective_pair_variables)
+
+        # assert len(perspective_pair_variables) == len(perspective_pair_weights)
+
+        # given perspectives, retrieve relevant evidences
+        # evidence_variables = []
+        # evidence_weights = []
+        # evidence_ids = []
+        # threshold = 10
+        # perspective_to_evidence_variables = {}
+        evidence_to_perspective_variables = {}
+        # for p_text1, pId1, _ in perspective_given_claim:
+            # perspective_to_evidence_variables[pId1] = []
+            # lucene_evidences = get_evidence_from_pool(p_text1, 1)
+            # for (eIdx, (e_text, eId, eScore)) in enumerate(lucene_evidences):
+                # if pScore > threshold:
+                #     x = LpVariable("pe" + str(pId1) + "-" + str(eId), 0, 1)
+                    # evidence_variables.append(x)
+                    # evidence_weights.append(pScore)
+                    # evidence_ids.append(eId)
+                    # perspective_to_evidence_variables[pId1].append((x, pScore, eId))
+                    # print(pScore)
+
+        # if a perspective is active, it should be connected to at least one evidence
+        # evidence is not active, unless it is connected to sth
+
+        prob += total_obj
+        status = prob.solve()
+        print(LpStatus[status])
+
+        # extract active variables
+        used_evidences_and_texts = []
+        persp_sup = []
+        for pVar, p in zip(perspective_variables, perspective_given_claim):
+            pScore = p[2]
+            p_text = p[0]
+            # print(pVar)
+            # print(value(pVar))
+            if value(pVar) != None:
+                if value(pVar) > 0.5:
+                    lucene_evidences = get_evidence_from_pool(claim + p_text, 2)
+                    evidences = []
+                    if len(lucene_evidences) > 0:
+                        (e_text, eId, eScore) = lucene_evidences[0]
+                        evidences = eId
+                        used_evidences_and_texts.append([eId, e_text])
+                    persp_sup.append((p[0], p[1], 1, [evidences], pScore))
+
+            else:
+                print("value is none")
+
+        claim_persp_bundled = [(claim, persp_sup, [])]
+
+        context = {
+            "claim_persp_bundled": claim_persp_bundled,
+            "used_evidences_and_texts": used_evidences_and_texts
+        }
+    else:
+        context = { }
+
+    return render(request, "vis_dataset_js.html", context)

@@ -99,7 +99,26 @@ def get_claims_with_claim_surface(text):
         id = doc['_source']["claim_id"]
         claim_title = doc['_source']["claim_title"]
         output.append((concat, claim_title, id, score))
+    return output
 
+def get_perspective_from_pool(text, size):
+    res = es.search(index="perspective_pool_v0.1", doc_type="text", body={"query": {"match": {"text": text}}}, size=size)
+    output = []
+    for doc in res['hits']['hits']:
+        score = doc['_score']
+        text = doc['_source']["text"]
+        pId = doc['_source']["pId"]
+        output.append((text, pId, score))
+    return output
+
+def get_evidence_from_pool(text, size):
+    res = es.search(index="evidence_pool_v0.1", doc_type="text", body={"query": {"match": {"text": text}}}, size=size)
+    output = []
+    for doc in res['hits']['hits']:
+        score = doc['_score']
+        text = doc['_source']["text"]
+        eId = doc['_source']["eId"]
+        output.append((text, eId, score))
     return output
 
 if __name__ == '__main__':
