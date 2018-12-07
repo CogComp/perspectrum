@@ -21,7 +21,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Topic Annotation Interface </title>
     <script src="{% static "js/csrf_util.js" %}"></script>
-    //<script src="{% static "js/step3/evidence_verification.js" %}"></script>-->
+    <script src="{% static "js/step4/topic_anno.js" %}"></script>
     {% csrf_token %}
 </head>
 <body>
@@ -29,28 +29,24 @@
         <h4 class="rel_claim_title pallete pallete-peter-river">
             Topic Annotation Interface
         </h4>
-        <nav aria-label="breadcrumb">
-          <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="/step3/task_list/">Home</a></li>
-            <li class="breadcrumb-item active" aria-current="page">Task</li>
-          </ol>
-        </nav>
 
         <div class="rel_option_container">
             In this task we ask you to tell us which options(s) best describe the <strong>topic</strong> of the given sentence:
             <br>
 
+            {% for c in claims %}
             <div class="col persps-container rel_tile">
                 <div class="container">
                     <!--<p>Indicate whether each <font color="red">claim</font> is supported by the given <font color="blue">paragraph</font>:</p>-->
                     <div class="row">
                         <div class="col-5">
                             <strong><h6 style="color: blue">Sentence: </h6></strong>
-                                <p> {{ evi.content }} </p>
+                                <p> {{ c.title }} </p>
 
                         </div>
                     <div class="col-sm">
                         <div class="rel-q1" id="q1">
+
                             <div class="col equi-cand-container">
 
                                 <div class="row">
@@ -59,14 +55,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="culture-{{ c.id }}" type="radio" id="yes-culture-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="culture-{{ c.id }}" type="radio" id="no-culture-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -78,14 +74,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="economy-{{ c.id }}" type="radio" id="yes-economy-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="economy-{{ c.id }}" type="radio" id="no-economy-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -97,14 +93,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="education-{{ c.id }}" type="radio" id="yes-education-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="education-{{ c.id }}" type="radio" id="no-education-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -116,14 +112,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="environment-{{ c.id }}" type="radio" id="yes-environment-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="environment-{{ c.id }}" type="radio" id="no-environment-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -135,14 +131,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="freedom_of_speech-{{ c.id }}" type="radio" id="yes-freedom_of_speech-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="freedom_of_speech-{{ c.id }}" type="radio" id="no-freedom_of_speech-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -154,14 +150,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="health_and_medicine-{{ c.id }}" type="radio" id="yes-health_and_medicine-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="health_and_medicine-{{ c.id }}" type="radio" id="no-health_and_medicine-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -173,14 +169,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="world_international-{{ c.id }}" type="radio" id="yes-world_international-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="world_international-{{ c.id }}" type="radio" id="no-world_international-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -192,14 +188,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="law-{{ c.id }}" type="radio" id="yes-law-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="law-{{ c.id }}" type="radio" id="no-law-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -211,14 +207,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="philosophy-{{ c.id }}" type="radio" id="yes-philosophy-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="philosophy-{{ c.id }}" type="radio" id="no-philosophy-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -230,14 +226,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="politics-{{ c.id }}" type="radio" id="yes-politics-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="politics-{{ c.id }}" type="radio" id="no-politics-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -249,14 +245,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="religion-{{ c.id }}" type="radio" id="yes-religion-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="religion-{{ c.id }}" type="radio" id="no-religion-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -268,14 +264,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="science_and_technology-{{ c.id }}" type="radio" id="yes-science_and_technology-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="science_and_technology-{{ c.id }}" type="radio" id="no-science_and_technology-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -287,14 +283,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="society-{{ c.id }}" type="radio" id="yes-society-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="society-{{ c.id }}" type="radio" id="no-society-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -306,14 +302,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="sports_and_entertainments-{{ c.id }}" type="radio" id="yes-sports_and_entertainments-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="sports_and_entertainments-{{ c.id }}" type="radio" id="no-sports_and_entertainments-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -325,14 +321,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="digital_freedom-{{ c.id }}" type="radio" id="yes-digital_freedom-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="digital_freedom-{{ c.id }}" type="radio" id="no-digital_freedom-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -344,14 +340,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="human_rights-{{ c.id }}" type="radio" id="yes-human_rights-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="human_rights-{{ c.id }}" type="radio" id="no-human_rights-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -363,14 +359,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="gender-{{ c.id }}" type="radio" id="yes-gender-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="gender-{{ c.id }}" type="radio" id="no-gender-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -382,14 +378,14 @@
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="sup_{{ evi.id }}_{{ persp.id }}" value="sup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="ethics-{{ c.id }}" type="radio" id="yes-ethics-{{ c.id }}" value="yes" data-toggle="radio" class="custom-radio option_yes">
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>Yes</b>
                                         </label>
                                     </div>
                                     <div class="col-2">
                                         <label class="radio rel_option_radio">
-                                            <input name="check_{{ evi.id }}_{{ persp.id }}" type="radio" id="nsup_{{ evi.id }}_{{ persp.id }}" value="nsup" data-toggle="radio" class="custom-radio equi_option">
+                                            <input name="ethics-{{ c.id }}" type="radio" id="no-ethics-{{ c.id }}" value="no" data-toggle="radio" class="custom-radio option_no" checked>
                                             <span class="icons"><span class="icon-unchecked"></span><span class="icon-checked"></span></span>
                                             <b>No</b>
                                         </label>
@@ -401,9 +397,9 @@
                     </div>
                   </div>
                 </div>
+
             </div>
-
-
+            {% endfor %}
             <div class="row">
                 <div class="col-4">
                     <button id="rel_option_clear" class="btn btn-block btn-lg btn-danger">Clear Selection</button>
@@ -414,6 +410,7 @@
             </div>
             <br>
         </div>
+        <h3 id="code"></h3>
     </div>
 </body>
 </html>

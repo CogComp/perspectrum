@@ -18,8 +18,8 @@ class Claim(models.Model):
     finished_counts = models.IntegerField(default=0)
 
     # Human annotation counts for evidence verification
-    evidence_assign_counts = models.IntegerField(default=0)
-    evidence_finished_counts = models.IntegerField(default=0)
+    topic_assign_counts = models.IntegerField(default=0)
+    topic_finished_counts = models.IntegerField(default=0)
 
     # Keywords
     keywords = models.TextField(default="[]") # List of string keywords
@@ -194,3 +194,21 @@ class EquivalenceBatch(models.Model):
     perspective_ids = models.TextField(default="[]") # list of integer perspective ids
     assign_counts = models.IntegerField(default=0)
     finished_counts = models.IntegerField(default=0)
+
+
+# Topic HIT Session
+class TopicHITSession(models.Model):
+    username = models.CharField(max_length=100)
+    instruction_complete = models.BooleanField(default=False)
+    job_complete = models.BooleanField(default=False)
+    jobs = models.TextField()  # a list of integer claim ids
+    finished_jobs = models.TextField()
+    duration = models.DurationField()
+    last_start_time = models.DateTimeField(null=True)
+
+
+# Topic annotation
+class TopicAnnotation(models.Model):
+    author = models.CharField(max_length=100)
+    claim_id = models.IntegerField()
+    topics = models.TextField(default="[]")
