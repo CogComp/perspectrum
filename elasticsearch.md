@@ -12,7 +12,6 @@ http.port: 8080
 discovery.type: single-node
 ```
 
-
 Then create an index `perspectivesAndClaims``: 
 ```
 curl -X PUT "localhost:9200/perspectivesandclaims"
@@ -21,6 +20,11 @@ curl -X PUT "localhost:9200/perspectivesandclaims"
 which should make it available on the following uri: 
 ```
 http://localhost:9200
+```
+
+To make sure the index is there, list all the indices: 
+```
+http://bronte.cs.illinois.edu:8080/_cat/indices
 ```
 
 Install `elasticsearch_loader` to move the questions to the elasticsearch: 

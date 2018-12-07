@@ -83,10 +83,29 @@
 {#    </div>#}
 {#</div>#}
 
-<div class="container-fluid">
-    <div class="row">
-        <div class="tile" style="margin: 100px;">
-            <div id="mynetwork" style="float: left; width: 1800px;"></div>
+<div class="container" style="margin-left: 5%; width: 90%; ">
+    <div class="input-group mb-3" style="margin-top: 5%; margin-left: 30%; text-align: center">
+        <div class="input-group-prepend">
+            <button id="search-claim" type="button" class="btn btn-primary">Search</button>
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Lucene</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div role="separator" class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+            </div>
+        </div>
+        <input id="claim-box" type="text" class="form-control" aria-label="Text input with segmented dropdown button">
+    </div>
+
+
+    <div class="row" style="width: 100%;">
+        <div class="tile">
+            <div id="mynetwork" style="width: 1800px;"></div>
         </div>
     </div>
 </div>
@@ -130,7 +149,7 @@
         );
 
         // perspective nodes: support
-        {% for p, pid, cluster_id, evidences  in persp_sup %}
+        {% for p, pid, cluster_id, evidences, score  in persp_sup %}
             if (!nodeIds.includes({{ pid }})) {
                 nodes.push({
                     id: {{ pid }},
@@ -144,7 +163,7 @@
         {% endfor %}
 
         // perspective nodes: undermine
-        {% for p, pid, cluster_id, evidences  in persp_und %}
+        {% for p, pid, cluster_id, evidences, score  in persp_und %}
             if (!nodeIds.includes({{ pid }})) {
                 nodes.push({
                     id: {{ pid }},
@@ -158,42 +177,46 @@
         {% endfor %}
 
         // evidence nodes
-{#        {% for eId, evidences in used_evidences_and_texts %}#}
-{#            if (!evidenceIds.includes(offset + {{ eId }})) {#}
-{#                nodes.push({#}
-{#                    id: (offset + {{ eId }}),#}
-{#                    widthConstraint: {maximum: 300},#}
-{#                    label: "<b>Evidence:</b> {{ evidences }}",#}
-{#                    group: -1,#}
-{#                    font: {multi: 'html', size: 7}#}
-{#                });#}
-{#                evidenceIds.push(offset + {{ eId }});#}
-{#            }#}
-{#        {% endfor %}#}
+                {% for eId, evidences in used_evidences_and_texts %}
+                    if (!evidenceIds.includes(offset + {{ eId }})) {
+                        nodes.push({
+                            id: (offset + {{ eId }}),
+                            widthConstraint: {maximum: 300},
+                            label: `<b>Evidence:</b> {{ evidences }}`,
+                            group: -1,
+                            font: {multi: 'html', size: 7}
+                        });
+                        evidenceIds.push(offset + {{ eId }});
+                    }
+                {% endfor %}
 
         // adding claim to perspective edges: undermine
-        {% for p, pid, cluster_id, evidences in persp_und %}
+        {% for p, pid, cluster_id, evidences, score in persp_und %}
+            var pScore = {{ score }};
+            pScore = Math.floor(pScore* 10)/10;
             edges.push({
                 from: claimID,
                 to: {{ pid }},
-                label: "<b>Stance:</b> Oppose",
+                label: "<b>Stance:</b> Oppose (" + pScore + ")",
                 font: {multi: 'html'}
             });
         {% endfor %}
 
         // adding claim to perspective edges: support
-        {% for p, pid, cluster_id, evidences in persp_sup %}
+        {% for p, pid, cluster_id, evidences, score in persp_sup %}
+            var pScore = {{ score }};
+            pScore = Math.floor(pScore* 10)/10;
             edges.push({
                 from: claimID,
                 to: {{ pid }},
-                label: "<b>Stance:</b> Support",
+                label: "<b>Stance:</b> Support (" + pScore + ")",
                 font: {multi: 'html'}
             });
         {% endfor %}
 
         // adding edges between perspectives
-        {% for p1, pid1, cluster_id1, evidences1 in persp_und %}
-            {% for p2, pid2, cluster_id2, evidences2 in persp_und %}
+        {% for p1, pid1, cluster_id1, evidences1, score1 in persp_und %}
+            {% for p2, pid2, cluster_id2, evidences2, score2 in persp_und %}
                 {% if pid2 > pid1 and cluster_id2 == cluster_id1 %}
                     edges.push({from: {{ pid1 }}, to: {{ pid2 }}, label: "", font: {multi: 'html'}});
                 {% endif %}
@@ -201,13 +224,13 @@
         {% endfor %}
 
         // adding perspective to evidence edges
-        {% for p, pid, cluster_id, evidences in persp_sup %}
+        {% for p, pid, cluster_id, evidences, score in persp_sup %}
             {% for eId in evidences %}
                 edges.push({from: {{ pid }}, to: (offset + {{ eId }}), label: "", font: {multi: 'html'}});
             {% endfor %}
         {% endfor %}
 
-        {% for p, pid, cluster_id, evidences in persp_und %}
+        {% for p, pid, cluster_id, evidences, score in persp_und %}
             {% for eId in evidences %}
                 edges.push({from: {{ pid }}, to: (offset + {{ eId }}), label: "", font: {multi: 'html'}});
             {% endfor %}
@@ -252,7 +275,15 @@
     };
     var network = new vis.Network(container, data, options);
 </script>
+<script type="application/javascript">
 
+    $('#search-claim').click(function () {
+        var claimText = $("#claim-box").val();
+        let url = '/baseline/claim_text=' + claimText + "";
+        console.log(url);
+        window.location.href = url;
+    });
 
+</script>
 </body>
 </html>
