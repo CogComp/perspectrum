@@ -1080,19 +1080,21 @@ def lucene_baseline(request, claim_text=""):
         prob = LpProblem("perspectiveOptimization", LpMaximize)
 
         # given a claim, extract perspectives
-        perspective_given_claim = get_perspective_from_pool(claim, 30)
+        perspective_given_claim = [ (p_text, pId, pScore/len(p_text.split(" ")))  for p_text, pId, pScore in get_perspective_from_pool(claim, 30)]
 
         # create binary variables per perspective
         perspective_variables = []
         perspective_weights = []
         perspective_ids = []
+        perspective_given_claim_subset = []
 
         for (pIdx, (p_text, pId, pScore)) in enumerate(perspective_given_claim):
-            if pScore > 9.0:
+            if pScore > 1.55:
                 x = LpVariable("p" + str(pIdx), 0, 1)
                 perspective_variables.append(x)
                 perspective_weights.append(pScore)
                 perspective_ids.append(pId)
+                perspective_given_claim_subset.append((p_text, pId, pScore))
                 # print(pScore)
 
         # print(len(perspective_variables))
@@ -1174,7 +1176,7 @@ def lucene_baseline(request, claim_text=""):
         # extract active variables
         used_evidences_and_texts = []
         persp_sup = []
-        for pVar, p in zip(perspective_variables, perspective_given_claim):
+        for pVar, p in zip(perspective_variables, perspective_given_claim_subset):
             pScore = p[2]
             p_text = p[0]
             # print(pVar)
@@ -1186,7 +1188,7 @@ def lucene_baseline(request, claim_text=""):
                     if len(lucene_evidences) > 0:
                         (e_text, eId, eScore) = lucene_evidences[0]
                         evidences = eId
-                        used_evidences_and_texts.append([eId, e_text])
+                        used_evidences_and_texts.append([eId, e_text.replace("`", "'")])
                     persp_sup.append((p[0], p[1], 1, [evidences], pScore))
 
             else:
