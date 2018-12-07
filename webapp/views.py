@@ -1233,6 +1233,7 @@ def submit_topic_annotation(request):
     session = get_topic_hit_session(username)
 
     # Update annotation in EquivalenceAnnotation table
+    finished_cid_set = set()
     for anno in annos:
         cid = anno[0]
         label = anno[1]
@@ -1241,9 +1242,12 @@ def submit_topic_annotation(request):
         t.save()
 
         if username != 'TEST':
-            c = Claim.objects.get(id=cid)
-            c.topic_finished_counts += 1
-            c.save()
+            finished_cid_set.add(cid)
+
+    for cid in finished_cid_set:
+        c = Claim.objects.get(id=cid)
+        c.topic_finished_counts += 1
+        c.save()
 
     # increment duration in database
     delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time

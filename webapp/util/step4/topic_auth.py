@@ -22,7 +22,7 @@ def get_topic_hit_session(username):
 
 
 # Number of assignments for each claim in the persp topic task
-TARGET_ASSIGNMENT_COUNT = 1
+TARGET_ASSIGNMENT_COUNT = 2
 
 
 def generate_topic_jobs(username, num_claims):

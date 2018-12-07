@@ -88,4 +88,8 @@ urlpatterns = [
     # path('baseline/claim=<slug:claim_text>', views.lucene_baseline),
     path('baseline/', views.lucene_baseline),
     path('baseline/claim_text=<str:claim_text>', views.lucene_baseline),
+
+
+    # Human Evaluation
+    # path('baseline/<int:claim_id>', views.render_human_eval),
 ]
