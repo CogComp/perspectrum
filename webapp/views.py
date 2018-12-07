@@ -19,6 +19,7 @@ from webapp.util.step1.persp_verification_auth import get_persp_hit_session
 from webapp.util.step2b.equivalence_auth import get_equivalence_hit_session
 from webapp.util.step2a.paraphrase_auth import get_paraphrase_hit_session
 from webapp.util.step3.evidence_auth import get_evidence_hit_session
+from webapp.util.step4.topic_auth import get_topic_hit_session
 
 from collections import OrderedDict
 import datetime
@@ -1014,8 +1015,6 @@ def render_step3_task_list(request):
 def render_step3_instructions(request):
     return render(request, "step3/instructions.html", {})
 
-def render_step4_task_list(request):
-    return render(request, "step4_topics/topic_interface.html", {})
 
 evidence_label_mapping = {
     "sup" : "S",
@@ -1199,6 +1198,58 @@ def lucene_baseline(request, claim_text=""):
             "used_evidences_and_texts": used_evidences_and_texts
         }
     else:
-        context = { }
+        context = {}
 
     return render(request, "vis_dataset_js.html", context)
+
+
+###############################################
+#     STEP 4 APIs
+#     Topic
+###############################################
+
+def render_topic_annotation(request):
+    username = request.user.username
+    session = get_topic_hit_session(username)
+
+    jobs = json.loads(session.jobs)
+    finished = json.loads(session.finished_jobs)
+
+    claims = [Claim.objects.get(id=cid) for cid in jobs]
+
+    context = {
+        'claims': claims
+    }
+
+    return render(request, "step4_topics/topic_interface.html", context)
+
+
+def submit_topic_annotation(request):
+    if request.method != 'POST':
+        raise ValueError("submit_topic_annotation API only supports POST request")
+
+    annos = json.loads(request.POST.get('annotations'))
+    username = request.user.username
+    session = get_topic_hit_session(username)
+
+    # Update annotation in EquivalenceAnnotation table
+    for anno in annos:
+        cid = anno[0]
+        label = anno[1]
+
+        t = TopicAnnotation.objects.create(author=username, claim_id=cid, topics=label)
+        t.save()
+
+        if username != 'TEST':
+            c = Claim.objects.get(id=cid)
+            c.topic_finished_counts += 1
+            c.save()
+
+    # increment duration in database
+    delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
+    session.duration = session.duration + delta
+    session.job_complete = True
+    session.save()
+
+    res = HttpResponse(str(session.id), status=200)
+    return res

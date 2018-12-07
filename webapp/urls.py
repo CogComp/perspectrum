@@ -69,7 +69,8 @@ urlpatterns = [
     path('step3/api/submit_instr/', views.step3_submit_instr, name="step3_submit_instr"),
 
     # step 4
-    path('step4/task_list/', views.render_step4_task_list, name="step4_topic_annotation"),
+    path('step4/topic/', views.render_topic_annotation, name="step4_topic_annotation"),
+    path('step4/api/submit_topic_annotation', views.submit_topic_annotation, name="step4_submit_topic_annotation"),
 
     # side by side apis
     path('dataset/side_by_side/<int:claim_id1>/<int:claim_id2>', views.vis_dataset_side_by_side),
