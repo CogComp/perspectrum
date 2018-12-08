@@ -35,7 +35,8 @@ urlpatterns = [
     path('dataset_js/id=<slug:claim_id>', views.vis_spectrum_js_index),
     path('dataset_js/list=<slug:claim_id_list>', views.vis_spectrum_js_list),
     path('dataset_js/range=<slug:claim_id_range>', views.vis_spectrum_js_range),
-    path('dataset_js/claims_and_topics', views.sunburst),
+    path('dataset_js/sunburst', views.sunburst),
+    path('dataset_js/sunburst2', views.sunburst),
 
     # step 1
     path('step1/task_list/', views.render_list_page, name="task_list"),

@@ -17,9 +17,9 @@ text {
 <script src="http://d3js.org/d3.v3.min.js"></script>
 <script>
 
-var width = 960,
-    height = 700,
-    radius = Math.min(width, height) / 2;
+var width = 1000,
+    height = 1000,
+    radius = 480; ///Math.min(width, height) / 2;
 
 var x = d3.scale.linear()
     .range([0, 2 * Math.PI]);
@@ -44,7 +44,9 @@ var arc = d3.svg.arc()
     .innerRadius(function(d) { return Math.max(0, y(d.y)); })
     .outerRadius(function(d) { return Math.max(0, y(d.y + d.dy)); });
 
-d3.json("flare.json", function(error, root) {
+  var root = {{ data | safe}};
+  console.log(root);
+  //var root = root[0];
   var g = svg.selectAll("g")
       .data(partition.nodes(root))
     .enter().append("g");
@@ -81,7 +83,6 @@ d3.json("flare.json", function(error, root) {
           }
       });
   }
-});
 
 d3.select(self.frameElement).style("height", height + "px");
 
