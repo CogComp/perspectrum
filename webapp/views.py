@@ -1459,12 +1459,33 @@ def sunburst(request):
     return render(request, "topics-sunburst/sunburst.html", context)
 
 
+topics_map = {
+    'culture':'Culture',
+    'society':'Society',
+    'world_international':'World',
+    'politics':'Politics',
+    'law':'Law',
+    'religion':'Religion',
+    'human_rights':'Human Rights',
+    'economy':'Economy',
+    'environment':'Environment',
+    'science_and_technology':'Science',
+    'education':'education',
+    'digital_freedom':'Digital Freedom',
+    'freedom_of_speech':'F. of Speech',
+    'health_and_medicine':'Health',
+    'gender':'Gender',
+    'ethics':'Ethics',
+    'sports_and_entertainments': 'Sports',
+    'philosophy': 'Philosophy'
+}
+
 def sunburst(request):
     # create a list of topics and populate their claim strings
     # claims = load_json(file_names["claim_annotation"])
     topics_to_claim = {}
 
-    for c in random.sample(claims, 30):
+    for c in random.sample(claims, 35):
         topics = c['topics']
         claim_text = c['text']
         for topic_text in topics:
@@ -1472,20 +1493,23 @@ def sunburst(request):
                 topics_to_claim[topic_text] = []
             topics_to_claim[topic_text].append(claim_text)
 
+    print(topics_to_claim.keys())
+
     data = []
     total_childen = 0
     for key in topics_to_claim.keys():
         children = [{"name": x, "value": 1} for x in topics_to_claim[key]]
-        data.append({
-            "name": key,
-            "children": children,
-            "value": len(children)
-        })
-        total_childen += len(children)
+        if len(children) > 1:
+            data.append({
+                "name": topics_map[key],
+                "children": children,
+                "value": len(children)
+            })
+            total_childen += len(children)
 
     data.append({
         "name": "dummy",
-        "children": [{"name": "fake", "value": 1} for x in range(1,total_childen)],
+        "children": [{"name": "fake", "value": 1} for x in range(0,total_childen)],
         #"value": total_childen
     })
 
