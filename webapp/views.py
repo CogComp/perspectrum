@@ -1458,7 +1458,6 @@ def sunburst(request):
     }
     return render(request, "topics-sunburst/sunburst.html", context)
 
-
 topics_map = {
     'culture':'Culture',
     'society':'Society',
@@ -1509,14 +1508,8 @@ def sunburst(request):
 
     data.append({
         "name": "dummy",
-        "children": [{"name": "fake", "value": 1} for x in range(0,total_childen)],
-        #"value": total_childen
+        "children": [{"name": "fake", "value": 1} for x in range(0,total_childen)]
     })
-
-    # data = [{
-    #     "name": "core",
-    #     "children": data
-    # }]
 
     context = {
         "data": json.dumps([{
