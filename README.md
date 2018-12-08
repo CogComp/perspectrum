@@ -5,9 +5,9 @@ This repository contains codes and scripts relevant to the dataset introduced in
 
 ## Code structure: 
 
- - `website/`: contains the webapp used for crowdsourcing experiments. 
+ - `website/`: contains the webapp used for crowdsourcing experiments, as well as the search engine for claim/perspectives. 
  - `data/`: contains the dataset at each stages of our annotations. 
- - `experiments`: Jupyter notebooks containing different small experiments. [TODO: clarify this] 
+ - `experiments`: Jupyter notebooks containing different small experiments for dataset construction. 
  
 
 ## Citation 
@@ -15,9 +15,9 @@ This repository contains codes and scripts relevant to the dataset introduced in
 Please cite the following work if you want to refer to this work: 
 ```
 @inproceedings{chen2018perspectives,
-  title={See Things from a Different Angle: Formalizing Diverse Perspectives about Queries},
+  title={Seeing Things from a Different Angle: Discovering Diverse Perspectives about Claims},
   author={Chen, Sihao and Khashabi, Daniel and Yin, Wenpeng and Callison-Burch, Chris and Roth, Dan},
   book={?},
-  year={(in submission)}
+  year={20019}
 }
 ```
