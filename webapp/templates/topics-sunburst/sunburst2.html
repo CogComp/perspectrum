@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+ <head>
+  <meta charset="UTF-8">
+  <meta content="IE=edge" http-equiv="X-UA-Compatible">
+  <meta content="width=device-width, initial-scale=1" name="viewport">
+  <title>Radar Space Source AnyChart Core</title>
+  <link href="https://playground.anychart.com/gallery/Sunburst_Charts/Radar_Space_Source_AnyChart_Core/iframe" rel="canonical">
+  <meta content="AJAX Chart,Chart from JSON,JSON Chart,JSON Plot,Sunburst Chart,Tooltip" name="keywords">
+  <meta content="AnyChart - JavaScript Charts designed to be embedded and integrated" name="description">
+  <!--[if lt IE 9]>
+<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+<![endif]-->
+  <link href="https://cdn.anychart.com/releases/v8/css/anychart-ui.min.css" rel="stylesheet" type="text/css">
+  <link href="https://cdn.anychart.com/releases/v8/fonts/css/anychart-font.min.css" rel="stylesheet" type="text/css">
+  <style>		html,
+		body,
+		#container {
+			width: 100%;
+			height: 100%;
+			margin: 0;
+			padding: 0;
+		}</style>
+ </head>
+ <body>
+  <div id="container"></div>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-base.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-sunburst.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-ui.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-exports.min.js"></script>
+  <script src="https://cdn.anychart.com/releases/v8/js/anychart-data-adapter.min.js"></script>
+  <script type="text/javascript">		anychart.onDocumentReady(function () {
+			// The data used in this sample can be obtained from the CDN
+			// https://cdn.anychart.com/samples/sunburst-charts/radar-space-source-anychart-core/data.json
+			//anychart.data.loadJsonFile(
+			//	'https://cdn.anychart.com/samples/sunburst-charts/radar-space-source-anychart-core/data.json',
+			//	function (data) {
+            var data = {{ data | safe}};
+					// makes tree from the data for the sample
+					var dataTree = anychart.data.tree(data);
+
+					// create sunburst chart
+					var chart = anychart.sunburst(dataTree);
+
+					// set calculation mode
+					chart.calculationMode('parent-independent');
+
+					// descending sort data
+					chart.sort('desc');
+
+					chart.startAngle(90);
+
+					// hide the first level
+                    //chart.level(1).enabled(false);
+
+                    // set the thickness of leaves
+                    chart.leaves().thickness("60%");
+
+					//chart.innerRadius(20);
+                    //chart.radius("30%");
+
+					// set chart title
+					chart.title('Radar Space source AnyChart Core');
+
+					// set custom palette
+					chart.palette([
+						'#dbaaff', '#ff9a32', '#69d55e', '#ff8470', '#80c3ff',
+						'#355a85', '#66a64a', '#fab353', '#aaa2d8', '#6097ce',
+						'#ff715a', '#eab8a8', '#895070', '#89b5ab', '#8e4dbd'
+					]);
+
+					chart.labels().useHtml(true);
+
+
+					// format chart labels
+					//chart.labels().format('{%Name}');
+                    chart.labels().format("<span style='font-size: 15px;'>{%name}</span>");
+
+                    chart.labels().position("radial");
+
+                    var label = anychart.standalones.label();
+                    label.text("Company Structure");
+                    label.width("100%");
+                    label.height("100%");
+                    label.fontColor("#dd2c00");
+                    label.fontSize(17);
+                    label.fontWeight(600);
+                    label.hAlign("center");
+                    label.vAlign("middle");
+
+                    // set the center content
+                    chart.center().content(label);
+
+					// format tooltip
+					chart.tooltip().format(function () {
+						return this.name + ': ' + format(this.value)
+					});
+
+					// set container id for the chart
+					chart.container('container');
+					// initiate chart drawing
+					chart.draw();
+
+					function format(bytes) {
+						var kb = bytes / 1024;
+						var mb = bytes / 1024 / 1024;
+
+						var units = {
+							KB: kb,
+							MB: mb
+						};
+
+						var lastUnit = 'B';
+						var lastValue = bytes;
+
+						for (var u in units) {
+							if (units[u] < 1) {
+								return lastValue + ' ' + lastUnit
+							}
+							lastUnit = u;
+							lastValue = units[u].toFixed(2);
+						}
+
+						return lastValue + ' ' + lastUnit
+					}
+				//});
+		});</script>
+ </body>
+</html>

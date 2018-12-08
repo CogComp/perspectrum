@@ -27,21 +27,25 @@ import random
 from copy import deepcopy
 
 file_names = {
-    'evidence': 'data/dataset/evidence_pool_v0.1.json',
-    'perspective': 'data/dataset/perspective_pool_v0.1.json',
-    'claim_annotation': 'data/dataset/perspectrum_with_answers_v0.1.json'
+    'evidence': 'data/dataset/evidence_pool_v0.2.json',
+    'perspective': 'data/dataset/perspective_pool_v0.2.json',
+    'claim_annotation': 'data/dataset/perspectrum_with_answers_v0.2.json'
 }
 
 """Helper functions"""
+
+
 def load_json(file_name):
     with open(file_name, encoding='utf-8') as data_file:
         data = json.loads(data_file.read())
         return data
 
+
 def save_json(data, file_name):
     with open(file_name, 'w') as data_file:
         _df = File(data_file)
         _df.write(json.dumps(data))
+
 
 def get_pool_from_claim_id(claim_id):
     """
@@ -49,8 +53,8 @@ def get_pool_from_claim_id(claim_id):
     :param claim_id: id of the claim
     :return:
     """
-    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id).\
-        order_by("?")[:2]
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id). \
+                             order_by("?")[:2]
     related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
 
     return related_persps
@@ -61,7 +65,7 @@ def get_all_persp(claim_id):
     :param claim_id: id of the claim
     :return: list of perspectives
     """
-    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id).\
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id). \
         order_by("?")
     related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
 
@@ -74,7 +78,7 @@ def get_all_google_persp(claim_id):
     :return: list of perspectives
     """
     related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD,
-                                                            claim_id=claim_id, comment="google")\
+                                                            claim_id=claim_id, comment="google") \
         .order_by("?")
     related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
 
@@ -86,16 +90,20 @@ def get_all_original_persp(claim_id):
     :param claim_id: id of the claim
     :return: list of perspectives
     """
-    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id)\
+    related_persp_anno = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id) \
         .exclude(comment="google").order_by("?")
     related_persps = [Perspective.objects.get(id=rel.perspective_id) for rel in related_persp_anno]
 
     return related_persps
 
+
 """ APIs """
+
+
 def personality(request):
-    context = { }
+    context = {}
     return render(request, 'personality.html', context)
+
 
 @login_required
 def main_page(request):
@@ -115,6 +123,7 @@ def vis_claims(request):
         "claim_titles": claim_titles
     }
     return render(request, 'claims.html', context)
+
 
 @login_required
 def vis_spectrum(request, claim_id):
@@ -139,22 +148,26 @@ def vis_spectrum(request, claim_id):
     }
     return render(request, 'step1/vis_spectrum.html', context)
 
+
 # separated by commas
 @login_required
 def vis_spectrum_js_list(request, claim_id_list):
     ids = claim_id_list.split('-')
     return vis_spectrum_js(request, [int(x) for x in ids])
 
+
 @login_required
 def vis_spectrum_js_range(request, claim_id_range):
     split = claim_id_range.split('-')
     return vis_spectrum_js(request, list(range(int(split[0]), int(split[1]))))
+
 
 @login_required
 def vis_spectrum_js_index(request, claim_id):
     # print(claim_id)
     # if claim_id != None and int(claim_id) >= 0:
     return vis_spectrum_js(request, [int(claim_id)])
+
 
 @login_required
 def vis_spectrum_js(request, claim_ids_all):
@@ -182,7 +195,7 @@ def vis_spectrum_js(request, claim_ids_all):
 
     used_evidences = []
     claim_persp_bundled = []
-    for claim_id  in claim_ids_all:
+    for claim_id in claim_ids_all:
         c_title = claim_dict[claim_id]["text"]
         persp_sup = []
         persp_und = []
@@ -192,10 +205,10 @@ def vis_spectrum_js(request, claim_ids_all):
             for pid in cluster["pids"]:
                 title = str(pid) + ": " + persp_dict[pid]
                 if cluster['stance_label_3'] == "SUPPORT":
-                    persp_sup.append((title, pid, cluster_id+1, evidences, 1.0))
+                    persp_sup.append((title, pid, cluster_id + 1, evidences, 1.0))
                     used_evidences.extend(evidences)
                 elif cluster['stance_label_3'] == "UNDERMINE":
-                    persp_und.append((title, pid, cluster_id+1, evidences, 1.0))
+                    persp_und.append((title, pid, cluster_id + 1, evidences, 1.0))
                     used_evidences.extend(evidences)
         claim_persp_bundled.append((c_title, persp_sup, persp_und))
 
@@ -217,12 +230,14 @@ def vis_spectrum_js(request, claim_ids_all):
 
     return render(request, 'vis_dataset_js.html', context)
 
+
 STANCE_FLIP_MAPPING = {
     "SUPPORT": "UNDERMINE",
     "MILDLY_SUPPORT": "MILDLY_UNDERMINE",
     "MILDLY_UNDERMINE": "MILDLY_SUPPORT",
     "UNDERMINE": "SUPPORT",
 }
+
 
 ## utils functions for the side-by-side view
 def unify_persps(request, cid1, cid2, flip_stance):
@@ -244,7 +259,6 @@ def unify_persps(request, cid1, cid2, flip_stance):
 
 
 def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
-
     if cid_from == cid_to:
         return HttpResponse("Success", status=200)
 
@@ -335,7 +349,6 @@ def split_perspective_from_cluster(request, claim_id, perspective_id):
 
 
 def merge_perspectives(request, cid1, pid1, cid2, pid2):
-
     if (cid1 == cid2) and (pid1 == pid2):
         return HttpResponse("Success", status=200)
 
@@ -401,9 +414,9 @@ for e in evidence:
 for c in claims:
     claim_dict[c["cId"]] = c
 
+
 @login_required
 def vis_dataset_side_by_side(request, claim_id1, claim_id2):
-
     # claim_id1 = 300
     claim_id1 = int(claim_id1)
 
@@ -444,6 +457,7 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
 
     return render(request, 'vis_dataset_side_by_side.html', context)
 
+
 @login_required
 def vis_dataset(request, claim_id):
     persps = load_json(file_names["perspective"])
@@ -457,7 +471,6 @@ def vis_dataset(request, claim_id):
 
     for c in claims:
         claim_dict[c["cId"]] = c
-
 
     c_title = claim_dict[claim_id]["text"]
     persp_sup = []
@@ -477,7 +490,6 @@ def vis_dataset(request, claim_id):
     }
 
     return render(request, 'vis_dataset.html', context)
-
 
 
 @login_required
@@ -533,6 +545,7 @@ def submit_instr(request):
         session.save()
         return HttpResponse("Submission Success!", status=200)
 
+
 @login_required
 @csrf_protect
 def submit_rel_anno(request):
@@ -586,11 +599,14 @@ def render_login_page(request):
     """
     return render(request, "login.html", {})
 
+
 from django.contrib.auth import logout
+
 
 def logout_request(request):
     logout(request)
     return render_login_page(request)
+
 
 @login_required
 def render_list_page(request):
@@ -621,8 +637,10 @@ def render_list_page(request):
     context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
     return render(request, "step1/list_tasks.html", context)
 
+
 def render_instructions(request):
     return render(request, "step1/instructions.html", {})
+
 
 def render_contact(request):
     if request.method == 'GET':
@@ -639,6 +657,7 @@ def render_contact(request):
                 return HttpResponse('Invalid header found.')
             return redirect('success')
     return render(request, "contact.html", {'form': form})
+
 
 def successView(request):
     return HttpResponse('Success! Thank you for your message.')
@@ -722,7 +741,8 @@ def vis_perspective_paraphrase(request, batch_id):
     for pp in paraphrases:
         pid = pp.perspective_id
         perspectives.append(Perspective.objects.get(id=pid))
-        cid = PerspectiveRelation.objects.filter(author="GOLD").exclude(comment="google").get(perspective_id=pid).claim_id
+        cid = PerspectiveRelation.objects.filter(author="GOLD").exclude(comment="google").get(
+            perspective_id=pid).claim_id
         c = Claim.objects.get(id=cid)
 
         _h = json.loads(pp.hints)
@@ -736,6 +756,7 @@ def vis_perspective_paraphrase(request, batch_id):
         "claims": claims
     })
 
+
 @login_required
 @csrf_protect
 def step2a_submit_instr(request):
@@ -748,6 +769,7 @@ def step2a_submit_instr(request):
         session.instruction_complete = True
         session.save()
         return HttpResponse("Submission Success!", status=200)
+
 
 @login_required
 @csrf_protect
@@ -763,7 +785,8 @@ def submit_paraphrase_annotation(request):
         # Update annotation in EquivalenceAnnotation table
         for pid, paras in annos.items():
             p = PerspectiveParaphrase.objects.get(perspective_id=pid)
-            user_para_str = p.user_generated.replace('"','\\"').replace('[\'', '["').replace('\']', '"]').replace('\', \'', '", "')\
+            user_para_str = p.user_generated.replace('"', '\\"').replace('[\'', '["').replace('\']', '"]').replace(
+                '\', \'', '", "') \
                 .replace('\', "', '", "').replace('", \'', '", "')
             print(user_para_str)
             user_para = json.loads(user_para_str)
@@ -796,6 +819,7 @@ def submit_paraphrase_annotation(request):
 
         return HttpResponse("Submission Success!", status=200)
 
+
 ###############################################
 #     STEP 2b APIs
 #     Perspective Equivalence
@@ -803,6 +827,7 @@ def submit_paraphrase_annotation(request):
 @login_required
 def render_step2b_instructions(request):
     return render(request, "step2b/instructions.html", {})
+
 
 @login_required
 def render_step2b_task_list(request):
@@ -831,6 +856,7 @@ def render_step2b_task_list(request):
     context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
 
     return render(request, 'step2b/task_list.html', context)
+
 
 @login_required
 def vis_persp_equivalence(request, batch_id):
@@ -901,6 +927,7 @@ def submit_equivalence_annotation(request):
 
         return HttpResponse("Submission Success!", status=200)
 
+
 @login_required
 @csrf_protect
 def step2b_submit_instr(request):
@@ -922,6 +949,7 @@ def step2b_submit_instr(request):
 
 PERSP_NUM = 8
 
+
 @login_required
 def render_evidence_verification(request, batch_id):
     username = request.user.username
@@ -935,7 +963,8 @@ def render_evidence_verification(request, batch_id):
 
     eids = json.loads(eb.evidence_ids)
 
-    valid_persp_ids = ReStep1Results.objects.filter(label_3__in=["S", "U"], p_i_3__gt=0.5).values_list('perspective_id').distinct()
+    valid_persp_ids = ReStep1Results.objects.filter(label_3__in=["S", "U"], p_i_3__gt=0.5).values_list(
+        'perspective_id').distinct()
 
     evidences = [Evidence.objects.get(id=i) for i in eids]
     keywords = {}
@@ -984,7 +1013,6 @@ def render_evidence_verification(request, batch_id):
 
 
 def render_step3_task_list(request):
-
     username = request.user.username
     session = get_evidence_hit_session(username)
 
@@ -1017,9 +1045,10 @@ def render_step3_instructions(request):
 
 
 evidence_label_mapping = {
-    "sup" : "S",
-    "nsup" : "N"
+    "sup": "S",
+    "nsup": "N"
 }
+
 
 @login_required
 @csrf_protect
@@ -1037,7 +1066,7 @@ def submit_evidence_annotation(request):
             label = anno[2]
             if label in evidence_label_mapping:
                 EvidenceRelation.objects.create(author=username, evidence_id=anno[0], perspective_id=anno[1],
-                                            anno=evidence_label_mapping[label], comment="step3")
+                                                anno=evidence_label_mapping[label], comment="step3")
 
         # Update finished jobs in user session
         fj = set(json.loads(session.finished_jobs))
@@ -1057,6 +1086,7 @@ def submit_evidence_annotation(request):
 
         return HttpResponse("Submission Success!", status=200)
 
+
 @login_required
 @csrf_protect
 def step3_submit_instr(request):
@@ -1069,6 +1099,7 @@ def step3_submit_instr(request):
         session.instruction_complete = True
         session.save()
         return HttpResponse("Submission Success!", status=200)
+
 
 @login_required
 def bert_baseline(request, claim_text=""):
@@ -1205,16 +1236,18 @@ def bert_baseline(request, claim_text=""):
 
     return render(request, "vis_dataset_js.html", context)
 
+
 @login_required
 def lucene_baseline(request, claim_text=""):
     print(claim_text)
     if claim_text != "":
-        claim = claim_text #
+        claim = claim_text  #
 
         prob = LpProblem("perspectiveOptimization", LpMaximize)
 
         # given a claim, extract perspectives
-        perspective_given_claim = [ (p_text, pId, pScore/len(p_text.split(" ")))  for p_text, pId, pScore in get_perspective_from_pool(claim, 30)]
+        perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
+                                   get_perspective_from_pool(claim, 30)]
 
         # create binary variables per perspective
         perspective_variables = []
@@ -1289,16 +1322,16 @@ def lucene_baseline(request, claim_text=""):
         # perspective_to_evidence_variables = {}
         evidence_to_perspective_variables = {}
         # for p_text1, pId1, _ in perspective_given_claim:
-            # perspective_to_evidence_variables[pId1] = []
-            # lucene_evidences = get_evidence_from_pool(p_text1, 1)
-            # for (eIdx, (e_text, eId, eScore)) in enumerate(lucene_evidences):
-                # if pScore > threshold:
-                #     x = LpVariable("pe" + str(pId1) + "-" + str(eId), 0, 1)
-                    # evidence_variables.append(x)
-                    # evidence_weights.append(pScore)
-                    # evidence_ids.append(eId)
-                    # perspective_to_evidence_variables[pId1].append((x, pScore, eId))
-                    # print(pScore)
+        # perspective_to_evidence_variables[pId1] = []
+        # lucene_evidences = get_evidence_from_pool(p_text1, 1)
+        # for (eIdx, (e_text, eId, eScore)) in enumerate(lucene_evidences):
+        # if pScore > threshold:
+        #     x = LpVariable("pe" + str(pId1) + "-" + str(eId), 0, 1)
+        # evidence_variables.append(x)
+        # evidence_weights.append(pScore)
+        # evidence_ids.append(eId)
+        # perspective_to_evidence_variables[pId1].append((x, pScore, eId))
+        # print(pScore)
 
         # if a perspective is active, it should be connected to at least one evidence
         # evidence is not active, unless it is connected to sth
@@ -1395,23 +1428,76 @@ def submit_topic_annotation(request):
     res = HttpResponse(str(session.id), status=200)
     return res
 
+
 def sunburst(request):
     # create a list of topics and populate their claim strings
-    claims = load_json(file_names["claim_annotation"])
+    # claims = load_json(file_names["claim_annotation"])
     topics_to_claim = {}
 
-    for c in claims:
-        topic_text = c['topic']
-        claim_text = c['topic']
-        if topic_text in topics_to_claim:
-            topics_to_claim[topic_text] = []
+    for c in claims[0:70]:
+        topics = c['topics']
+        claim_text = c['text']
+        for topic_text in topics:
+            if topic_text not in topics_to_claim:
+                topics_to_claim[topic_text] = []
+            topics_to_claim[topic_text].append(claim_text)
 
-        topics_to_claim[topic_text].append(claim_text)
+    data = []
+    for key in topics_to_claim.keys():
+        children = [{"name": x, "size": 1} for x in topics_to_claim[key]]
+        data.append({
+            "name": key,
+            "children": children
+        })
 
-    {
-        "name": "topics",
-        "children": []
+    context = {
+        "data": json.dumps({
+            "name": "topics",
+            "children": data
+        })
     }
-
-    context = {}
     return render(request, "topics-sunburst/sunburst.html", context)
+
+
+def sunburst(request):
+    # create a list of topics and populate their claim strings
+    # claims = load_json(file_names["claim_annotation"])
+    topics_to_claim = {}
+
+    for c in random.sample(claims, 30):
+        topics = c['topics']
+        claim_text = c['text']
+        for topic_text in topics:
+            if topic_text not in topics_to_claim:
+                topics_to_claim[topic_text] = []
+            topics_to_claim[topic_text].append(claim_text)
+
+    data = []
+    total_childen = 0
+    for key in topics_to_claim.keys():
+        children = [{"name": x, "value": 1} for x in topics_to_claim[key]]
+        data.append({
+            "name": key,
+            "children": children,
+            "value": len(children)
+        })
+        total_childen += len(children)
+
+    data.append({
+        "name": "dummy",
+        "children": [{"name": "fake", "value": 1} for x in range(1,total_childen)],
+        #"value": total_childen
+    })
+
+    # data = [{
+    #     "name": "core",
+    #     "children": data
+    # }]
+
+    context = {
+        "data": json.dumps([{
+            "name": "",
+            "children": data
+        }])
+    }
+    return render(request, "topics-sunburst/sunburst2.html", context)
