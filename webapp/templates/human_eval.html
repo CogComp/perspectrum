@@ -3,22 +3,25 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
-        integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
-        integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
-        crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
-      integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
-      integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous"/>
-<link rel="stylesheet" href="{% static "css/style.css" %}">
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Perspective Annotation Interface</title>
+<head>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
+          integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous"/>
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Perspective Annotation Interface</title>
+    <script src="{% static "js/csrf_util.js" %}"></script>
+{% csrf_token %}
 </head>
 <body>
 <div class="container-fluid">
@@ -31,17 +34,17 @@
         <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
 
             <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
-
                 <li class="nav-item dropdown">
                     <a class="nav-link" href="javascript:void(0)" id="sbs-delete">
-                        Submit Response
+                        Perspective - Human Evaluation
                     </a>
                 </li>
             </ul>
             <div class="form-inline my-2 my-lg-0">
-                <input id='sbs-cid1' class="form-control mr-sm-2" type="search" placeholder="Claim ID 1" aria-label="Search">
-                <input id='sbs-cid2' class="form-control mr-sm-2" type="search" placeholder="Claim ID 2" aria-label="Search">
-                <button id="sbs-redirect" class="btn btn-outline-success my-2 my-sm-0" type="submit">Lookup</button>
+                <button id="hum-prev" style="display: none" class="btn btn-large btn-block btn-info my-2 my-sm-0" type="submit">Back to perspective selection</button>
+            </div>
+            <div class="form-inline my-2 my-lg-0">
+                <button id="hum-lockin" class="btn btn-large btn-block btn-primary my-2 my-sm-0" type="submit">Lock your selection</button>
             </div>
         </div>
     </nav>
@@ -49,70 +52,234 @@
     <div style="padding-top: 70px" class="row">
         <div class="col">
             <h4 class="persp-claim-title pallete pallete-peter-river">
-                {{ cid1 }} : {{ claim1 }}
+                Claim: {{ claim_title }}
             </h4>
         </div>
     </div>
     <div class="row">
-        <div class="col persps-container tile">
+        <div id="sup_ctnr" class="col persps-container tile droppable" sem_color="#1ABC9C" ondrop="drop(event)" ondragover="allowDrop(event)">
             <h6>
-                Candidates
+                <font color="#27AE60"><b>Supporting Perspectives</b></font>
             </h6>
-            {% for cluster in persp_sup1 %}
-                <a class="persp-title btn-block btn-lg  palette-turquoise">
-                    {% for p in cluster %}
-                    <div class="row">
-                        <div class="col-1">
-                            <input class='sbs_persp_checkbox' id='sbs_{{ cid1 }}_{{ p.0 }}' type="checkbox">
-                        </div>
-                        <div class="col-11">
-                            {{ p.0 }} : {{ p.1 }}
-                        </div>
+        </div>
+        <div id="und_ctnr" class="col persps-container tile droppable" sem_color="#E67E22" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h6>
+                <font color="#D35400"><b>Opposing Perspectives</b></font>
+            </h6>
+        </div>
+        <div id="hum-persp-cand-ctnr" class="col persps-container tile droppable" sem_color="#BDC3C7" ondrop="drop(event)" ondragover="allowDrop(event)">
+            <h6>
+                Perspective Candidates
+            </h6>
+            {% for cand in persp_candidates %}
+            <a id="persp_{{ claim_id }}_{{ cand.1 }}" draggable="true" ondragstart="drag(event)" class="persp-title btn-block btn-lg palette-peter-river perspective" style="background-color: #BDC3C7">
+                <div class="row">
+                    <div class="col-11">
+                        {{ cand.0 }}
                     </div>
-                    {% endfor %}
-                </a>
+                    <div id="hum_search_{{ claim_id }}_{{ cand.1 }}"  class="col-1 hum-search" style="display: none">
+                         <span class="fui-search"></span>
+                    </div>
+                </div>
+            </a>
             {% endfor %}
         </div>
-        <div class="col persps-container tile">
+        <div id="hum-evi-cand-ctnr" class="col persps-container tile" style="display: none" sem_color="#BDC3C7" ondrop="drop(event)" ondragover="allowDrop(event)">
             <h6>
-                Supporting Perspectives
+                <font color="#2980B9"><b>Evidences Candidates</b></font>
             </h6>
-            {% for cluster in persp_und1 %}
-                <a class="persp-title btn-block btn-lg palette-carrot">
-                    {% for p in cluster %}
-                    <div class="row">
-                        <div class="col-1">
-                            <input class='sbs_persp_checkbox' id='sbs_{{ cid1 }}_{{ p.0 }}' type="checkbox">
-                        </div>
-                        <div class="col-11">
-                            {{ p.0 }} : {{ p.1 }}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </a>
-            {% endfor %}
-        </div>
-        <div class="col persps-container tile">
-            <h6>
-                Undermining Perspectives
-            </h6>
-            {% for cluster in persp_sup2 %}
-                <a class="persp-title btn-block btn-lg palette-turquoise">
-                    {% for p in cluster %}
-                    <div class="row">
-                        <div class="col-1">
-                            <input class='sbs_persp_checkbox' id='sbs_{{ cid2 }}_{{ p.0 }}' type="checkbox">
-                        </div>
-                        <div class="col-11">
-                            {{ p.0 }} : {{ p.1 }}
-                        </div>
-                    </div>
-                    {% endfor %}
-                </a>
-            {% endfor %}
         </div>
     </div>
 </div>
+<script type="application/javascript">
 
+    var state = 0;
+    var selected_p = null;
+    var annos = [];
+
+    $(document).ready(function() {
+          // 0 means selecting perspectives, 1 means selecting evidences
+
+        $('#hum-lockin').click(function() {
+            state += 1;
+            invoke_state_transition()
+        });
+
+        $('#hum-prev').click(function() {
+            state -= 1;
+            invoke_state_transition()
+        });
+
+        $('.hum-search').click(function() {
+            let $this = $(this);
+            let parts = $this.prop('id').split('_');
+            let pid = parts.pop();
+            let cid = parts.pop();
+            let url = "/human_eval/api/retrieve_evidence_candidates/" + cid + "/" + pid;
+            selected_p = $this.closest('a.perspective');
+
+            $.get(url, function(res) {
+                let ctnr = $('#hum-evi-cand-ctnr');
+                ctnr.find('a.evidence').remove();
+                res['evi_candidates'].forEach(function(e){
+                    let evi_el = "<a id=\"evi_" + pid + "_" + e[1] + "\" draggable=\"true\" ondragstart=\"drag(event)\" class=\"persp-title btn-block btn-lg palette-peter-river evidence\" style=\"background-color: #BDC3C7\">\n" +
+                        "                    <div class=\"col-1\">\n" +
+                        "                      "+  e[1] + "\n" +
+                        "                    </div>\n" +
+                        "                    <div class=\"col\">\n" +
+                        "                      "+  e[0] + "\n" +
+                        "                    </div>\n" +
+                        "            </a>";
+                    ctnr.append(evi_el)
+                })
+            })
+        });
+    });
+
+    function invoke_state_transition() {
+        switch(state) {
+            case -1:
+                state = 0;
+                break;
+            case 0:
+                $('.hum-search').hide();
+
+                $('#hum-persp-cand-ctnr').show();
+                $('#hum-evi-cand-ctnr').hide();
+                $('#hum-lockin').show();
+                $('#hum-prev').hide();
+                break;
+            case 1:
+                $('.hum-search').show();
+
+                $('#hum-persp-cand-ctnr').hide();
+                $('#hum-evi-cand-ctnr').show();
+                $('#hum-lockin').show();
+                $('#hum-prev').show();
+                break;
+            case 2:
+                if (confirm("Are you sure ")) {
+                    submit();
+                }
+                else {
+                    state = 1;
+                }
+                break;
+            case 3:
+                state = 2;
+                break;
+        }
+
+        $('.droppable').on('click', '.added_evidence', function(ev) {
+            let $this = $(this);
+            let parts = $this.prop('id').split('_');
+            let eid = parts.pop();
+            let pid = parts.pop();
+
+            annos.splice(annos.indexOf([pid, eid]), 1);
+            $this.remove();
+            console.log(annos);
+        });
+
+    }
+
+    function submit(){
+        csrfSetup()
+        
+        let cid = {{ claim_id }};
+        let url = "/human_eval/api/submit_human_anno";
+
+        let evi_anno = {};
+        annos.forEach(function(t) {
+            if (t[0] in evi_anno)
+                evi_anno[t[0]].push(parseInt(t[1]));
+            else
+                evi_anno[t[0]] = [parseInt(t[1])];
+        });
+
+        let annotations = [];
+        $('#sup_ctnr a.perspective').each(function() {
+            let _id = $(this).prop('id').split('_').pop();
+
+            let evi = null;
+
+            if (evi_anno.has(_id))
+                evi = evi_anno[_id];
+            else
+                evi = [];
+
+            let anno = {
+                "pId": parseInt(_id),
+                "stance_3": 'S',
+                "evidences": JSON.stringify(evi),
+            };
+
+            annotations.push(anno);
+        });
+
+        $('#und_ctnr a.perspective').each(function() {
+            let _id = $(this).prop('id').split('_').pop();
+
+            let evi = null;
+
+            if (_id in evi_anno)
+                evi = evi_anno[_id];
+            else
+                evi = [];
+
+            let anno = {
+                "pId": parseInt(_id),
+                "stance_3": 'U',
+                "evidences": JSON.stringify(evi),
+            };
+
+            annotations.push(anno);
+        });
+
+        let annos_json = JSON.stringify(annotations);
+        console.log(cid);
+        $.post(url, {
+            "claim_id": cid,
+            "annotations": annos_json
+        }, alert("Submission Success!"))
+    }
+
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+       ev.dataTransfer.setData("text", ev.target.id);
+    }
+
+    function drop(ev) {
+      ev.preventDefault();
+      let data = ev.dataTransfer.getData("text");
+      let el = document.getElementById(data);
+      if (el.classList.contains('evidence')) {
+          let parts = el.id.split("_");
+          let eid = parts.pop();
+          let pid = parts.pop();
+          annos.push([pid, eid]);
+          console.log(annos);
+          selected_p.addClass("persp_has_evidence");
+          selected_p.css('background-color', '#7F8C8D');
+          selected_p.append("<button id=\"remove_\"" + pid + "_" + eid + " class=\"btn btn-info col-1 added_evidence\">" + eid + "</button>")
+      }
+      else {
+          let origin_ctnr = el.closest(".droppable");
+          let new_ctnr = ev.target.closest(".droppable");
+          if (origin_ctnr !== new_ctnr) {
+              if (!el.classList.contains("persp_has_evidence"))
+                el.style.backgroundColor = new_ctnr.getAttribute('sem_color');
+              new_ctnr.appendChild(el)
+          }
+      }
+
+    }
+
+
+
+</script>
 </body>
 </html>

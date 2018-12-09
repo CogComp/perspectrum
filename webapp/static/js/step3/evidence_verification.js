@@ -15,7 +15,7 @@ $(document).ready(function () {
  */
 function submit() {
 
-    // Get all annotations
+    // Get all annotation
     let annos = [];
     let radios = $("input.equi_option");
     let checked = radios.filter(':checked');

@@ -26,6 +26,8 @@ import datetime
 import random
 from copy import deepcopy
 
+import experiment.query_elasticsearch as es
+
 file_names = {
     'evidence': 'data/dataset/evidence_pool_v0.2.json',
     'perspective': 'data/dataset/perspective_pool_v0.2.json',
@@ -1501,3 +1503,47 @@ def sunburst(request):
         }])
     }
     return render(request, "topics-sunburst/sunburst2.html", context)
+
+@login_required
+def render_human_eval(request, claim_id):
+    if claim_id not in claim_dict:
+        return HttpResponse("Claim with id = {} doesn't exist in our database. ".format(claim_id), status=404)
+
+    claim_title = claim_dict[claim_id]['text']
+
+    cands = es.get_perspective_from_pool(claim_title, 50)
+
+    context = {
+        'claim_id' : claim_id,
+        'claim_title' : claim_title,
+        'persp_candidates' : cands
+    }
+    return render(request, 'human_eval.html', context)
+
+
+def retrieve_evidence_candidates(request, cid, pid):
+    if (cid not in claim_dict) or (pid not in persp_dict):
+        return HttpResponse("Claim with id = {} doesn't exist in our database. ".format(cid), status=404)
+
+    claim_title = claim_dict[cid]['text']
+    persp_title = persp_dict[pid]
+
+    cands = get_evidence_from_pool(claim_title + '. ' + persp_title, 20)
+
+    return JsonResponse({
+        'evi_candidates' : cands
+    })
+
+@login_required
+@csrf_protect
+def submit_human_anno(request):
+    if request.method != 'POST':
+        raise ValueError("submit_topic_annotation API only supports POST request")
+
+    claim_id = request.POST.get('claim_id')
+    annos = json.loads(request.POST.get('annotations'))
+    username = request.user.username
+
+    HumanAnnotation.objects.create(author=username, claim_id=claim_id , annotation=json.dumps(annos))
+
+    return HttpResponse("Submission success!", status=200)

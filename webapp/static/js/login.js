@@ -20,5 +20,5 @@ function login() {
 }
 
 function login_callback() {
-    window.location.href = '/step4/topic';
+    window.location.href = '/human_eval/2';
 }
