@@ -93,5 +93,7 @@ urlpatterns = [
 
 
     # Human Evaluation
-    # path('baseline/<int:claim_id>', views.render_human_eval),
+    path('human_eval/<int:claim_id>', views.render_human_eval),
+    path('human_eval/api/retrieve_evidence_candidates/<int:cid>/<int:pid>', views.retrieve_evidence_candidates),
+    path('human_eval/api/submit_human_anno', views.submit_human_anno)
 ]

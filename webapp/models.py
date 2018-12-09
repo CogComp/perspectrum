@@ -212,3 +212,9 @@ class TopicAnnotation(models.Model):
     author = models.CharField(max_length=100)
     claim_id = models.IntegerField()
     topics = models.TextField(default="[]")
+
+
+class HumanAnnotation(models.Model):
+    author = models.CharField(max_length=100)
+    claim_id = models.IntegerField(default=0)
+    annotation = models.TextField()
