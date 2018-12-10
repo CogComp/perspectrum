@@ -1545,7 +1545,7 @@ def retrieve_evidence_candidates(request, cid, pid):
     claim_title = claim_dict[cid]['text']
     persp_title = persp_dict[pid]
 
-    cands = get_evidence_from_pool(claim_title + '. ' + persp_title, 20)
+    cands = get_evidence_from_pool(claim_title + '. ' + persp_title, 40)
 
     return JsonResponse({
         'evi_candidates' : cands
