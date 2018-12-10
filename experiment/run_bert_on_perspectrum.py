@@ -2,6 +2,7 @@ import os
 import random
 from tqdm import tqdm, trange
 
+import csv
 import numpy as np
 import torch
 from torch.utils.data import TensorDataset, DataLoader, RandomSampler, SequentialSampler
@@ -12,9 +13,10 @@ from pytorch_pretrained_bert.modeling import BertForSequenceClassification
 from pytorch_pretrained_bert.optimization import BertAdam
 from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 
-from examples.run_classifier import ColaProcessor, MrpcProcessor, logger, convert_examples_to_features, \
-    set_optimizer_params_grad, copy_optimizer_params_to_model, accuracy
-from examples.run_classifier import MnliProcessor
+from experiment.bert.run_classifier import ColaProcessor, MrpcProcessor, logger, convert_examples_to_features, \
+    set_optimizer_params_grad, copy_optimizer_params_to_model, accuracy, p_r_f1, tp_pcount_gcount
+from experiment.bert.run_classifier import MnliProcessor
+
 
 
 def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
@@ -148,9 +150,10 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
     if not do_train and not do_eval:
         raise ValueError("At least one of `do_train` or `do_eval` must be True.")
 
-    if os.path.exists(output_dir) and os.listdir(output_dir):
-        raise ValueError("Output directory ({}) already exists and is not empty.".format(output_dir))
-    os.makedirs(output_dir, exist_ok=True)
+    if do_train:
+        if os.path.exists(output_dir) and os.listdir(output_dir):
+            raise ValueError("Output directory ({}) already exists and is not emp1ty.".format(output_dir))
+        os.makedirs(output_dir, exist_ok=True)
 
     task_name = task_name.lower()
 
@@ -262,7 +265,11 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                     model.zero_grad()
                     global_step += 1
 
+        torch.save(model.state_dict(), output_dir + "output.pth")
+
+
     if do_eval and (local_rank == -1 or torch.distributed.get_rank() == 0):
+        # eval_examples = processor.get_test_examples(data_dir)
         eval_examples = processor.get_dev_examples(data_dir)
         eval_features = convert_examples_to_features(
             eval_examples, label_list, max_seq_length, tokenizer)
@@ -281,7 +288,13 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
         model.load_state_dict(torch.load(saved_model))
 
         model.eval()
-        eval_loss, eval_accuracy = 0, 0
+        # eval_loss, eval_accuracy = 0, 0
+
+        eval_tp, eval_pred_c, eval_gold_c = 0, 0, 0
+        eval_loss, eval_macro_p, eval_macro_r = 0, 0, 0
+
+        raw_score = []
+
         nb_eval_steps, nb_eval_examples = 0, 0
         for input_ids, input_mask, segment_ids, label_ids in eval_dataloader:
             input_ids = input_ids.to(device)
@@ -295,41 +308,80 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
 
             logits = logits.detach().cpu().numpy()
             label_ids = label_ids.to('cpu').numpy()
-            tmp_eval_accuracy = accuracy(logits, label_ids)
+
+            # Micro F1 (aggregated tp, fp, fn counts across all examples)
+            tmp_tp, tmp_pred_c, tmp_gold_c = tp_pcount_gcount(logits, label_ids)
+            eval_tp += tmp_tp
+            eval_pred_c += tmp_pred_c
+            eval_gold_c += tmp_gold_c
+
+            raw_score += zip(logits, label_ids)
+            # Macro F1 (averaged P, R across mini batches)
+            tmp_eval_p, tmp_eval_r, tmp_eval_f1 = p_r_f1(logits, label_ids)
+
+            eval_macro_p += tmp_eval_p
+            eval_macro_r += tmp_eval_r
 
             eval_loss += tmp_eval_loss.mean().item()
-            eval_accuracy += tmp_eval_accuracy
-
             nb_eval_examples += input_ids.size(0)
             nb_eval_steps += 1
 
-        eval_loss = eval_loss / nb_eval_steps
-        eval_accuracy = eval_accuracy / nb_eval_examples
 
+        # Micro F1 (aggregated tp, fp, fn counts across all examples)
+        eval_micro_p = eval_tp / eval_pred_c
+        eval_micro_r = eval_tp / eval_gold_c
+        eval_micro_f1 = 2 * eval_micro_p * eval_micro_r / (eval_micro_p + eval_micro_r)
+
+        # Macro F1 (averaged P, R across mini batches)
+        eval_macro_p = eval_macro_p / nb_eval_steps
+        eval_macro_r = eval_macro_r / nb_eval_steps
+        eval_macro_f1 = 2 * eval_macro_p * eval_macro_r / (eval_macro_p + eval_macro_r)
+
+        eval_loss = eval_loss / nb_eval_steps
         result = {'eval_loss': eval_loss,
-                  'eval_accuracy': eval_accuracy,
+                  'eval_micro_p': eval_micro_p,
+                  'eval_micro_r': eval_micro_r,
+                  'eval_micro_f1': eval_micro_f1,
+                  # 'eval_macro_p': eval_macro_p,
+                  # 'eval_macro_r': eval_macro_r,
+                  # 'eval_macro_f1': eval_macro_f1,
                   'global_step': global_step,
                   # 'loss': tr_loss/nb_tr_steps
                   }
 
         output_eval_file = os.path.join(output_dir, "eval_results.txt")
+        output_raw_score = os.path.join(output_dir, "raw_score.csv")
         with open(output_eval_file, "w") as writer:
             logger.info("***** Eval results *****")
             for key in sorted(result.keys()):
                 logger.info("  %s = %s", key, str(result[key]))
                 writer.write("%s = %s\n" % (key, str(result[key])))
 
-        torch.save(model.state_dict(), output_dir + "output.pth")
+        with open(output_raw_score, 'w') as fout:
+            fields = ["undermine_score", "support_score", "gold"]
+            writer = csv.DictWriter(fout, fieldnames=fields)
+            writer.writeheader()
+            for score, gold in raw_score:
+                writer.writerow({
+                    "undermine_score": str(score[0]),
+                    "support_score": str(score[1]),
+                    "gold": str(gold)
+                })
+
 
 def experiments():
-    data_dir = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/"
-    data_dir_output = data_dir + "output/"
+    # data_dir = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/"
+    data_dir = "../data/dataset/perspective_stances/"
+    # data_dir_output = data_dir + "output2/"
+    data_dir_output = "/shared/experiments/schen149/perspective_model/"
     train_and_test(data_dir=data_dir, do_train=True, do_eval=True, output_dir=data_dir_output,task_name="Mrpc")
 
 def evaluation_with_pretrained():
-    bert_model = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/output/output.pth"
-    data_dir = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/"
-    data_dir_output = data_dir + "output2/"
+    # bert_model = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/output/output.pth"
+    bert_model = "/shared/experiments/schen149/perspective_model/output.pth"
+    data_dir = "../data/dataset/perspective_stances/"
+    # data_dir_output = data_dir + "output2/"
+    data_dir_output = "/shared/experiments/schen149/perspective_model/dummy_output/"
     train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=data_dir_output,task_name="Mrpc",saved_model=bert_model)
 
 if __name__ == "__main__":
