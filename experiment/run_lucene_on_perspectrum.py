@@ -1,4 +1,5 @@
 import json
+import random
 
 from query_elasticsearch import get_perspective_from_pool
 from query_elasticsearch import get_evidence_from_pool
@@ -298,6 +299,39 @@ def supporting_evidences():
     print("test")
     eval(gold_claims_test)
 
+def print_lucene_evidences_on_disk():
+    def eval(claim_list):
+        with open('evidences.tsv', 'a', encoding='utf-8') as the_file:
+            # the_file.write('Hello\n')
+        # for threshold in np.arange(0.0, 4.0, 0.1):
+        #     recall_list = []
+        #     precision_list = []
+        #     length_list = []
+            for c in random.sample(claim_list, 20):
+                cId = str(c['cId'])
+                claim_text = c["text"]
+                for p in random.sample(c["perspectives"], 1):
+                    # gold_evidences = p["evidence"]
+                    # selected_evidences = []
+                    for pid1 in p["pids"]:
+                        pText1 = gold_persp_dict[pid1]
+                        # print(pid1)
+                        # print(lucene_annotation_cache[cId]["e_given_pc"].keys())
+                        for (e_text, eId2, eScore) in lucene_annotation_cache[cId]["e_given_pc"][str(pid1)]:
+                            eId2 = str(int(eId2))
+                            pid1 = str(int(pid1))
+                            # print(cId)
+                            # print(pid1)
+                            # print(eId2)
+                            the_file.write(cId + '\t' + str(claim_text) + '\t' + pid1 + '\t' + str(pText1) + '\t' + eId2  + '\t' + str(e_text) + '\n')
+
+    # print("train + dev... ")
+    # eval(gold_claims_train + gold_claims_dev)
+
+    print("test")
+    eval(gold_claims_test)
+
+
 
 # def experiments():
 #     data_dir = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/"
@@ -316,4 +350,5 @@ if __name__ == "__main__":
     # perspective_stances_counts()
     # perspective_equivalence_static_baselines()
     # perspective_equivalence()
-    supporting_evidences()
+    # supporting_evidences()
+    print_lucene_evidences_on_disk()
