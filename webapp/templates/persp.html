@@ -1,4 +1,4 @@
-{% load static %}
+    {% load static %}
 {% load claim_filter %}
 
 <!DOCTYPE html>
@@ -31,44 +31,42 @@
                 <h6>
                     Perspectives For
                 </h6>
-                {% for persp in persp_sup %}
-                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">
-                        {{ persp.id }}:&nbsp;&nbsp;{{ persp.title }}
+                {% for cluster in persp_sup %}
+                <a class="persp-title btn-block btn-lg  palette-turquoise">
+                    {% for p in cluster.0 %}
+                    <div class="row">
+                        <div class="col-12">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="row">
+                        <div class="col-12">
+                            Voter Counts : {{ cluster.1 }}
+                        </div>
+                    </div>
                 </a>
-{#                <div class="persp-arg-container">#}
-{#                    <strong>Argument</strong>#}
-{#                    {% for para in persp|get_pro_description %}#}
-{#                        <p class="persp-arg-desc"> {{ para }}#}
-{#                        </p>#}
-{#                    {% endfor %}#}
-{#                    <strong>Counter-Argument</strong>#}
-{#                    {% for para in persp|get_con_description %}#}
-{#                        <p class="persp-arg-desc"> {{ para }}#}
-{#                        </p>#}
-{#                    {% endfor %}#}
-{#                </div>#}
                 {% endfor %}
             </div>
             <div class="col persps-container tile">
                 <h6>
                     Perspectives Against
                 </h6>
-                {% for persp in persp_und %}
-                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">
-                        {{ persp.id }}:&nbsp;&nbsp;{{ persp.title }}
+                {% for cluster in persp_und %}
+                <a class="persp-title btn-block btn-lg palette-carrot">
+                    {% for p in cluster.0 %}
+                    <div class="row">
+                        <div class="col-12">
+                            {{ p.0 }} : {{ p.1 }}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="row">
+                        <div class="col-12">
+                            Voter Counts : {{ cluster.1 }}
+                        </div>
+                    </div>
                 </a>
-{#                <div class="persp-arg-container">#}
-{#                    <strong>Argument</strong>#}
-{#                    {% for para in persp|get_pro_description %}#}
-{#                        <p class="persp-arg-desc"> {{ para }}#}
-{#                        </p>#}
-{#                    {% endfor %}#}
-{#                    <strong>Counter-Argument</strong>#}
-{#                    {% for para in persp|get_con_description %}#}
-{#                        <p class="persp-arg-desc"> {{ para }}#}
-{#                        </p>#}
-{#                    {% endfor %}#}
-{#                </div>#}
                 {% endfor %}
             </div>
         </div>

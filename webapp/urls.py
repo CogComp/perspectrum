@@ -30,7 +30,7 @@ urlpatterns = [
     path('dataset/<slug:claim_id>', views.vis_dataset),
     path('claims/', views.vis_claims),
     path('personality/', views.personality),
-    path('perspectives/<int:claim_id1>', views.vis_persps, name="perspectives"),
+    path('perspectives/<int:claim_id>', views.vis_persps, name="perspectives"),
     path('vis_spectrum/<slug:claim_id>', views.vis_spectrum, name="vis_spectrum"),
     path('dataset_js/id=<slug:claim_id>', views.vis_spectrum_js_index),
     path('dataset_js/list=<slug:claim_id_list>', views.vis_spectrum_js_list),

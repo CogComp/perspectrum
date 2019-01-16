@@ -20,5 +20,12 @@ function login() {
 }
 
 function login_callback() {
-    window.location.href = '/human_eval/2';
+    var url = new URL(window.location.href);
+    var redir = url.searchParams.get("next");
+    if (redir) {
+        window.location.href = redir;
+    }
+    else {
+        window.location.href = '/human_eval/2';
+    }
 }
