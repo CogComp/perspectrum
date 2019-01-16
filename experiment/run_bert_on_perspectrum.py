@@ -23,7 +23,7 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                    output_dir=None, max_seq_length=128, do_train=False, do_eval=False, do_lower_case=False,
                    train_batch_size=32, eval_batch_size=8, learning_rate=5e-5, num_train_epochs=3,
                    warmup_proportion=0.1,no_cuda=False, local_rank=-1, seed=42, gradient_accumulation_steps=1,
-                   optimize_on_cpu=False, fp16=False, loss_scale=128, saved_model=""):
+                   optimize_on_cpu=False, fp16=False, loss_scale=128, saved_model="", eval_dev_set=False):
 
 
     # ## Required parameters
@@ -153,6 +153,8 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
     if do_train:
         if os.path.exists(output_dir) and os.listdir(output_dir):
             raise ValueError("Output directory ({}) already exists and is not emp1ty.".format(output_dir))
+
+    if not os.path.exists(output_dir):
         os.makedirs(output_dir, exist_ok=True)
 
     task_name = task_name.lower()
@@ -269,8 +271,12 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
 
 
     if do_eval and (local_rank == -1 or torch.distributed.get_rank() == 0):
-        # eval_examples = processor.get_test_examples(data_dir)
-        eval_examples = processor.get_dev_examples(data_dir)
+
+        if eval_dev_set:
+            eval_examples = processor.get_dev_examples(data_dir)
+        else:
+            eval_examples = processor.get_test_examples(data_dir)
+
         eval_features = convert_examples_to_features(
             eval_examples, label_list, max_seq_length, tokenizer)
         logger.info("***** Running evaluation *****")
@@ -369,21 +375,43 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                 })
 
 
-def experiments():
+def stance_train():
     # data_dir = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/"
     data_dir = "../data/dataset/perspective_stances/"
     # data_dir_output = data_dir + "output2/"
     data_dir_output = "/shared/experiments/schen149/perspective_model/"
-    train_and_test(data_dir=data_dir, do_train=True, do_eval=True, output_dir=data_dir_output,task_name="Mrpc")
+    train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=data_dir_output,task_name="Mrpc")
 
-def evaluation_with_pretrained():
+def stance_test():
     # bert_model = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/output/output.pth"
-    bert_model = "/shared/experiments/schen149/perspective_model/output.pth"
-    data_dir = "../data/dataset/perspective_stances/"
+    bert_model = "/shared/experiments/schen149/perspective_model/stance/stance_bert.pth"
+    data_dir = "../data/dataset/perspective_stances/stance/"
     # data_dir_output = data_dir + "output2/"
-    data_dir_output = "/shared/experiments/schen149/perspective_model/dummy_output/"
+    data_dir_output = "/shared/experiments/schen149/perspective_model/stance/stance_output/"
     train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=data_dir_output,task_name="Mrpc",saved_model=bert_model)
 
+
+def relevance_train():
+    # data_dir = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/"
+    data_dir = "../data/dataset/perspective_relevance/"
+    # data_dir_output = data_dir + "output2/"
+    data_dir_output = "/shared/experiments/schen149/perspective_model/relevance/"
+    train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=data_dir_output,task_name="Mrpc")
+
+
+def relevance_test():
+    bert_model = "/shared/experiments/schen149/perspective_model/relevance/output.pth"
+    data_dir = "../data/dataset/perspective_relevance/"
+    data_dir_output = "/shared/experiments/schen149/perspective_model/relevance/relevance_output/"
+
+    # eval on test set
+    train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=data_dir_output,task_name="Mrpc",saved_model=bert_model, eval_dev_set=False)
+
+    # eval on dev set
+    # train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=data_dir_output,task_name="Mrpc",saved_model=bert_model, eval_dev_set=True)
+
 if __name__ == "__main__":
-    # experiments()
-    evaluation_with_pretrained()
+    # stance_train()
+    # stance_test()
+    # relevance_train()
+    relevance_test()
