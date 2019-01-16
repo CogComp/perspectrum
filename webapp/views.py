@@ -121,8 +121,9 @@ def main_page(request):
 @login_required
 def vis_claims(request):
     claim_titles = []
-    for c in Claim.objects.all():
-        claim_titles.append((c.title, c.id))
+    claims = load_json(file_names["claim_annotation"])
+    for c in claims:
+        claim_titles.append((c["text"], c["cId"]))
 
     context = {
         "claim_titles": claim_titles
@@ -527,16 +528,20 @@ def vis_dataset(request, claim_id):
 
 @login_required
 def vis_persps(request, claim_id):
-    claim = Claim.objects.get(id=claim_id)
-    rel_set = PerspectiveRelation.objects.filter(author=PerspectiveRelation.GOLD, claim_id=claim_id)
-    rel_sup_ids = [r["perspective_id"] for r in rel_set.filter(rel='S').values("perspective_id")]
-    rel_und_ids = [r["perspective_id"] for r in rel_set.filter(rel='U').values("perspective_id")]
+    c_title = claim_dict[claim_id]["text"]
+    persp_sup = []
+    persp_und = []
+    for cluster in claim_dict[claim_id]["perspectives"]:
+        titles = [(pid, persp_dict[pid]) for pid in cluster["pids"]]
 
-    persp_sup = Perspective.objects.filter(id__in=rel_sup_ids)
-    persp_und = Perspective.objects.filter(id__in=rel_und_ids)
+        if cluster['stance_label_3'] == "SUPPORT":
+            persp_sup.append((titles, json.dumps(cluster["voter_counts"])))
+        elif cluster['stance_label_3'] == "UNDERMINE":
+            persp_und.append((titles, json.dumps(cluster["voter_counts"])))
 
     context = {
-        "claim": claim,
+        "claim": c_title,
+        "claim_id": claim_id,
         "persp_sup": persp_sup,
         "persp_und": persp_und,
     }

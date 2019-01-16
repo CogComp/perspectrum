@@ -11,7 +11,7 @@ This repository contains codes and scripts relevant to the dataset introduced in
  
 
 ## Citation 
-
+Work is published under **the Creative Commons license**. 
 Please cite the following work if you want to refer to this work: 
 ```
 @inproceedings{chen2018perspectives,
