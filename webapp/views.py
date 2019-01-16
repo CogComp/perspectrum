@@ -1,5 +1,8 @@
 import json
+import zipfile
+from io import BytesIO
 
+from io import StringIO
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -10,7 +13,7 @@ from django.core.files import File
 
 from experiment.query_elasticsearch import get_perspective_from_pool
 from experiment.query_elasticsearch import get_evidence_from_pool
-from pulp import LpVariable, LpProblem, LpMaximize, LpStatus, value
+from pulp import LpVariable, LpProblem, LpMaximize, LpStatus, value, os
 
 from .forms import ContactForm
 
@@ -239,6 +242,31 @@ STANCE_FLIP_MAPPING = {
     "MILDLY_UNDERMINE": "MILDLY_SUPPORT",
     "UNDERMINE": "SUPPORT",
 }
+
+def dataset_download(request):
+    prefix = "/Users/daniel/ideaProjects/perspective/data/dataset/"
+    filelist = [
+        prefix + "dataset_split_v0.2.json",
+        prefix + "evidence_pool_v0.2.json",
+        prefix + "perspective_pool_v0.2.json",
+        prefix + "perspectrum_with_answers_v0.2.json"
+    ]
+
+    byte_data = BytesIO()
+    zip_file = zipfile.ZipFile(byte_data, "w")
+
+    for file in filelist:
+        filename = os.path.basename(os.path.normpath(file))
+        zip_file.write(file, filename)
+    zip_file.close()
+
+    response = HttpResponse(byte_data.getvalue(), content_type='application/zip')
+    response['Content-Disposition'] = 'attachment; filename=perspectrum_v0_2.zip'
+
+    # Print list files in zip_file
+    zip_file.printdir()
+
+    return response
 
 def dataset_page(request):
     context = {}

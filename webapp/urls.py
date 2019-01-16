@@ -37,6 +37,7 @@ urlpatterns = [
     path('visualization/range=<slug:claim_id_range>', views.vis_spectrum_js_range),
     path('visualization/sunburst', views.sunburst),
     path('perspectrum/', views.dataset_page),
+    path('dataset_downoad/', views.dataset_download),
 
     # step 1
     path('step1/task_list/', views.render_list_page, name="task_list"),

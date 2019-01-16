@@ -12,7 +12,6 @@
             crossorigin="anonymous"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
           integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-    <script src="multirc.js"></script>
     <link rel="stylesheet" href="multirc.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <style>
@@ -22,22 +21,6 @@
     </style>
 </head>
 <body>
-{#<nav class="navbar navbar-dark bg-dark navbar-expand-lg sticky-top">#}
-{#    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"#}
-{#            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">#}
-{#        <span class="navbar-toggler-icon"></span>#}
-{#    </button>#}
-{#    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">#}
-{#        <div class="navbar-nav">#}
-{#            <a class="nav-item nav-link active" href="#">Homepage <span class="sr-only">(current)</span></a>#}
-{#            <a class="nav-item nav-link" href="#releases">Releases and downloads</a>#}
-{#            <a class="nav-item nav-link" href="explore/train/">Explore the data</a>#}
-{#            <a class="nav-item nav-link"#}
-{#               href="https://worksheets.codalab.org/worksheets/0x55757d643dde4692b9b515575e45487e/">CodaLab</a>#}
-{#            <a class="nav-item nav-link" href="https://github.com/CogComp/multirc">Evaluation Script</a>#}
-{#        </div>#}
-{#    </div>#}
-{#</nav>#}
 <div class="jumbotron jumbotron-fluid">
     <div class="container">
         <div class="row">
@@ -45,10 +28,10 @@
                 <h1 class="display-4">Perspectrum</h1>
                 <p class="lead">A dataset of claims, perspectives and evidences</p>
             </div>
-            <div class="col-sm" style="text-align: right">
-                <a href="http://cogcomp.org"><img alt=" " src="ccg.png" height="120px" width=auto></a>
+{#            <div class="col-sm" style="text-align: right">#}
+{#                <a href="http://cogcomp.org"><img alt=" " src="ccg.png" height="120px" width=auto></a>#}
                 <!--<img alt=" " src="upenn.png" height="80px" width=auto>-->
-            </div>
+{#            </div>#}
         </div>
     </div>
 </div>
@@ -60,7 +43,18 @@
                 <div class="card-body">
                     <h2 class="card-title">Introduction</h2>
                     <br>
-                    asdad
+                    Perspectrum, is a dataset of claims, perspectives and evidences.
+
+
+
+
+challenges, and show that human baselines
+
+across multiple subtasks far outperform ma-
+chine baselines built upon state-of-the-art NLP
+
+techniques. This poses a challenge and oppor-
+tunity for the NLP community to address.
                     <br>
                 </div>
             </div>
@@ -76,34 +70,19 @@
         <div class="col-sm">
             <div class="card">
                 <div class="card-body">
-                    <h2 class="card-title">Leaderboard</h2>
-                    Here we show a summary of the best results on our dataset:
-                </div>
-            </div>
-            <br>
-            <div class="card">
-                <div class="card-body">
                     <h2 class="card-title">Releases and Downloads</h2>
-                    The entire corpus consists of ~10K questionss (~6k multiple-sentence questions).
-                    We release about 60% of this data as training/dev data.
+                    The entire dataset contains 1k claims, accompanied with pools of 10k and 8k perspective sentences and evidence paragraphs, respectively.
+
                     <br>
                     <br>
                     <div class="container" style="text-align: center" id="releases">
-                        <a class="btn btn-primary" href="data/mutlirc-v1.zip" role="button" style="text-align: center">Download
-                            the data</a>
-                        <!--<button type="button" class="btn btn-secondary btn-lg">Browsing through the questions</button>-->
+                        <a class="btn btn-primary" href="/dataset_downoad/" role="button" style="text-align: center">Download the data</a>
                     </div>
                     <br>
-                    The
+                    To find some details on the structure of the dataset conventions, check out <a href="https://github.com/CogComp/perspectrum/tree/master/data/dataset">this link</a>.
                 </div>
             </div>
             <br>
-            <div class="card">
-                <div class="card-body">
-                    This work is actively being developed. To hear about the most recent updates and changes, register in our list: <br><br>
-
-                </div>
-            </div>
         </div>
     </div>
 </div>
