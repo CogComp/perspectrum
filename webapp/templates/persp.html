@@ -51,9 +51,10 @@
                                              <font color='red'>Undermine</font> = {{ cluster.1.3 }} <br />
                                              <font color='black'>Invalid-Perspective</font> = {{ cluster.1.4 }} <br />
                                              <b>Evidences</b> <br />
-                                             {% for eid in cluster.2 %}
-                                             <a href='#'>{{ eid }}</a>
-                                             {% endfor %}">
+                                             <a href='/evidences/{% for eid in cluster.2 %}{{ eid }}-{% endfor %}'
+                                             target='_blank'>
+                                                {% for eid in cluster.2 %}{{ eid }} {% endfor %}</a>
+                                             ">
                                 <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                             </a>
                         </div>
@@ -83,9 +84,10 @@
                                              <font color='red'>Undermine</font> = {{ cluster.1.3 }} <br />
                                              <font color='black'>Invalid-Perspective</font> = {{ cluster.1.4 }} <br />
                                              <b>Evidences</b> <br />
-                                             {% for eid in cluster.2 %}
-                                             <a href='#'>{{ eid }}</a>
-                                             {% endfor %}">
+                                             <a href='/evidences/{% for eid in cluster.2 %}{{ eid }}-{% endfor %}'
+                                             target='_blank'>
+                                                {% for eid in cluster.2 %}{{ eid }} {% endfor %}</a>
+                                             ">
                                 <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
                             </a>
                         </div>

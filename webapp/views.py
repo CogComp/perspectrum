@@ -517,6 +517,20 @@ def vis_persps(request, claim_id):
 
     return render(request, 'persp.html', context)
 
+@login_required
+def vis_evidence(request, evidence_ids):
+    eid_list = [int(eid) for eid in evidence_ids.split("-") if eid]
+    _evidences = []
+
+    for eid in eid_list:
+        if eid in evidence_dict:
+            _evidences.append((eid, evidence_dict[eid]))
+
+    context = {
+        "evidences" : _evidences
+    }
+    return render(request, 'evidence.html', context)
+
 
 @login_required
 def vis_neg_anno(request, claim_id):
