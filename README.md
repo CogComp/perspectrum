@@ -18,6 +18,6 @@ Please cite the following work if you want to refer to this work:
   title={Seeing Things from a Different Angle: Discovering Diverse Perspectives about Claims},
   author={Chen, Sihao and Khashabi, Daniel and Yin, Wenpeng and Callison-Burch, Chris and Roth, Dan},
   book={?},
-  year={20019}
+  year={2019}
 }
 ```
