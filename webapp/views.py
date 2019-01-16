@@ -240,6 +240,9 @@ STANCE_FLIP_MAPPING = {
     "UNDERMINE": "SUPPORT",
 }
 
+def dataset_page(request):
+    context = {}
+    return render(request, 'dataset_page.html', context)
 
 ## utils functions for the side-by-side view
 def unify_persps(request, cid1, cid2, flip_stance):
@@ -1486,7 +1489,7 @@ def sunburst(request):
     # claims = load_json(file_names["claim_annotation"])
     topics_to_claim = {}
 
-    for c in random.sample(claims, 35):
+    for c in random.sample(claims, 55):
         topics = c['topics']
         claim_text = c['text']
         for topic_text in topics:
@@ -1508,10 +1511,11 @@ def sunburst(request):
             })
             total_childen += len(children)
 
-    data.append({
-        "name": "dummy",
-        "children": [{"name": "fake", "value": 1} for x in range(0,total_childen)]
-    })
+    # the bottom half
+    # data.append({
+    #     "name": "dummy",
+    #     "children": [{"name": "fake", "value": 1} for x in range(0,total_childen)]
+    # })
 
     context = {
         "data": json.dumps([{

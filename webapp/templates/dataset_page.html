@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <script src="multirc.js"></script>
+    <link rel="stylesheet" href="multirc.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        html {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+{#<nav class="navbar navbar-dark bg-dark navbar-expand-lg sticky-top">#}
+{#    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"#}
+{#            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">#}
+{#        <span class="navbar-toggler-icon"></span>#}
+{#    </button>#}
+{#    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">#}
+{#        <div class="navbar-nav">#}
+{#            <a class="nav-item nav-link active" href="#">Homepage <span class="sr-only">(current)</span></a>#}
+{#            <a class="nav-item nav-link" href="#releases">Releases and downloads</a>#}
+{#            <a class="nav-item nav-link" href="explore/train/">Explore the data</a>#}
+{#            <a class="nav-item nav-link"#}
+{#               href="https://worksheets.codalab.org/worksheets/0x55757d643dde4692b9b515575e45487e/">CodaLab</a>#}
+{#            <a class="nav-item nav-link" href="https://github.com/CogComp/multirc">Evaluation Script</a>#}
+{#        </div>#}
+{#    </div>#}
+{#</nav>#}
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <h1 class="display-4">Perspectrum</h1>
+                <p class="lead">A dataset of claims, perspectives and evidences</p>
+            </div>
+            <div class="col-sm" style="text-align: right">
+                <a href="http://cogcomp.org"><img alt=" " src="ccg.png" height="120px" width=auto></a>
+                <!--<img alt=" " src="upenn.png" height="80px" width=auto>-->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Introduction</h2>
+                    <br>
+                    asdad
+                    <br>
+                </div>
+            </div>
+            <br>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Example</h2>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="col-sm">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Leaderboard</h2>
+                    Here we show a summary of the best results on our dataset:
+                </div>
+            </div>
+            <br>
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Releases and Downloads</h2>
+                    The entire corpus consists of ~10K questionss (~6k multiple-sentence questions).
+                    We release about 60% of this data as training/dev data.
+                    <br>
+                    <br>
+                    <div class="container" style="text-align: center" id="releases">
+                        <a class="btn btn-primary" href="data/mutlirc-v1.zip" role="button" style="text-align: center">Download
+                            the data</a>
+                        <!--<button type="button" class="btn btn-secondary btn-lg">Browsing through the questions</button>-->
+                    </div>
+                    <br>
+                    The
+                </div>
+            </div>
+            <br>
+            <div class="card">
+                <div class="card-body">
+                    This work is actively being developed. To hear about the most recent updates and changes, register in our list: <br><br>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <hr/>
+    <h1>Paper</h1>
+    Work is published under <b><a href="https://creativecommons.org/licenses/">the Creative Commons </a></b> license. <br>
+
+    If you find this data helpful in your work, please cite <a href="http://cogcomp.org/page/publication_view/833">this
+    paper</a>:
+
+    <pre><div class="alert alert-primary" role="alert">@inproceedings{chen2018perspectives,
+  title={Seeing Things from a Different Angle: Discovering Diverse Perspectives about Claims},
+  author={Chen, Sihao and Khashabi, Daniel and Yin, Wenpeng and Callison-Burch, Chris and Roth, Dan},
+  book={?},
+  year={2019}
+}</div></pre>
+</div>
+<script>window.twttr = (function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function (f) {
+        t._e.push(f);
+    };
+
+    return t;
+}(document, "script", "twitter-wjs"));</script>
+</body>
+</html>
