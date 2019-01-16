@@ -31,6 +31,7 @@ urlpatterns = [
     path('claims/', views.vis_claims),
     path('personality/', views.personality),
     path('perspectives/<int:claim_id>', views.vis_persps, name="perspectives"),
+    path('evidences/<slug:evidence_ids>', views.vis_evidence, name="evidences"),
     path('vis_spectrum/<slug:claim_id>', views.vis_spectrum, name="vis_spectrum"),
     path('visualization/id=<slug:claim_id>', views.vis_spectrum_js_index),
     path('visualization/list=<slug:claim_id_list>', views.vis_spectrum_js_list),
@@ -86,6 +87,7 @@ urlpatterns = [
     path('dataset/side_by_side/merge/<int:cid1>/<int:pid1>/<int:cid2>/<int:pid2>', views.merge_perspectives),
     path('dataset/side_by_side/save/<str:file_name>', views.save_updated_claim_on_disk),
     path('dataset/side_by_side/save_default', views.save_defualt_on_disk),
+
 
     # baselines
     # path('baseline/claim=<slug:claim_text>', views.lucene_baseline),

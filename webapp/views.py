@@ -535,9 +535,9 @@ def vis_persps(request, claim_id):
         titles = [(pid, persp_dict[pid]) for pid in cluster["pids"]]
 
         if cluster['stance_label_3'] == "SUPPORT":
-            persp_sup.append((titles, json.dumps(cluster["voter_counts"])))
+            persp_sup.append((titles, cluster["voter_counts"], cluster["evidence"]))
         elif cluster['stance_label_3'] == "UNDERMINE":
-            persp_und.append((titles, json.dumps(cluster["voter_counts"])))
+            persp_und.append((titles, cluster["voter_counts"], cluster["evidence"]))
 
     context = {
         "claim": c_title,
@@ -547,6 +547,20 @@ def vis_persps(request, claim_id):
     }
 
     return render(request, 'persp.html', context)
+
+@login_required
+def vis_evidence(request, evidence_ids):
+    eid_list = [int(eid) for eid in evidence_ids.split("-") if eid]
+    _evidences = []
+
+    for eid in eid_list:
+        if eid in evidence_dict:
+            _evidences.append((eid, evidence_dict[eid]))
+
+    context = {
+        "evidences" : _evidences
+    }
+    return render(request, 'evidence.html', context)
 
 
 @login_required

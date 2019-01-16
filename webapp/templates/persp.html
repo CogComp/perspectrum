@@ -16,6 +16,8 @@
           integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
           integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.6.3/css/all.css"
+          integrity="sha384-UHRtZLI+pbxtHCWp1t77Bi1L4ZtiqrqD80Kn4Z8NTSRyMA2Fd33n5dQ8lWUE00s/" crossorigin="anonymous">
     <link rel="stylesheet" href="{% static "css/style.css" %}">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>Perspective Annotation Interface</title>
@@ -32,20 +34,32 @@
                     Perspectives For
                 </h6>
                 {% for cluster in persp_sup %}
-                <a class="persp-title btn-block btn-lg  palette-turquoise">
-                    {% for p in cluster.0 %}
+                <div class="persp-title btn-block btn-lg  palette-turquoise">
                     <div class="row">
-                        <div class="col-12">
-                            {{ p.0 }} : {{ p.1 }}
+                        <div class="col-11">
+                            {% for p in cluster.0 %}
+                            <div>{{ p.0 }} : {{ p.1 }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-1">
+                            <a tabindex="0" data-toggle="popover" data-trigger="focus" data-container="body"
+                               data-placement="bottom" data-html="true"
+                               data-content="<b>Annotator Votes</b> <br />
+                                             <font color='green'>Support</font> = {{ cluster.1.0 }} <br />
+                                             <font color='teal'>Slight-Support</font> = {{ cluster.1.1 }} <br />
+                                             <font color='orange'>Slight-Undermine</font> = {{ cluster.1.2 }} <br />
+                                             <font color='red'>Undermine</font> = {{ cluster.1.3 }} <br />
+                                             <font color='black'>Invalid-Perspective</font> = {{ cluster.1.4 }} <br />
+                                             <b>Evidences</b> <br />
+                                             <a href='/evidences/{% for eid in cluster.2 %}{{ eid }}-{% endfor %}'
+                                             target='_blank'>
+                                                {% for eid in cluster.2 %}{{ eid }} {% endfor %}</a>
+                                             ">
+                                <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                            </a>
                         </div>
                     </div>
-                    {% endfor %}
-                    <div class="row">
-                        <div class="col-12">
-                            Voter Counts : {{ cluster.1 }}
-                        </div>
-                    </div>
-                </a>
+                </div>
                 {% endfor %}
             </div>
             <div class="col persps-container tile">
@@ -53,24 +67,43 @@
                     Perspectives Against
                 </h6>
                 {% for cluster in persp_und %}
-                <a class="persp-title btn-block btn-lg palette-carrot">
-                    {% for p in cluster.0 %}
+                <div class="persp-title btn-block btn-lg  palette-carrot">
                     <div class="row">
-                        <div class="col-12">
-                            {{ p.0 }} : {{ p.1 }}
+                        <div class="col-11">
+                            {% for p in cluster.0 %}
+                            <div>{{ p.0 }} : {{ p.1 }}</div>
+                            {% endfor %}
+                        </div>
+                        <div class="col-1">
+                            <a tabindex="0" data-toggle="popover" data-trigger="focus" data-container="body"
+                               data-placement="bottom" data-html="true"
+                               data-content="<b>Annotator Votes</b> <br />
+                                             <font color='green'>Support</font> = {{ cluster.1.0 }} <br />
+                                             <font color='teal'>Slight-Support</font> = {{ cluster.1.1 }} <br />
+                                             <font color='orange'>Slight-Undermine</font> = {{ cluster.1.2 }} <br />
+                                             <font color='red'>Undermine</font> = {{ cluster.1.3 }} <br />
+                                             <font color='black'>Invalid-Perspective</font> = {{ cluster.1.4 }} <br />
+                                             <b>Evidences</b> <br />
+                                             <a href='/evidences/{% for eid in cluster.2 %}{{ eid }}-{% endfor %}'
+                                             target='_blank'>
+                                                {% for eid in cluster.2 %}{{ eid }} {% endfor %}</a>
+                                             ">
+                                <i class="fa fa-lg fa-info-circle" aria-hidden="true"></i>
+                            </a>
                         </div>
                     </div>
-                    {% endfor %}
-                    <div class="row">
-                        <div class="col-12">
-                            Voter Counts : {{ cluster.1 }}
-                        </div>
-                    </div>
-                </a>
+                </div>
                 {% endfor %}
             </div>
         </div>
     </div>
 
+
 </body>
+<script>
+$(document).ready(function(){
+    $('[data-toggle="popover"]').popover();
+});
+</script>
+
 </html>
