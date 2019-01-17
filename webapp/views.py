@@ -158,20 +158,17 @@ def vis_spectrum_js_list(request, claim_id_list):
     return vis_spectrum_js(request, [int(x) for x in ids])
 
 
-@login_required
 def vis_spectrum_js_range(request, claim_id_range):
     split = claim_id_range.split('-')
     return vis_spectrum_js(request, list(range(int(split[0]), int(split[1]))))
 
 
-@login_required
 def vis_spectrum_js_index(request, claim_id):
     # print(claim_id)
     # if claim_id != None and int(claim_id) >= 0:
     return vis_spectrum_js(request, [int(claim_id)])
 
 
-@login_required
 def vis_spectrum_js(request, claim_ids_all):
     persps = load_json(file_names["perspective"])
     claims = load_json(file_names["claim_annotation"])
@@ -291,7 +288,7 @@ def unify_persps(request, cid1, cid2, flip_stance):
 def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
     if cid_from == cid_to:
         return HttpResponse("Success", status=200)
-
+    
     claim_from = claim_dict[cid_from]
     claim_to = claim_dict[cid_to]
 
