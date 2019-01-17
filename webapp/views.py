@@ -110,7 +110,6 @@ def personality(request):
     return render(request, 'personality.html', context)
 
 
-@login_required
 def main_page(request):
     context = {
         "datasets": list(file_names.keys())
@@ -118,7 +117,6 @@ def main_page(request):
     return render(request, 'main.html', context)
 
 
-@login_required
 def vis_claims(request):
     claim_titles = []
     claims = load_json(file_names["claim_annotation"])
@@ -131,7 +129,6 @@ def vis_claims(request):
     return render(request, 'claims.html', context)
 
 
-@login_required
 def vis_spectrum(request, claim_id):
     claim = Claim.objects.get(id=claim_id)
 
@@ -156,7 +153,6 @@ def vis_spectrum(request, claim_id):
 
 
 # separated by commas
-@login_required
 def vis_spectrum_js_list(request, claim_id_list):
     ids = claim_id_list.split('-')
     return vis_spectrum_js(request, [int(x) for x in ids])
@@ -449,7 +445,6 @@ for c in claims:
     claim_dict[c["cId"]] = c
 
 
-@login_required
 def vis_dataset_side_by_side(request, claim_id1, claim_id2):
     # claim_id1 = 300
     claim_id1 = int(claim_id1)
@@ -492,7 +487,6 @@ def vis_dataset_side_by_side(request, claim_id1, claim_id2):
     return render(request, 'vis_dataset_side_by_side.html', context)
 
 
-@login_required
 def vis_dataset(request, claim_id):
     persps = load_json(file_names["perspective"])
     claims = load_json(file_names["claim_annotation"])
@@ -526,7 +520,6 @@ def vis_dataset(request, claim_id):
     return render(request, 'vis_dataset.html', context)
 
 
-@login_required
 def vis_persps(request, claim_id):
     c_title = claim_dict[claim_id]["text"]
     persp_sup = []
@@ -548,7 +541,7 @@ def vis_persps(request, claim_id):
 
     return render(request, 'persp.html', context)
 
-@login_required
+
 def vis_evidence(request, evidence_ids):
     eid_list = [int(eid) for eid in evidence_ids.split("-") if eid]
     _evidences = []
