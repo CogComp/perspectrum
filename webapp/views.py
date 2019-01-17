@@ -238,7 +238,7 @@ STANCE_FLIP_MAPPING = {
 }
 
 def dataset_download(request):
-    prefix = "/Users/daniel/ideaProjects/perspective/data/dataset/"
+    prefix = "data/dataset/"
     filelist = [
         prefix + "dataset_split_v0.2.json",
         prefix + "evidence_pool_v0.2.json",
