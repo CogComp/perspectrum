@@ -17,11 +17,32 @@ from experiment.bert.run_classifier import ColaProcessor, MrpcProcessor, logger,
     set_optimizer_params_grad, copy_optimizer_params_to_model, accuracy, p_r_f1, tp_pcount_gcount
 from experiment.bert.run_classifier import MnliProcessor
 
+# Data Directory
+FILE_PATH = {
+    # Stance
+    "stance_data": "../data/dataset/perspective_stances/",
+    "stance_model_dir": "../model/stance",
+    "stance_model_name": "bert_stance.pth",
 
+    # Relevance
+    "relevance_data": "../data/dataset/perspective_relevance/",
+    "relevance_model_dir": "../model/relevance",
+    "relevance_model_name": "bert_relevance.pth",
+
+    # Evidence
+    "evidence_data": "../data/dataset/perspective_evidence/",
+    "evidence_model_dir": "../model/evidence",
+    "evidence_model_name": "bert_evidence.pth",
+
+    # Equivalence
+    "equivalence_data": "../data/dataset/perspective_equivalence/",
+    "equivalence_model_dir": "../model/equivalence",
+    "equivalence_model_name": "bert_equivalence.pth",
+}
 
 def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
-                   output_dir=None, max_seq_length=128, do_train=False, do_eval=False, do_lower_case=False,
-                   train_batch_size=32, eval_batch_size=8, learning_rate=5e-5, num_train_epochs=3,
+                   output_dir=None, output_name="output.pth", max_seq_length=128, do_train=False, do_eval=False,
+                   do_lower_case=False,train_batch_size=32, eval_batch_size=8, learning_rate=5e-5, num_train_epochs=3,
                    warmup_proportion=0.1,no_cuda=False, local_rank=-1, seed=42, gradient_accumulation_steps=1,
                    optimize_on_cpu=False, fp16=False, loss_scale=128, saved_model="", eval_dev_set=False):
 
@@ -228,8 +249,10 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
         train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=train_batch_size)
 
         model.train()
+
         for _ in trange(int(num_train_epochs), desc="Epoch"):
             tr_loss = 0
+            tr_per_batch_loss = []
             nb_tr_examples, nb_tr_steps = 0, 0
             for step, batch in enumerate(tqdm(train_dataloader, desc="Iteration")):
                 batch = tuple(t.to(device) for t in batch)
@@ -245,6 +268,7 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                     loss = loss / gradient_accumulation_steps
                 loss.backward()
                 tr_loss += loss.item()
+                tr_per_batch_loss.append(loss.item())
                 nb_tr_examples += input_ids.size(0)
                 nb_tr_steps += 1
                 if (step + 1) % gradient_accumulation_steps == 0:
@@ -267,7 +291,10 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                     model.zero_grad()
                     global_step += 1
 
-        torch.save(model.state_dict(), output_dir + "output.pth")
+            logger.info("Training Loss: {}".format(tr_loss))
+            logger.info("Per mini batch training loss: {}".format(str(tr_per_batch_loss)))
+
+        torch.save(model.state_dict(), os.path.join(output_dir, output_name))
 
 
     if do_eval and (local_rank == -1 or torch.distributed.get_rank() == 0):
@@ -375,40 +402,38 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                 })
 
 
+
 def stance_train():
-    # data_dir = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/"
-    data_dir = "../data/dataset/perspective_stances/"
-    # data_dir_output = data_dir + "output2/"
-    data_dir_output = "/shared/experiments/schen149/perspective_model/"
-    train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=data_dir_output,task_name="Mrpc")
+    data_dir = FILE_PATH['stance_data']
+    model_dir = FILE_PATH['stance_model_dir']
+    model_name = FILE_PATH['stance_model_name']
+    train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=model_dir, output_name=model_name,
+                   task_name="Mrpc")
 
 def stance_test():
-    # bert_model = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/output/output.pth"
-    bert_model = "/shared/experiments/schen149/perspective_model/stance/stance_bert.pth"
-    data_dir = "../data/dataset/perspective_stances/stance/"
-    # data_dir_output = data_dir + "output2/"
-    data_dir_output = "/shared/experiments/schen149/perspective_model/stance/stance_output/"
-    train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=data_dir_output,task_name="Mrpc",saved_model=bert_model)
+    data_dir = FILE_PATH['stance_data']
+    model_dir = FILE_PATH['stance_model_dir']
+    model_name = FILE_PATH['stance_model_name']
+    model_path = os.path.join(model_dir, model_name)
+    train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=model_dir,task_name="Mrpc",
+                   saved_model=model_path)
 
 
 def relevance_train():
-    # data_dir = "/shared/shelley/khashab2/perspective/data/dataset/perspective_stances/"
-    data_dir = "../data/dataset/perspective_relevance/"
-    # data_dir_output = data_dir + "output2/"
-    data_dir_output = "/shared/experiments/schen149/perspective_model/relevance/"
-    train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=data_dir_output,task_name="Mrpc")
+    data_dir = FILE_PATH['relevance_data']
+    model_dir = FILE_PATH['relevance_model_dir']
+    model_name = FILE_PATH['relevance_model_name']
+    train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=model_dir, output_name=model_name,
+                   task_name="Mrpc")
 
 
 def relevance_test():
-    bert_model = "/shared/experiments/schen149/perspective_model/relevance/output.pth"
-    data_dir = "../data/dataset/perspective_relevance/"
-    data_dir_output = "/shared/experiments/schen149/perspective_model/relevance/relevance_output/"
-
-    # eval on test set
-    train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=data_dir_output,task_name="Mrpc",saved_model=bert_model, eval_dev_set=False)
-
-    # eval on dev set
-    # train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=data_dir_output,task_name="Mrpc",saved_model=bert_model, eval_dev_set=True)
+    data_dir = FILE_PATH['relevance_data']
+    model_dir = FILE_PATH['relevance_model_dir']
+    model_name = FILE_PATH['relevance_model_name']
+    model_path = os.path.join(model_dir, model_name)
+    train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=model_dir, task_name="Mrpc",
+                  saved_model=model_path)
 
 if __name__ == "__main__":
     # stance_train()
