@@ -435,8 +435,27 @@ def relevance_test():
     train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=model_dir, task_name="Mrpc",
                   saved_model=model_path)
 
+def equivalence_train():
+    data_dir = FILE_PATH['equivalence_data']
+    model_dir = FILE_PATH['equivalence_model_dir']
+    model_name = FILE_PATH['equivalence_model_name']
+    train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=model_dir, output_name=model_name,
+                   task_name="Mrpc")
+
+
+def equivalence_test():
+    data_dir = FILE_PATH['equivalence_data']
+    model_dir = FILE_PATH['equivalence_model_dir']
+    model_name = FILE_PATH['equivalence_model_name']
+    model_path = os.path.join(model_dir, model_name)
+    train_and_test(data_dir=data_dir, do_train=False, do_eval=True, output_dir=model_dir, task_name="Mrpc",
+                  saved_model=model_path)
+
+
 if __name__ == "__main__":
     # stance_train()
     # stance_test()
     # relevance_train()
-    relevance_test()
+    # relevance_test()
+    equivalence_train()
+    equivalence_test()
