@@ -8,3 +8,4 @@ website/webapp/util/__pycache__/
 website/db.sqlite3
 *.pyc
 model/
+script/
