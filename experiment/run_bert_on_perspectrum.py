@@ -42,100 +42,9 @@ FILE_PATH = {
 
 def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                    output_dir=None, output_name="output.pth", max_seq_length=128, do_train=False, do_eval=False,
-                   do_lower_case=False,train_batch_size=32, eval_batch_size=8, learning_rate=5e-5, num_train_epochs=3,
+                   do_lower_case=False,train_batch_size=32, eval_batch_size=8, learning_rate=5e-5, num_train_epochs=10,
                    warmup_proportion=0.1,no_cuda=False, local_rank=-1, seed=42, gradient_accumulation_steps=1,
                    optimize_on_cpu=False, fp16=False, loss_scale=128, saved_model="", eval_dev_set=False):
-
-
-    # ## Required parameters
-    # parser.add_argument("--data_dir",
-    #                     default=None,
-    #                     type=str,
-    #                     required=True,
-    #                     help="The input data dir. Should contain the .tsv files (or other data files) for the task.")
-    # parser.add_argument("--bert_model", default=None, type=str, required=True,
-    #                     help="Bert pre-trained model selected in the list: bert-base-uncased, "
-    #                          "bert-large-uncased, bert-base-cased, bert-base-multilingual, bert-base-chinese.")
-    # parser.add_argument("--task_name",
-    #                     default=None,
-    #                     type=str,
-    #                     required=True,
-    #                     help="The name of the task to train.")
-    # parser.add_argument("--output_dir",
-    #                     default=None,
-    #                     type=str,
-    #                     required=True,
-    #                     help="The output directory where the model checkpoints will be written.")
-
-    ## Other parameters
-    # parser.add_argument("--max_seq_length",
-    #                     default=128,
-    #                     type=int,
-    #                     help="The maximum total input sequence length after WordPiece tokenization. \n"
-    #                          "Sequences longer than this will be truncated, and sequences shorter \n"
-    #                          "than this will be padded.")
-    # parser.add_argument("--do_train",
-    #                     default=False,
-    #                     action='store_true',
-    #                     help="Whether to run training.")
-    # parser.add_argument("--do_eval",
-    #                     default=False,
-    #                     action='store_true',
-    #                     help="Whether to run eval on the dev set.")
-    # parser.add_argument("--do_lower_case",
-    #                     default=False,
-    #                     action='store_true',
-    #                     help="Set this flag if you are using an uncased model.")
-    # parser.add_argument("--train_batch_size",
-    #                     default=32,
-    #                     type=int,
-    #                     help="Total batch size for training.")
-    # parser.add_argument("--eval_batch_size",
-    #                     default=8,
-    #                     type=int,
-    #                     help="Total batch size for eval.")
-    # parser.add_argument("--learning_rate",
-    #                     default=5e-5,
-    #                     type=float,
-    #                     help="The initial learning rate for Adam.")
-    # parser.add_argument("--num_train_epochs",
-    #                     default=3.0,
-    #                     type=float,
-    #                     help="Total number of training epochs to perform.")
-    # parser.add_argument("--warmup_proportion",
-    #                     default=0.1,
-    #                     type=float,
-    #                     help="Proportion of training to perform linear learning rate warmup for. "
-    #                          "E.g., 0.1 = 10%% of training.")
-    # parser.add_argument("--no_cuda",
-    #                     default=False,
-    #                     action='store_true',
-    #                     help="Whether not to use CUDA when available")
-    # parser.add_argument("--local_rank",
-    #                     type=int,
-    #                     default=-1,
-    #                     help="local_rank for distributed training on gpus")
-    # parser.add_argument('--seed',
-    #                     type=int,
-    #                     default=42,
-    #                     help="random seed for initialization")
-    # parser.add_argument('--gradient_accumulation_steps',
-    #                     type=int,
-    #                     default=1,
-    #                     help="Number of updates steps to accumulate before performing a backward/update pass.")
-    # parser.add_argument('--optimize_on_cpu',
-    #                     default=False,
-    #                     action='store_true',
-    #                     help="Whether to perform optimization and keep the optimizer averages on CPU")
-    # parser.add_argument('--fp16',
-    #                     default=False,
-    #                     action='store_true',
-    #                     help="Whether to use 16-bit float precision instead of 32-bit")
-    # parser.add_argument('--loss_scale',
-    #                     type=float, default=128,
-    #                     help='Loss scaling, positive power of 2 values can improve fp16 convergence.')
-
-    # args = parser.parse_args()
 
     processors = {
         "cola": ColaProcessor,
@@ -192,6 +101,7 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
     num_train_steps = None
     if do_train:
         train_examples = processor.get_train_examples(data_dir)
+        dev_examples = processor.get_dev_examples(data_dir)
         num_train_steps = int(
             len(train_examples) / train_batch_size / gradient_accumulation_steps * num_train_epochs)
 
@@ -231,26 +141,42 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
 
     global_step = 0
     if do_train:
-        train_features = convert_examples_to_features(
-            train_examples, label_list, max_seq_length, tokenizer)
+        train_features = convert_examples_to_features(train_examples, label_list, max_seq_length, tokenizer)
+        dev_features = convert_examples_to_features(train_examples, label_list, max_seq_length, tokenizer)
         logger.info("***** Running training *****")
         logger.info("  Num examples = %d", len(train_examples))
         logger.info("  Batch size = %d", train_batch_size)
         logger.info("  Num steps = %d", num_train_steps)
+
+        # Train features
         all_input_ids = torch.tensor([f.input_ids for f in train_features], dtype=torch.long)
         all_input_mask = torch.tensor([f.input_mask for f in train_features], dtype=torch.long)
         all_segment_ids = torch.tensor([f.segment_ids for f in train_features], dtype=torch.long)
         all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.long)
+
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
+
+        # Dev features
+        dev_all_input_ids = torch.tensor([f.input_ids for f in dev_features], dtype=torch.long)
+        dev_all_input_mask = torch.tensor([f.input_mask for f in dev_features], dtype=torch.long)
+        dev_all_segment_ids = torch.tensor([f.segment_ids for f in dev_features], dtype=torch.long)
+        dev_all_label_ids = torch.tensor([f.label_id for f in dev_features], dtype=torch.long)
+
+        dev_data = TensorDataset(dev_all_input_ids, dev_all_input_mask, dev_all_segment_ids, dev_all_label_ids)
+
         if local_rank == -1:
             train_sampler = RandomSampler(train_data)
         else:
             train_sampler = DistributedSampler(train_data)
+
+        dev_sampler = SequentialSampler(dev_data)
+
         train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=train_batch_size)
+        dev_dataloader = DataLoader(dev_data, sampler=dev_sampler, batch_size=eval_batch_size)
 
         model.train()
 
-        for _ in trange(int(num_train_epochs), desc="Epoch"):
+        for _epoch in trange(int(num_train_epochs), desc="Epoch"):
             tr_loss = 0
             tr_per_batch_loss = []
             nb_tr_examples, nb_tr_steps = 0, 0
@@ -291,10 +217,57 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                     model.zero_grad()
                     global_step += 1
 
+            # After every epoch, validate on dev
+            eval_tp, eval_pred_c, eval_gold_c = 0, 0, 0
+            eval_loss, eval_macro_p, eval_macro_r = 0, 0, 0
+
+            nb_eval_steps, nb_eval_examples = 0, 0
+            for input_ids, input_mask, segment_ids, label_ids in dev_dataloader:
+                input_ids = input_ids.to(device)
+                input_mask = input_mask.to(device)
+                segment_ids = segment_ids.to(device)
+                label_ids = label_ids.to(device)
+
+                with torch.no_grad():
+                    tmp_eval_loss = model(input_ids, segment_ids, input_mask, label_ids)
+                    logits = model(input_ids, segment_ids, input_mask)
+
+                logits = logits.detach().cpu().numpy()
+                label_ids = label_ids.to('cpu').numpy()
+
+                # Micro F1 (aggregated tp, fp, fn counts across all examples)
+                tmp_tp, tmp_pred_c, tmp_gold_c = tp_pcount_gcount(logits, label_ids)
+                eval_tp += tmp_tp
+                eval_pred_c += tmp_pred_c
+                eval_gold_c += tmp_gold_c
+
+                # Macro F1 (averaged P, R across mini batches)
+                tmp_eval_p, tmp_eval_r, tmp_eval_f1 = p_r_f1(logits, label_ids)
+
+                eval_macro_p += tmp_eval_p
+                eval_macro_r += tmp_eval_r
+
+                eval_loss += tmp_eval_loss.mean().item()
+                nb_eval_examples += input_ids.size(0)
+                nb_eval_steps += 1
+
+            # Micro F1 (aggregated tp, fp, fn counts across all examples)
+            eval_micro_p = eval_tp / eval_pred_c
+            eval_micro_r = eval_tp / eval_gold_c
+            eval_micro_f1 = 2 * eval_micro_p * eval_micro_r / (eval_micro_p + eval_micro_r)
+
+            # Macro F1 (averaged P, R across mini batches)
+            eval_macro_p = eval_macro_p / nb_eval_steps
+            eval_macro_r = eval_macro_r / nb_eval_steps
+            eval_macro_f1 = 2 * eval_macro_p * eval_macro_r / (eval_macro_p + eval_macro_r)
+
             logger.info("Training Loss: {}".format(tr_loss))
             logger.info("Per mini batch training loss: {}".format(str(tr_per_batch_loss)))
+            logger.info("Epoch {} Dev Macro Precision: {}".format(_epoch, eval_macro_p))
+            logger.info("Epoch {} Dev Macro Recall: {}".format(_epoch, eval_macro_r))
+            logger.info("Epoch {} Dev Macro F1: {}".format(_epoch, eval_macro_f1))
 
-        torch.save(model.state_dict(), os.path.join(output_dir, output_name))
+            torch.save(model.state_dict(), os.path.join(output_dir, "epoch_{}.pth".format(_epoch)))
 
 
     if do_eval and (local_rank == -1 or torch.distributed.get_rank() == 0):
@@ -457,5 +430,5 @@ if __name__ == "__main__":
     # stance_test()
     # relevance_train()
     # relevance_test()
-    equivalence_train()
-    equivalence_test()
+    # equivalence_train()
+    # equivalence_test()
