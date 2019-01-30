@@ -376,12 +376,12 @@ def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
 
 
 
-def stance_train():
+def stance_train(epoch=7):
     data_dir = FILE_PATH['stance_data']
     model_dir = FILE_PATH['stance_model_dir']
     model_name = FILE_PATH['stance_model_name']
     train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=model_dir, output_name=model_name,
-                   task_name="Mrpc")
+                   task_name="Mrpc", num_train_epochs=epoch)
 
 def stance_test():
     data_dir = FILE_PATH['stance_data']
@@ -392,12 +392,12 @@ def stance_test():
                    saved_model=model_path)
 
 
-def relevance_train():
+def relevance_train(epoch=7):
     data_dir = FILE_PATH['relevance_data']
     model_dir = FILE_PATH['relevance_model_dir']
     model_name = FILE_PATH['relevance_model_name']
     train_and_test(data_dir=data_dir, do_train=True, do_eval=False, output_dir=model_dir, output_name=model_name,
-                   task_name="Mrpc")
+                   task_name="Mrpc", num_train_epochs=epoch)
 
 
 def relevance_test():
@@ -426,7 +426,7 @@ def equivalence_test():
 
 
 if __name__ == "__main__":
-    # stance_train()
+    stance_train()
     # stance_test()
     # relevance_train()
     # relevance_test()
