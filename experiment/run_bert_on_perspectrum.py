@@ -40,6 +40,7 @@ FILE_PATH = {
     "equivalence_model_name": "bert_equivalence.pth",
 }
 
+
 def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                    output_dir=None, output_name="output.pth", max_seq_length=128, do_train=False, do_eval=False,
                    do_lower_case=False,train_batch_size=32, eval_batch_size=8, learning_rate=5e-5, num_train_epochs=10,
