@@ -243,7 +243,8 @@ def dataset_download(request):
         prefix + "dataset_split_v0.2.json",
         prefix + "evidence_pool_v0.2.json",
         prefix + "perspective_pool_v0.2.json",
-        prefix + "perspectrum_with_answers_v0.2.json"
+        prefix + "perspectrum_with_answers_v0.2.json",
+        prefix + "license.txt"
     ]
 
     byte_data = BytesIO()
