@@ -17,6 +17,7 @@ from experiment.bert.run_classifier import ColaProcessor, MrpcProcessor, logger,
     set_optimizer_params_grad, copy_optimizer_params_to_model, accuracy, p_r_f1, tp_pcount_gcount
 from experiment.bert.run_classifier import MnliProcessor
 
+
 # Data Directory
 FILE_PATH = {
     # Stance
@@ -40,6 +41,133 @@ FILE_PATH = {
     "equivalence_model_name": "bert_equivalence.pth",
 }
 
+# Default config file
+DEFAULT_CONFIG = {
+    "bert_model": "bert-base-uncased",
+    "max_seq_length": 128,
+    "do_lower_case": False,
+    "train_batch_size": 32,
+    "eval_batch_size": 8,
+    "learning_rate": 5e-5,
+    "num_train_epoch": 8,
+    "warmup_proportion": 0.1,
+    "no_cuda": False,
+    "local_rank": -1,
+    "seed": 42,
+    "gradient_accumulation_steps": 1,
+    "optimize_on_cpu": False,
+    "fp16": False,
+    "loss_scale": 128,
+}
+
+"""
+TODO: Improvements
+1. Look at where they cached the bert model, if it's under /home/ or /tmp, move it somewhere else
+"""
+
+class BertBaseline:
+    def __init__(self, do_train=False, saved_model=None, **kwargs):
+
+        self.config =
+        """
+        :param saved_model: path to trained model
+        :param kwargs: see DEFAULT_CONFIG above
+        """
+        if kwargs["local_rank"] == -1 or kwargs["no_cuda"]:
+            device = torch.device("cuda" if torch.cuda.is_available() and not kwargs["no_cuda"] else "cpu")
+            n_gpu = torch.cuda.device_count()
+        else:
+            device = torch.device("cuda", kwargs["local_rank"])
+            n_gpu = 1
+            # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
+            torch.distributed.init_process_group(backend='nccl')
+            if kwargs["fp16"]:
+                logger.info("16-bits training currently not supported in distributed training")
+                fp16 = False  # (see https://github.com/pytorch/pytorch/pull/13496)
+        logger.info("device %s n_gpu %d distributed training %r", device, n_gpu, bool(kwargs["local_rank"] != -1))
+
+        if kwargs["gradient_accumulation_steps"] < 1:
+            raise ValueError("Invalid gradient_accumulation_steps parameter: {}, should be >= 1".format(
+                kwargs["gradient_accumulation_steps"]))
+
+        train_batch_size = int(kwargs["train_batch_size"] / kwargs["gradient_accumulation_steps"])
+
+        random.seed(kwargs["seed"])
+        np.random.seed(kwargs["seed"])
+        torch.manual_seed(kwargs["seed"])
+        if n_gpu > 0:
+            torch.cuda.manual_seed_all(kwargs["seed"])
+
+        processor = MrpcProcessor()
+        label_list = processor.get_labels()
+
+        tokenizer = BertTokenizer.from_pretrained(kwargs["bert_model"], do_lower_case=kwargs["do_lower_case"])
+
+        # Prepare model
+        model = BertForSequenceClassification.from_pretrained(kwargs["bert_model"],
+                                                              cache_dir=PYTORCH_PRETRAINED_BERT_CACHE / 'distributed_{}'.format(
+                                                                  kwargs["local_rank"]))
+        if kwargs["fp16"]:
+            model.half()
+        model.to(device)
+        if kwargs["local_rank"] != -1:
+            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[kwargs["local_rank"]],
+                                                              output_device=kwargs["local_rank"])
+        elif n_gpu > 1:
+            model = torch.nn.DataParallel(model)
+
+            # Prepare optimizer
+        if fp16:
+            param_optimizer = [(n, param.clone().detach().to('cpu').float().requires_grad_()) \
+                               for n, param in model.named_parameters()]
+        elif kwargs["optimize_on_cpu"]:
+            param_optimizer = [(n, param.clone().detach().to('cpu').requires_grad_()) \
+                               for n, param in model.named_parameters()]
+        else:
+            param_optimizer = list(model.named_parameters())
+        no_decay = ['bias', 'gamma', 'beta']
+        optimizer_grouped_parameters = [
+            {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
+             'weight_decay_rate': 0.01},
+            {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay_rate': 0.0}
+        ]
+
+
+            train_examples = None
+            num_train_steps = None
+            if do_train:
+                train_examples = processor.get_train_examples(data_dir)
+                num_train_steps = int(
+                    len(train_examples) / train_batch_size / gradient_accumulation_steps * num_train_epochs)
+
+        optimizer = BertAdam(optimizer_grouped_parameters,
+                             lr=learning_rate,
+                             warmup=kwargs["warmup_proportion"],
+                             t_total=t_total)
+
+>>>>>>> WIP: save before going home
+
+    @property
+    def config(self):
+        """
+        :return: The configurations of the model as a dict
+        """
+        return self.config
+
+    def _train_init(self):
+
+
+    def train(self, train_data_dir, output_dir):
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
+
+        t_total = num_train_steps
+        if local_rank != -1:
+            t_total = t_total // torch.distributed.get_world_size()
+
+    def evaluate(self):
+
+    def
 
 def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                    output_dir=None, output_name="output.pth", max_seq_length=128, do_train=False, do_eval=False,
