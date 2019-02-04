@@ -67,64 +67,89 @@ TODO: Improvements
 
 class BertBaseline:
     def __init__(self, do_train=False, saved_model=None, **kwargs):
-
-        self.config =
         """
         :param saved_model: path to trained model
         :param kwargs: see DEFAULT_CONFIG above
         """
-        if kwargs["local_rank"] == -1 or kwargs["no_cuda"]:
-            device = torch.device("cuda" if torch.cuda.is_available() and not kwargs["no_cuda"] else "cpu")
-            n_gpu = torch.cuda.device_count()
+        self._config = kwargs
+
+        if self._config["local_rank"] == -1 or self._config["no_cuda"]:
+            self._device = torch.device("cuda" if torch.cuda.is_available() and not self._config["no_cuda"] else "cpu")
+            self._n_gpu = torch.cuda.device_count()
         else:
-            device = torch.device("cuda", kwargs["local_rank"])
-            n_gpu = 1
+            self._device = torch.device("cuda", self._config["local_rank"])
+            self._n_gpu = 1
             # Initializes the distributed backend which will take care of sychronizing nodes/GPUs
             torch.distributed.init_process_group(backend='nccl')
-            if kwargs["fp16"]:
+            if self._config["fp16"]:
                 logger.info("16-bits training currently not supported in distributed training")
-                fp16 = False  # (see https://github.com/pytorch/pytorch/pull/13496)
-        logger.info("device %s n_gpu %d distributed training %r", device, n_gpu, bool(kwargs["local_rank"] != -1))
+                self._config["fp16"] = False  # (see https://github.com/pytorch/pytorch/pull/13496)
+        logger.info("device %s n_gpu %d distributed training %r", self._device, self._n_gpu, bool(self._config["local_rank"] != -1))
 
-        if kwargs["gradient_accumulation_steps"] < 1:
+        if self._config["gradient_accumulation_steps"] < 1:
             raise ValueError("Invalid gradient_accumulation_steps parameter: {}, should be >= 1".format(
-                kwargs["gradient_accumulation_steps"]))
+                self._config["gradient_accumulation_steps"]))
 
-        train_batch_size = int(kwargs["train_batch_size"] / kwargs["gradient_accumulation_steps"])
+        train_batch_size = int(self._config["train_batch_size"] / self._config["gradient_accumulation_steps"])
 
-        random.seed(kwargs["seed"])
-        np.random.seed(kwargs["seed"])
-        torch.manual_seed(kwargs["seed"])
-        if n_gpu > 0:
-            torch.cuda.manual_seed_all(kwargs["seed"])
+        random.seed(self._config["seed"])
+        np.random.seed(self._config["seed"])
+        torch.manual_seed(self._config["seed"])
+        if self._n_gpu > 0:
+            torch.cuda.manual_seed_all(self._config["seed"])
 
-        processor = MrpcProcessor()
-        label_list = processor.get_labels()
+        self._processor = MrpcProcessor()
 
-        tokenizer = BertTokenizer.from_pretrained(kwargs["bert_model"], do_lower_case=kwargs["do_lower_case"])
 
         # Prepare model
-        model = BertForSequenceClassification.from_pretrained(kwargs["bert_model"],
+        model = BertForSequenceClassification.from_pretrained(self._config["bert_model"],
                                                               cache_dir=PYTORCH_PRETRAINED_BERT_CACHE / 'distributed_{}'.format(
-                                                                  kwargs["local_rank"]))
-        if kwargs["fp16"]:
+                                                                  self._config["local_rank"]))
+        if self._config["fp16"]:
             model.half()
-        model.to(device)
-        if kwargs["local_rank"] != -1:
+        model.to(self._device)
+        if self._config["local_rank"] != -1:
             model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[kwargs["local_rank"]],
                                                               output_device=kwargs["local_rank"])
-        elif n_gpu > 1:
+        elif self._n_gpu > 1:
             model = torch.nn.DataParallel(model)
 
-            # Prepare optimizer
-        if fp16:
+        self._model = model
+        self._optimizer = None
+
+
+
+    @property
+    def config(self):
+        """
+        :return: The configurations of the model as a dict
+        """
+        return self._config
+
+    # @property
+    # def model(self):
+    #     """
+    #     :return: Underlying bert torch model
+    #     """
+    #     return self._model
+
+    def train(self, train_data_dir, output_dir):
+
+        if os.path.exists(output_dir) and os.listdir(output_dir):
+            raise ValueError("Output directory ({}) already exists and is not emp1ty.".format(output_dir))
+
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir, exist_ok=True)
+
+        # Prepare optimizer
+        if self._config["fp16"]:
             param_optimizer = [(n, param.clone().detach().to('cpu').float().requires_grad_()) \
-                               for n, param in model.named_parameters()]
-        elif kwargs["optimize_on_cpu"]:
+                               for n, param in self._model.named_parameters()]
+        elif self._config["optimize_on_cpu"]:
             param_optimizer = [(n, param.clone().detach().to('cpu').requires_grad_()) \
-                               for n, param in model.named_parameters()]
+                               for n, param in self._model.named_parameters()]
         else:
-            param_optimizer = list(model.named_parameters())
+            param_optimizer = list(self._model.named_parameters())
         no_decay = ['bias', 'gamma', 'beta']
         optimizer_grouped_parameters = [
             {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
@@ -132,42 +157,130 @@ class BertBaseline:
             {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay_rate': 0.0}
         ]
 
-
-            train_examples = None
-            num_train_steps = None
-            if do_train:
-                train_examples = processor.get_train_examples(data_dir)
-                num_train_steps = int(
-                    len(train_examples) / train_batch_size / gradient_accumulation_steps * num_train_epochs)
-
-        optimizer = BertAdam(optimizer_grouped_parameters,
-                             lr=learning_rate,
-                             warmup=kwargs["warmup_proportion"],
-                             t_total=t_total)
-
->>>>>>> WIP: save before going home
-
-    @property
-    def config(self):
-        """
-        :return: The configurations of the model as a dict
-        """
-        return self.config
-
-    def _train_init(self):
-
-
-    def train(self, train_data_dir, output_dir):
-        if not os.path.exists(output_dir):
-            os.makedirs(output_dir, exist_ok=True)
+        train_examples = self._processor.get_train_examples(train_data_dir)
+        num_train_steps = int(len(train_examples) / self._config["train_batch_size"] / self._config["gradient_accumulation_steps"] * self._config["num_train_epochs"])
 
         t_total = num_train_steps
-        if local_rank != -1:
+        if self._config["local_rank"] != -1:
             t_total = t_total // torch.distributed.get_world_size()
 
-    def evaluate(self):
+        optimizer = BertAdam(optimizer_grouped_parameters,
+                             lr=self._config["learning_rate"],
+                             warmup=self._config["warmup_proportion"],
+                             t_total=self._config["t_total"])
 
-    def
+        label_list = self._processor.get_labels()
+
+        tokenizer = BertTokenizer.from_pretrained(self._config["bert_model"], do_lower_case=self._config["do_lower_case"])
+
+        train_features = convert_examples_to_features(
+            train_examples, label_list, self._config["max_seq_length"], tokenizer)
+
+        # Begin Training
+        logger.info("***** Running training *****")
+        logger.info("  Num examples = %d", len(train_examples))
+        logger.info("  Batch size = %d", self._config["train_batch_size"])
+        logger.info("  Num steps = %d", self._config["num_train_steps"])
+        all_input_ids = torch.tensor([f.input_ids for f in train_features], dtype=torch.long)
+        all_input_mask = torch.tensor([f.input_mask for f in train_features], dtype=torch.long)
+        all_segment_ids = torch.tensor([f.segment_ids for f in train_features], dtype=torch.long)
+        all_label_ids = torch.tensor([f.label_id for f in train_features], dtype=torch.long)
+        train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
+        if self._config["local_rank"] == -1:
+            train_sampler = RandomSampler(train_data)
+        else:
+            train_sampler = DistributedSampler(train_data)
+        train_dataloader = DataLoader(train_data, sampler=train_sampler, batch_size=self._config["train_batch_size"])
+
+        self._model.train()
+        global_step = 0
+        for _ in trange(int(self._config["num_train_epochs"]), desc="Epoch"):
+            tr_loss = 0
+            nb_tr_examples, nb_tr_steps = 0, 0
+            for step, batch in enumerate(tqdm(train_dataloader, desc="Iteration")):
+                batch = tuple(t.to(self._device) for t in batch)
+                input_ids, input_mask, segment_ids, label_ids = batch
+                loss = self._model(input_ids, segment_ids, input_mask, label_ids)
+                if self._n_gpu > 1:
+                    loss = loss.mean()  # mean() to average on multi-gpu.
+                if self._config["fp16"] and self._config["loss_scale"] != 1.0:
+                    # rescale loss for fp16 training
+                    # see https://docs.nvidia.com/deeplearning/sdk/mixed-precision-training/index.html
+                    loss = loss * self._config["loss_scale"]
+                if self._config["gradient_accumulation_steps"] > 1:
+                    loss = loss / self._config["gradient_accumulation_steps"]
+                loss.backward()
+                tr_loss += loss.item()
+                nb_tr_examples += input_ids.size(0)
+                nb_tr_steps += 1
+                if (step + 1) % self._config["gradient_accumulation_steps"] == 0:
+                    if self._config["fp16"] or self._config["optimize_on_cpu"]:
+                        if self._config["fp16"] and self._config["loss_scale"] != 1.0:
+                            # scale down gradients for fp16 training
+                            for param in self._model.parameters():
+                                if param.grad is not None:
+                                    param.grad.data = param.grad.data / self.config["loss_scale"]
+                        is_nan = set_optimizer_params_grad(param_optimizer, self._model.named_parameters(), test_nan=True)
+                        if is_nan:
+                            logger.info("FP16 TRAINING: Nan in gradients, reducing loss scaling")
+                            loss_scale = loss_scale / 2
+                            self._model.zero_grad()
+                            continue
+                        self.optimizer.step()
+                        copy_optimizer_params_to_model(self._model.named_parameters(), param_optimizer)
+                    else:
+                        optimizer.step()
+                    self._model.zero_grad()
+                    global_step += 1
+
+        torch.save(self._model.state_dict(), output_dir + "output.pth")
+
+
+    def _train_init(self, train_data_dir):
+        """
+
+        :param train_data_dir:
+        :return:
+        """
+        # Prepare optimizer
+        if self._config["fp16"]:
+            param_optimizer = [(n, param.clone().detach().to('cpu').float().requires_grad_()) \
+                               for n, param in self._model.named_parameters()]
+        elif self._config["optimize_on_cpu"]:
+            param_optimizer = [(n, param.clone().detach().to('cpu').requires_grad_()) \
+                               for n, param in self._model.named_parameters()]
+        else:
+            param_optimizer = list(self._model.named_parameters())
+        no_decay = ['bias', 'gamma', 'beta']
+        optimizer_grouped_parameters = [
+            {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
+             'weight_decay_rate': 0.01},
+            {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay_rate': 0.0}
+        ]
+
+        train_examples = self._processor.get_train_examples(train_data_dir)
+        num_train_steps = int(len(train_examples) / self._config["train_batch_size"] / self._config["gradient_accumulation_steps"] * self._config["num_train_epochs"])
+
+        t_total = num_train_steps
+        if self._config["local_rank"] != -1:
+            t_total = t_total // torch.distributed.get_world_size()
+
+        self._optimizer = BertAdam(optimizer_grouped_parameters,
+                             lr=self._config["learning_rate"],
+                             warmup=self._config["warmup_proportion"],
+                             t_total=self._config["t_total"])
+
+        label_list = self._processor.get_labels()
+
+        tokenizer = BertTokenizer.from_pretrained(self._config["bert_model"], do_lower_case=self._config["do_lower_case"])
+
+        self._train_features = convert_examples_to_features(
+            train_examples, label_list, self._config["max_seq_length"], tokenizer)
+
+
+    def evaluate(self):
+        pass
+
 
 def train_and_test(data_dir, bert_model="bert-base-uncased", task_name=None,
                    output_dir=None, output_name="output.pth", max_seq_length=128, do_train=False, do_eval=False,
