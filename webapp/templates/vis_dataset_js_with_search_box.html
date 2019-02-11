@@ -1,0 +1,270 @@
+{% load static %}
+{% load claim_filter %}
+
+<!DOCTYPE html>
+<html lang="en">
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+        integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+        crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+        integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+        crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+      integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
+      integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous"/>
+<link rel="stylesheet" href="{% static "css/style.css" %}">
+<script type="text/javascript" src="{% static "js/vis.js" %}"></script>
+<link href="{% static "css/vis-network.min.css" %}" rel="stylesheet" type="text/css"/>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<title>Perspective Annotation Interface</title>
+<script src="{% static "js/persp.js" %}"></script>
+
+<style type="text/css">
+    #mynetwork {
+        width: 100%;
+        height: 100%;
+        border: 1px solid lightgray;
+    }
+    code {
+        font-size: 14px;
+        background: #dddddd;
+    }
+    .indented {
+        margin-left: 00px;
+    }
+    .sep {
+        height: 1px;
+        width: 30%;
+        margin-left: 40px;
+        background-color: #dddddd;
+    }
+</style>
+
+</head>
+<body>
+{#<div class="container-fluid">#}
+{#    <h4 class="persp-claim-title pallete pallete-peter-river">#}
+{#        {{ claim }}#}
+{#    </h4>#}
+{#    <div class="row">#}
+{#        <div class="col persps-container tile">#}
+{#            <h6>#}
+{#                Perspectives For#}
+{#            </h6>#}
+{#            {% for cluster in persp_sup %}#}
+{#                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">#}
+{#                    {% for p in cluster %}#}
+{#                        {{ p }} <br>#}
+{#                    {% endfor %}#}
+{#                </a>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#        <div class="col persps-container tile">#}
+{#            <h6>#}
+{#                Perspectives Against#}
+{#            </h6>#}
+{#            {% for cluster in persp_und %}#}
+{#                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">#}
+{#                    {% for p in cluster %}#}
+{#                        {{ p }} <br>#}
+{#                    {% endfor %}#}
+{#                </a>#}
+{#            {% endfor %}#}
+{#        </div>#}
+{#    </div>#}
+{#</div>#}
+
+<div class="container" style="margin-left: 5%; width: 90%; ">
+    <div class="input-group mb-3" style="margin-top: 5%; margin-left: 30%; text-align: center">
+        <div class="input-group-prepend">
+            <button id="search-claim" type="button" class="btn btn-primary">Search</button>
+            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
+                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <div class="dropdown-menu">
+                <a class="dropdown-item" href="#">Lucene</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div role="separator" class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Separated link</a>
+            </div>
+        </div>
+        <input id="claim-box" type="text" class="form-control" aria-label="Text input with segmented dropdown button">
+    </div>
+
+
+    <div class="row" style="width: 100%;">
+        <div class="tile">
+            <div id="mynetwork" style="width: 1800px;"></div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    Array.prototype.contains = function (v) {
+        for (var i = 0; i < this.length; i++) {
+            if (this[i] === v) return true;
+        }
+        return false;
+    };
+    Array.prototype.unique = function () {
+        var arr = [];
+        for (var i = 0; i < this.length; i++) {
+            if (!arr.includes(this[i])) {
+                arr.push(this[i]);
+            }
+        }
+        return arr;
+    };
+    var nodes = [];
+    var edges = [];
+    var nodeIds = [];
+    var evidenceIds = [];
+    var offset = 100000;
+    {% for claim, persp_sup, persp_und in claim_persp_bundled %}
+        var claimID = -{{ forloop.counter }};
+        // adding claim
+        var claim_text = "{{ claim }}";
+        nodes.push({
+                id: claimID,
+                label: "<b>Claim:</b> \n" + claim_text,
+                widthConstraint: {maximum: 200},
+                group: 0,
+                font: {multi: 'html'}
+            }
+        );
+        // perspective nodes: support
+        {% for p, pid, cluster_id, evidences, score  in persp_sup %}
+            if (!nodeIds.includes({{ pid }})) {
+                nodes.push({
+                    id: {{ pid }},
+                    widthConstraint: {maximum: 200},
+                    label: "<b>Perspective:</b> \n {{ p }}",
+                    group: {{ cluster_id }},
+                    font: {multi: 'html'}
+                });
+                nodeIds.push({{ pid }})
+            }
+        {% endfor %}
+        // perspective nodes: undermine
+        {% for p, pid, cluster_id, evidences, score  in persp_und %}
+            if (!nodeIds.includes({{ pid }})) {
+                nodes.push({
+                    id: {{ pid }},
+                    widthConstraint: {maximum: 200},
+                    label: "<b>Perspective:</b> \n {{ p }}",
+                    group: {{ cluster_id }},
+                    font: {multi: 'html'}
+                });
+                nodeIds.push({{ pid }})
+            }
+        {% endfor %}
+        // evidence nodes
+                {% for eId, evidences in used_evidences_and_texts %}
+                    if (!evidenceIds.includes(offset + {{ eId }})) {
+                        nodes.push({
+                            id: (offset + {{ eId }}),
+                            widthConstraint: {maximum: 300},
+                            label: `<b>Evidence:</b> {{ evidences }}`,
+                            group: -1,
+                            font: {multi: 'html', size: 7}
+                        });
+                        evidenceIds.push(offset + {{ eId }});
+                    }
+                {% endfor %}
+        // adding claim to perspective edges: undermine
+        {% for p, pid, cluster_id, evidences, score in persp_und %}
+            var pScore = {{ score }};
+            pScore = Math.floor(pScore* 10)/10;
+            edges.push({
+                from: claimID,
+                to: {{ pid }},
+                label: "<b>Stance:</b> Oppose (" + pScore + ")",
+                font: {multi: 'html'}
+            });
+        {% endfor %}
+        // adding claim to perspective edges: support
+        {% for p, pid, cluster_id, evidences, score in persp_sup %}
+            var pScore = {{ score }};
+            pScore = Math.floor(pScore* 10)/10;
+            edges.push({
+                from: claimID,
+                to: {{ pid }},
+                label: "<b>Stance:</b> Support (" + pScore + ")",
+                font: {multi: 'html'}
+            });
+        {% endfor %}
+        // adding edges between perspectives
+        {% for p1, pid1, cluster_id1, evidences1, score1 in persp_und %}
+            {% for p2, pid2, cluster_id2, evidences2, score2 in persp_und %}
+                {% if pid2 > pid1 and cluster_id2 == cluster_id1 %}
+                    edges.push({from: {{ pid1 }}, to: {{ pid2 }}, label: "", font: {multi: 'html'}});
+                {% endif %}
+            {% endfor %}
+        {% endfor %}
+        // adding perspective to evidence edges
+        {% for p, pid, cluster_id, evidences, score in persp_sup %}
+            {% for eId in evidences %}
+                edges.push({from: {{ pid }}, to: (offset + {{ eId }}), label: "", font: {multi: 'html'}});
+            {% endfor %}
+        {% endfor %}
+        {% for p, pid, cluster_id, evidences, score in persp_und %}
+            {% for eId in evidences %}
+                edges.push({from: {{ pid }}, to: (offset + {{ eId }}), label: "", font: {multi: 'html'}});
+            {% endfor %}
+        {% endfor %}
+    {% endfor %}
+    nodes = nodes.unique();
+    var container = document.getElementById('mynetwork');
+    var data = {
+        nodes: nodes,
+        edges: edges
+    };
+    var options = {
+        edges: {
+            font: {
+                size: 12
+            },
+            widthConstraint: {
+                maximum: 90
+            }
+        },
+        nodes: {
+            shape: 'box',
+            margin: 10,
+            widthConstraint: {
+                maximum: 200
+            }
+        },
+        physics: {
+            enabled: true,
+            repulsion: {
+                centralGravity: 0.0000001,
+                //damping: 3
+                //springConstant: 2
+                //springLength: 200000
+                damping: 0.000001
+                //nodeDistance: 200000000
+            },
+            solver: "forceAtlas2Based"
+        }
+    };
+    var network = new vis.Network(container, data, options);
+</script>
+<script type="application/javascript">
+    $('#search-claim').click(function () {
+        var claimText = $("#claim-box").val();
+        let url = '/baseline/claim_text=' + claimText + "";
+        console.log(url);
+        window.location.href = url;
+    });
+</script>
+</body>
+</html>

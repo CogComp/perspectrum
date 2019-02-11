@@ -1413,7 +1413,7 @@ def lucene_baseline(request, claim_text=""):
     else:
         context = {}
 
-    return render(request, "vis_dataset_js.html", context)
+    return render(request, "vis_dataset_js_with_search_box.html", context)
 
 
 ###############################################
