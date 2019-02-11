@@ -1606,3 +1606,6 @@ def submit_human_anno(request):
     HumanAnnotation.objects.create(author=username, claim_id=claim_id , annotation=json.dumps(annos))
 
     return HttpResponse("Submission success!", status=200)
+
+def render_demo(request):
+    return  render(request, "demo/demo_home.html", {})
