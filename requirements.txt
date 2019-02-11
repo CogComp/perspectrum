@@ -1,4 +1,4 @@
-django<=2.0.0
+django>=2.0.2
 django-cors-headers>=2.1.0
 httplib2>=0.10.3
 requests>2.18
