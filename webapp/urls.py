@@ -39,6 +39,7 @@ urlpatterns = [
     path('visualization/sunburst', views.sunburst),
     path('perspectrum/', views.dataset_page),
     path('dataset_downoad/', views.dataset_download),
+    path('demo/', views.render_demo),
 
     # step 1
     path('step1/task_list/', views.render_list_page, name="task_list"),

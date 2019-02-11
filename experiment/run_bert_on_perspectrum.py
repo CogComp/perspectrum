@@ -102,9 +102,9 @@ class BertBaseline:
 
     def _init_model(self, saved_model=None):
         # Load pre-trained BERT
+        cache_dir = os.path.join(PYTORCH_PRETRAINED_BERT_CACHE, 'distributed_{}'.format(self._config["local_rank"]))
         model = BertForSequenceClassification.from_pretrained(self._config["bert_model"],
-                                                              cache_dir=PYTORCH_PRETRAINED_BERT_CACHE / 'distributed_{}'.format(
-                                                                  self._config["local_rank"]))
+                                                              cache_dir=cache_dir, num_labels=len(self._processor.get_labels()))
         if self._config["fp16"]:
             model.half()
         model.to(self._device)
@@ -139,7 +139,7 @@ class BertBaseline:
         #     raise ValueError("Output directory ({}) already exists and is not emp1ty.".format(output_dir))
 
         # Log validation results to a log file in the output directory
-        __log_path = os.path.join(output_dir, "train.log")
+        __log_path = os.path.join(output_dir, "{}_train.log".format(self._config["task_name"]))
 
         # Prepare training examples
         train_examples = self._processor.get_train_examples(train_data_dir)
@@ -222,10 +222,10 @@ class BertBaseline:
                 logger.info("\tNum steps = {}".format(num_train_steps))
 
                 with open(__log_path, 'a+') as fout:
-                    fout.write("  --- Current Parameters ---\n")
-                    fout.write("\tLearning Rate = {}\n".format(__lr))
-                    fout.write("\tBatch Size = {}\n".format(__bs))
-                    fout.write("\tNum steps = {}\n".format(num_train_steps))
+                    fout.write("--- Current Parameters ---\n")
+                    fout.write("Learning Rate = {}\n".format(__lr))
+                    fout.write("Batch Size = {}\n".format(__bs))
+                    fout.write("Num steps = {}\n".format(num_train_steps))
                     fout.write("\n")
 
                 # Begin Training
@@ -283,11 +283,11 @@ class BertBaseline:
                     p, r, f1 = self._evaluate(dev_data)
 
                     with open(__log_path, 'a+') as fout:
-                        fout.write("\tEpoch #{}".format(_epoch))
-                        fout.write("\t\tMicro Precision = {}\n".format(p))
-                        fout.write("\t\tMicro Precision = {}\n".format(p))
-                        fout.write("\t\tMicro Recall = {}\n".format(r))
-                        fout.write("\t\tMicro F1 = {}\n".format(f1))
+                        fout.write("Epoch #{}\n".format(_epoch))
+                        fout.write("\tMicro Precision = {}\n".format(p))
+                        fout.write("\tMicro Precision = {}\n".format(p))
+                        fout.write("\tMicro Recall = {}\n".format(r))
+                        fout.write("\tMicro F1 = {}\n".format(f1))
                         fout.write("\n")
 
                     # Save model after every epoch
@@ -448,11 +448,11 @@ def evidence_train():
     # Since evidence is usually long, we need to lift the max sequence length and lower the batch size.
     _config = {
         "bert_model": "bert-base-uncased",
-        "max_seq_length": 1024,
+        "max_seq_length": 512,
         "do_lower_case": False,
-        "train_batch_size": [2, 4],
+        "train_batch_size": [4, 8],
         "eval_batch_size": 8,
-        "learning_rate": [3e-5, 2e-5, 5e-5],
+        "learning_rate": [3e-5, 2e-5],
         "num_train_epochs": 5,
         "warmup_proportion": 0.1,
         "no_cuda": False,
@@ -472,10 +472,10 @@ def evidence_train():
     bb.train(data_dir, model_dir)
 
 if __name__ == "__main__":
-    stance_train()
+    # stance_train()
     # stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
     # equivalence_train()
     # equivalence_evaluation("/scratch/sihaoc/project/perspective/model/equivalence/lr2e-05_bs16/perspectrum_equivalence_epoch-0.pth")
     # relevance_train()
-    # evidence_train()
+    evidence_train()
 
