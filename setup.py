@@ -15,6 +15,8 @@ CLASSIFIERS = [
     'Programming Language :: Python :: 3.6', 'Topic :: Scientific/Engineering'
 ]
 
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "webapp.settings")
+
 setup(
     name='perspectrum',
     version=VERSION,
