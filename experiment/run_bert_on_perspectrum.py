@@ -13,7 +13,8 @@ from pytorch_pretrained_bert.optimization import BertAdam
 from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 
 from experiment.bert.run_classifier import MrpcProcessor, logger, convert_examples_to_features, \
-    set_optimizer_params_grad, copy_optimizer_params_to_model, accuracy, p_r_f1, tp_pcount_gcount
+    set_optimizer_params_grad, copy_optimizer_params_to_model, accuracy, p_r_f1, tp_pcount_gcount, \
+    InputExample
 
 
 # Data Directory
@@ -43,7 +44,7 @@ DEFAULT_CONFIG = {
     "train_batch_size": [16, 32],
     "eval_batch_size": 8,
     "learning_rate": [3e-5, 2e-5, 5e-5],
-    "num_train_epochs": 4,
+    "num_train_epochs": 5,
     "warmup_proportion": 0.1,
     "no_cuda": False,
     "local_rank": -1,
@@ -93,6 +94,9 @@ class BertBaseline:
 
         self._processor = MrpcProcessor()
 
+        self._tokenizer = BertTokenizer.from_pretrained(self._config["bert_model"],
+                                                  do_lower_case=self._config["do_lower_case"])
+
         self._init_model(saved_model)
 
 
@@ -134,13 +138,15 @@ class BertBaseline:
         # if os.path.exists(output_dir) and os.listdir(output_dir):
         #     raise ValueError("Output directory ({}) already exists and is not emp1ty.".format(output_dir))
 
+        # Log validation results to a log file in the output directory
+        __log_path = os.path.join(output_dir, "train.log")
+
         # Prepare training examples
         train_examples = self._processor.get_train_examples(train_data_dir)
         dev_examples = self._processor.get_dev_examples(train_data_dir)
 
         label_list = self._processor.get_labels()
-        tokenizer = BertTokenizer.from_pretrained(self._config["bert_model"],
-                                                  do_lower_case=self._config["do_lower_case"])
+        tokenizer = self._tokenizer
         train_features = convert_examples_to_features(train_examples, label_list,
                                                       self._config["max_seq_length"], tokenizer)
         dev_features = convert_examples_to_features(dev_examples, label_list,
@@ -215,6 +221,13 @@ class BertBaseline:
                 logger.info("\tBatch Size = {}".format(__bs))
                 logger.info("\tNum steps = {}".format(num_train_steps))
 
+                with open(__log_path, 'a+') as fout:
+                    fout.write("  --- Current Parameters ---\n")
+                    fout.write("\tLearning Rate = {}\n".format(__lr))
+                    fout.write("\tBatch Size = {}\n".format(__bs))
+                    fout.write("\tNum steps = {}\n".format(num_train_steps))
+                    fout.write("\n")
+
                 # Begin Training
                 if self._config["local_rank"] == -1:
                     train_sampler = RandomSampler(train_data)
@@ -267,7 +280,15 @@ class BertBaseline:
                             global_step += 1
 
                     # At the end of each epoch, validate on dev
-                    self._evaluate(dev_data)
+                    p, r, f1 = self._evaluate(dev_data)
+
+                    with open(__log_path, 'a+') as fout:
+                        fout.write("\tEpoch #{}".format(_epoch))
+                        fout.write("\t\tMicro Precision = {}\n".format(p))
+                        fout.write("\t\tMicro Precision = {}\n".format(p))
+                        fout.write("\t\tMicro Recall = {}\n".format(r))
+                        fout.write("\t\tMicro F1 = {}\n".format(f1))
+                        fout.write("\n")
 
                     # Save model after every epoch
                     __save_name = "{}_epoch-{}.pth".format(self._config["task_name"], _epoch)
@@ -284,8 +305,8 @@ class BertBaseline:
         """
         test_examples = self._processor.get_test_examples(data_dir)
         label_list = self._processor.get_labels()
-        tokenizer = BertTokenizer.from_pretrained(self._config["bert_model"],
-                                                  do_lower_case=self._config["do_lower_case"])
+        tokenizer = self._tokenizer
+
         test_features = convert_examples_to_features(test_examples, label_list,
                                                       self._config["max_seq_length"], tokenizer)
 
@@ -295,7 +316,7 @@ class BertBaseline:
         all_label_ids = torch.tensor([f.label_id for f in test_features], dtype=torch.long)
 
         test_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
-        self._evaluate(test_data)
+        return self._evaluate(test_data)
 
 
     def _evaluate(self, eval_data):
@@ -359,6 +380,28 @@ class BertBaseline:
         logger.info("  Micro Recall = {}".format(eval_micro_r))
         logger.info("  Micro F1 = {}".format(eval_micro_f1))
 
+        return eval_micro_p, eval_micro_r, eval_micro_f1
+
+
+    def predict(self, sent1, sent2):
+        """
+        Predict on a single sentence pair
+        :param example:
+        :return: label (1 or 0)
+        """
+        label_list = self._processor.get_labels()
+        example = InputExample(guid="dummy", text_a=sent1, text_b=sent2, label=label_list[0])
+        feature = convert_examples_to_features([example], label_list,
+                                                     self._config["max_seq_length"], self._tokenizer)[0]
+
+        self._model.eval()
+
+        with torch.no_grad():
+            output = self._model(feature)
+
+
+
+
 
 def stance_train():
     data_dir = FILE_PATH['stance_data']
@@ -372,6 +415,7 @@ def stance_evaluation(model_path):
 
     bb = BertBaseline(task_name="perspectrum_stance", saved_model=model_path)
     bb.evaluate(data_dir)
+
 
 def equivalence_train():
     data_dir = FILE_PATH['equivalence_data']
@@ -399,9 +443,39 @@ def relevance_evaluation(model_path):
     bb = BertBaseline(task_name="perspectrum_relevance", saved_model=model_path)
     bb.evaluate(data_dir)
 
+def evidence_train():
+
+    # Since evidence is usually long, we need to lift the max sequence length and lower the batch size.
+    _config = {
+        "bert_model": "bert-base-uncased",
+        "max_seq_length": 1024,
+        "do_lower_case": False,
+        "train_batch_size": [2, 4],
+        "eval_batch_size": 8,
+        "learning_rate": [3e-5, 2e-5, 5e-5],
+        "num_train_epochs": 5,
+        "warmup_proportion": 0.1,
+        "no_cuda": False,
+        "local_rank": -1,
+        "seed": 42,
+        "gradient_accumulation_steps": 1,
+        "optimize_on_cpu": False,
+        "fp16": False,
+        "loss_scale": 128,
+        "task_name": "perspectrum_evidence",
+    }
+
+    data_dir = FILE_PATH['evidence_data']
+    model_dir = FILE_PATH['evidence_model_dir']
+
+    bb = BertBaseline(None, **_config)
+    bb.train(data_dir, model_dir)
+
 if __name__ == "__main__":
-    # stance_train()
+    stance_train()
     # stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
     # equivalence_train()
     # equivalence_evaluation("/scratch/sihaoc/project/perspective/model/equivalence/lr2e-05_bs16/perspectrum_equivalence_epoch-0.pth")
-    relevance_train()
+    # relevance_train()
+    # evidence_train()
+
