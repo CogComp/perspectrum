@@ -5,8 +5,8 @@ from setuptools import setup, find_packages
 def read(fname):
     return open(os.path.join(os.path.dirname(__file__), fname)).read()
 
-import version
-VERSION = version.__version__
+
+VERSION = '1.0'
 
 CLASSIFIERS = [
     'Development Status :: 3 - Alpha', 'Intended Audience :: Science/Research',
