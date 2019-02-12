@@ -91,14 +91,37 @@
         <input id="claim-box" type="text" class="form-control" aria-label="Text input with segmented dropdown button">
     </div>
 
+
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" >
+  <label class="form-check-label" for="exampleRadios1">
+    Default radio
+  </label>
+</div>
+<div class="form-check">
+  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2" checked>
+  <label class="form-check-label" for="exampleRadios2">
+    Second default radio
+  </label>
+</div>
+<div class="form-check disabled">
+  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
+  <label class="form-check-label" for="exampleRadios3">
+    Disabled radio
+  </label>
+</div>
+
     <div style="margin: 2%; margin-left: 50%; text-align: center">
         <div class="btn-group btn-group-toggle" data-toggle="buttons">
             <label class="btn btn-primary active">
-                <input type="radio" name="options" id="option1" autocomplete="off" checked> Simple Visualization
+{#                <input type="radio" name="options" id="option-simple-viz" autocomplete="off" {% if vis_type == "simple-viz" %} checked {% endif %}> Simple Visualization#}
+            <input type="radio" name="options" id="option-simple-viz" autocomplete="off"> Simple Visualization
             </label>
-            <label class="btn btn-primary">
-                <input type="radio" name="options" id="option2" autocomplete="off"> Graphical Visualization
+        <label class="btn btn-primary">
+                <input type="radio" name="options" id="option-graph-viz" autocomplete="off" checked> Graphical Visualization
             </label>
+
+
             {#        <label class="btn btn-secondary">#}
             {#            <input type="radio" name="options" id="option3" autocomplete="off"> Radio#}
             {#        </label>#}
@@ -106,10 +129,10 @@
 
         <div class="btn-group btn-group-toggle" data-toggle="buttons" style="margin: 10px">
             <label class="btn btn-primary active">
-                <input type="radio" name="options" id="option1" autocomplete="off" checked> BERT
+                <input type="radio" name="options" id="option-bert" autocomplete="off" checked> BERT
             </label>
             <label class="btn btn-primary">
-                <input type="radio" name="options" id="option2" autocomplete="off"> Lucene
+                <input type="radio" name="options" id="option-lucene" autocomplete="off"> Lucene
             </label>
             {#            <label class="btn btn-secondary">#}
             {#                <input type="radio" name="options" id="option3" autocomplete="off"> Radio#}
@@ -282,7 +305,18 @@
 <script type="application/javascript">
     $('#search-claim').click(function () {
         var claimText = $("#claim-box").val();
-        let url = '/baseline/claim_text=' + claimText + "";
+
+        var visualization = 'graphical-viz';
+        if (document.getElementById('option-simple-viz').checked) {
+            visualization = 'simple-viz'
+        }
+
+        var solver = 'lucene-solver';
+        if (document.getElementById('option-bert').checked) {
+            solver = 'bert-solver'
+        }
+
+        let url = '/baseline/' + claimText + "/" + solver + "/" + visualization + "/";
         console.log(url);
         window.location.href = url;
     });
