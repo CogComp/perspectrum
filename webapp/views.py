@@ -1286,7 +1286,11 @@ def bert_baseline(request, claim_text=""):
 
 
 ### loading the BERT solvers
-bb = BertBaseline(task_name="perspectrum_relevane", saved_model="/Users/daniel/ideaProjects/perspective/model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth", no_cuda=True)
+bb_relevance = BertBaseline(task_name="perspectrum_relevance",
+                            saved_model="model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth", no_cuda=True)
+bb_stance = BertBaseline(task_name="perspectrum_stance",
+                         saved_model="model/stance/perspectrum_stance_lr2e-05_bs16_epoch-4.pth", no_cuda=True)
+
 
 @login_required
 def perspectrum_solver(request, claim_text="", vis_type=""):
@@ -1308,7 +1312,8 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
         perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
                                    get_perspective_from_pool(claim, 30)]
 
-        perspectives_sorted = [(p_text, pId, normalize(luceneScore), normalize(bb.predict(claim, p_text)[0])) for (p_text, pId, luceneScore) in
+        perspectives_sorted = [(p_text, pId, normalize(luceneScore), normalize(bb_relevance.predict(claim, p_text)[1]),
+                                normalize(bb_stance.predict(claim, p_text)[1])) for (p_text, pId, luceneScore) in
                                perspective_given_claim]
 
         perspectives_sorted = sorted(perspectives_sorted, key=lambda x: -x[3])
