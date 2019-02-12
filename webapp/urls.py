@@ -91,9 +91,9 @@ urlpatterns = [
 
 
     # baselines
-    # path('baseline/claim=<slug:claim_text>', views.lucene_baseline),
-    path('baseline/', views.lucene_baseline),
-    path('baseline/claim_text=<str:claim_text>', views.lucene_baseline),
+    # path('baseline/claim=<slug:claim_text>', views.perspectrum_solver),
+    path('baseline/', views.perspectrum_solver),
+    path('baseline/<str:claim_text>/<str:vis_type>/', views.perspectrum_solver),
 
 
     # Human Evaluation

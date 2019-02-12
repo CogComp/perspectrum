@@ -1,4 +1,5 @@
 import json
+import math
 import zipfile
 from io import BytesIO
 
@@ -15,6 +16,7 @@ from experiment.query_elasticsearch import get_perspective_from_pool
 from experiment.query_elasticsearch import get_evidence_from_pool
 from pulp import LpVariable, LpProblem, LpMaximize, LpStatus, value, os
 
+from experiment.run_bert_on_perspectrum import BertBaseline
 from .forms import ContactForm
 
 from webapp.models import *
@@ -237,6 +239,7 @@ STANCE_FLIP_MAPPING = {
     "UNDERMINE": "SUPPORT",
 }
 
+
 def dataset_download(request):
     prefix = "data/dataset/"
     filelist = [
@@ -263,9 +266,11 @@ def dataset_download(request):
 
     return response
 
+
 def dataset_page(request):
     context = {}
     return render(request, 'dataset_page.html', context)
+
 
 ## utils functions for the side-by-side view
 def unify_persps(request, cid1, cid2, flip_stance):
@@ -289,7 +294,7 @@ def unify_persps(request, cid1, cid2, flip_stance):
 def add_perspective_to_claim(request, cid_from, pid, cid_to, flip_stance):
     if cid_from == cid_to:
         return HttpResponse("Success", status=200)
-    
+
     claim_from = claim_dict[cid_from]
     claim_to = claim_dict[cid_to]
 
@@ -549,7 +554,7 @@ def vis_evidence(request, evidence_ids):
             _evidences.append((eid, evidence_dict[eid]))
 
     context = {
-        "evidences" : _evidences
+        "evidences": _evidences
     }
     return render(request, 'evidence.html', context)
 
@@ -1280,8 +1285,19 @@ def bert_baseline(request, claim_text=""):
     return render(request, "vis_dataset_js.html", context)
 
 
+### loading the BERT solvers
+bb = BertBaseline(task_name="perspectrum_relevane", saved_model="/Users/daniel/ideaProjects/perspective/model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth", no_cuda=True)
+
 @login_required
-def lucene_baseline(request, claim_text=""):
+def perspectrum_solver(request, claim_text="", vis_type=""):
+    """
+    solves a given instances with one of the baselines.
+    :param request: the default request argument.
+    :param claim_text: the text of the input claim.
+    :param vis_type: whether we visualize with the fancy graphical interface or we use a simple visualization.
+    :param baseline_name: the solver name (BERT and Lucene).
+    :return:
+    """
     print(claim_text)
     if claim_text != "":
         claim = claim_text  #
@@ -1291,6 +1307,11 @@ def lucene_baseline(request, claim_text=""):
         # given a claim, extract perspectives
         perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
                                    get_perspective_from_pool(claim, 30)]
+
+        perspectives_sorted = [(p_text, pId, normalize(luceneScore), normalize(bb.predict(claim, p_text)[0])) for (p_text, pId, luceneScore) in
+                               perspective_given_claim]
+
+        perspectives_sorted = sorted(perspectives_sorted, key=lambda x: -x[3])
 
         # create binary variables per perspective
         perspective_variables = []
@@ -1306,8 +1327,6 @@ def lucene_baseline(request, claim_text=""):
                 perspective_ids.append(pId)
                 perspective_given_claim_subset.append((p_text, pId, pScore))
                 # print(pScore)
-
-        # print(len(perspective_variables))
 
         total_obj = sum(x * obj for x, obj in zip(perspective_variables, perspective_weights))
 
@@ -1404,23 +1423,34 @@ def lucene_baseline(request, claim_text=""):
             else:
                 print("value is none")
 
-        claim_persp_bundled = [(claim, persp_sup, [])]
+        if vis_type == "graphical-viz":
+            claim_persp_bundled = [(claim, persp_sup, [])]
+        else:
+            claim_persp_bundled = []
 
-        persp_sup = [([(7584, 'It will cause less re-offenders.'), (26958, 'Adequate punishment reduces future offenses.'),
-           (26959, 'Just punishment will lead to less criminals re-offending. ')], [3, 0, 0, 0, 0],
-          [367, 368, 2628, 2629, 7862, 6549])]
+        persp_sup = [
+            ([(7584, 'It will cause less re-offenders.'), (26958, 'Adequate punishment reduces future offenses.'),
+              (26959, 'Just punishment will lead to less criminals re-offending. ')], [3, 0, 0, 0, 0],
+             [367, 368, 2628, 2629, 7862, 6549])]
         persp_und = [([(7587, 'The onus should not be on punishing the criminal.'),
-           (26962, 'Punishment should not be the primary focus.'),
-           (26963, 'Our  main goal should not be punishing the criminal. ')], [0, 0, 0, 3, 0], [7574, 7872])]
+                       (26962, 'Punishment should not be the primary focus.'),
+                       (26963, 'Our  main goal should not be punishing the criminal. ')], [0, 0, 0, 3, 0],
+                      [7574, 7872])]
 
         context = {
+            "claim_text": claim_text,
+            "vis_type": vis_type,
+            "perspectives_sorted": perspectives_sorted,
             "claim_persp_bundled": claim_persp_bundled,
             "used_evidences_and_texts": used_evidences_and_texts,
-            "claim": "",
+            # "claim": "",
             # "claim_id": claim_id,
             "persp_sup": persp_sup,
             "persp_und": persp_und,
         }
+
+        print(context)
+
     else:
         context = {}
 
@@ -1512,26 +1542,28 @@ def sunburst(request):
     }
     return render(request, "topics-sunburst/sunburst.html", context)
 
+
 topics_map = {
-    'culture':'Culture',
-    'society':'Society',
-    'world_international':'World',
-    'politics':'Politics',
-    'law':'Law',
-    'religion':'Religion',
-    'human_rights':'Human Rights',
-    'economy':'Economy',
-    'environment':'Environment',
-    'science_and_technology':'Science',
-    'education':'education',
-    'digital_freedom':'Digital Freedom',
-    'freedom_of_speech':'F. of Speech',
-    'health_and_medicine':'Health',
-    'gender':'Gender',
-    'ethics':'Ethics',
+    'culture': 'Culture',
+    'society': 'Society',
+    'world_international': 'World',
+    'politics': 'Politics',
+    'law': 'Law',
+    'religion': 'Religion',
+    'human_rights': 'Human Rights',
+    'economy': 'Economy',
+    'environment': 'Environment',
+    'science_and_technology': 'Science',
+    'education': 'education',
+    'digital_freedom': 'Digital Freedom',
+    'freedom_of_speech': 'F. of Speech',
+    'health_and_medicine': 'Health',
+    'gender': 'Gender',
+    'ethics': 'Ethics',
     'sports_and_entertainments': 'Sports',
     'philosophy': 'Philosophy'
 }
+
 
 def sunburst(request):
     # create a list of topics and populate their claim strings
@@ -1574,6 +1606,7 @@ def sunburst(request):
     }
     return render(request, "topics-sunburst/sunburst2.html", context)
 
+
 @login_required
 def render_human_eval(request, claim_id):
     if claim_id not in claim_dict:
@@ -1584,9 +1617,9 @@ def render_human_eval(request, claim_id):
     cands = es.get_perspective_from_pool(claim_title, 50)
 
     context = {
-        'claim_id' : claim_id,
-        'claim_title' : claim_title,
-        'persp_candidates' : cands
+        'claim_id': claim_id,
+        'claim_title': claim_title,
+        'persp_candidates': cands
     }
     return render(request, 'human_eval.html', context)
 
@@ -1601,8 +1634,13 @@ def retrieve_evidence_candidates(request, cid, pid):
     cands = get_evidence_from_pool(claim_title + '. ' + persp_title, 40)
 
     return JsonResponse({
-        'evi_candidates' : cands
+        'evi_candidates': cands
     })
+
+
+def normalize(num):
+    return math.floor(num * 100) / 100.0
+
 
 @login_required
 @csrf_protect
@@ -1614,9 +1652,10 @@ def submit_human_anno(request):
     annos = json.loads(request.POST.get('annotations'))
     username = request.user.username
 
-    HumanAnnotation.objects.create(author=username, claim_id=claim_id , annotation=json.dumps(annos))
+    HumanAnnotation.objects.create(author=username, claim_id=claim_id, annotation=json.dumps(annos))
 
     return HttpResponse("Submission success!", status=200)
 
+
 def render_demo(request):
-    return  render(request, "demo/demo_home.html", {})
+    return render(request, "demo/demo_home.html", {})

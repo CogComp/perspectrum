@@ -16,6 +16,7 @@ from experiment.bert.run_classifier import MrpcProcessor, logger, convert_exampl
     set_optimizer_params_grad, copy_optimizer_params_to_model, accuracy, p_r_f1, tp_pcount_gcount, \
     InputExample
 
+bert_model = "bert-base-uncased"
 
 # Data Directory
 FILE_PATH = {
@@ -61,6 +62,7 @@ TODO: Improvements
 1. Look at where they cached the bert model, if it's under /home/ or /tmp, move it somewhere else
 """
 
+
 class BertBaseline:
     def __init__(self, saved_model=None, **kwargs):
         """
@@ -69,8 +71,12 @@ class BertBaseline:
         """
         self._config = {**DEFAULT_CONFIG, **kwargs}
 
+        print(self._config)
+
         if self._config["local_rank"] == -1 or self._config["no_cuda"]:
+            print("here")
             self._device = torch.device("cuda" if torch.cuda.is_available() and not self._config["no_cuda"] else "cpu")
+            print(self._device)
             self._n_gpu = torch.cuda.device_count()
         else:
             self._device = torch.device("cuda", self._config["local_rank"])
@@ -80,7 +86,8 @@ class BertBaseline:
             if self._config["fp16"]:
                 logger.info("16-bits training currently not supported in distributed training")
                 self._config["fp16"] = False  # (see https://github.com/pytorch/pytorch/pull/13496)
-        logger.info("device %s n_gpu %d distributed training %r", self._device, self._n_gpu, bool(self._config["local_rank"] != -1))
+        logger.info("device %s n_gpu %d distributed training %r", self._device, self._n_gpu,
+                    bool(self._config["local_rank"] != -1))
 
         if self._config["gradient_accumulation_steps"] < 1:
             raise ValueError("Invalid gradient_accumulation_steps parameter: {}, should be >= 1".format(
@@ -95,29 +102,32 @@ class BertBaseline:
         self._processor = MrpcProcessor()
 
         self._tokenizer = BertTokenizer.from_pretrained(self._config["bert_model"],
-                                                  do_lower_case=self._config["do_lower_case"])
+                                                        do_lower_case=self._config["do_lower_case"])
 
         self._init_model(saved_model)
 
-
     def _init_model(self, saved_model=None):
         # Load pre-trained BERT
-        cache_dir = os.path.join(PYTORCH_PRETRAINED_BERT_CACHE, 'distributed_{}'.format(self._config["local_rank"]))
-        model = BertForSequenceClassification.from_pretrained(self._config["bert_model"],
-                                                              cache_dir=cache_dir, num_labels=len(self._processor.get_labels()))
+        if saved_model:
+            print("Loading the pre-trained model from: " + saved_model)
+            # if loading on a cpu:
+            model_state_dict = torch.load(saved_model, map_location='cpu')
+            # model_state_dict = torch.load(saved_model)
+            self._model = BertForSequenceClassification.from_pretrained(bert_model, state_dict=model_state_dict, num_labels=2)
+        else:
+            cache_dir = os.path.join(PYTORCH_PRETRAINED_BERT_CACHE, 'distributed_{}'.format(self._config["local_rank"]))
+            self._model = BertForSequenceClassification.from_pretrained(self._config["bert_model"],
+                                                                        cache_dir=cache_dir,
+                                                                        num_labels=len(self._processor.get_labels()))
+
         if self._config["fp16"]:
-            model.half()
-        model.to(self._device)
+            self._model.half()
+        self._model.to(self._device)
         if self._config["local_rank"] != -1:
-            model = torch.nn.parallel.DistributedDataParallel(model, device_ids=[self._config["local_rank"]],
+            model = torch.nn.parallel.DistributedDataParallel(self._model, device_ids=[self._config["local_rank"]],
                                                               output_device=self._config["local_rank"])
         elif self._n_gpu > 1:
-            model = torch.nn.DataParallel(model)
-
-        self._model = model
-        if saved_model:
-            self._model.load_state_dict(torch.load(saved_model))
-
+            _model = torch.nn.DataParallel(self._model)
 
     @property
     def config(self):
@@ -161,7 +171,7 @@ class BertBaseline:
         train_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
 
         # Dev features
-        dev_all_input_ids  = torch.tensor([f.input_ids for f in dev_features], dtype=torch.long)
+        dev_all_input_ids = torch.tensor([f.input_ids for f in dev_features], dtype=torch.long)
         dev_all_input_mask = torch.tensor([f.input_mask for f in dev_features], dtype=torch.long)
         dev_all_segment_ids = torch.tensor([f.segment_ids for f in dev_features], dtype=torch.long)
         dev_all_label_ids = torch.tensor([f.label_id for f in dev_features], dtype=torch.long)
@@ -173,7 +183,6 @@ class BertBaseline:
         logger.info("  --- Sweeping Parameters ---")
         logger.info("\tLearning Rate --> {}".format(self._config["learning_rate"]))
         logger.info("\tBatch Size --> {}".format(self._config["train_batch_size"]))
-
 
         # Do parameter sweep for training
         for __lr in self._config["learning_rate"]:
@@ -201,11 +210,13 @@ class BertBaseline:
                 optimizer_grouped_parameters = [
                     {'params': [p for n, p in param_optimizer if not any(nd in n for nd in no_decay)],
                      'weight_decay_rate': 0.01},
-                    {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)], 'weight_decay_rate': 0.0}
+                    {'params': [p for n, p in param_optimizer if any(nd in n for nd in no_decay)],
+                     'weight_decay_rate': 0.0}
                 ]
 
-
-                num_train_steps = int(len(train_examples) / __train_batch_size / self._config["gradient_accumulation_steps"] * self._config["num_train_epochs"])
+                num_train_steps = int(
+                    len(train_examples) / __train_batch_size / self._config["gradient_accumulation_steps"] *
+                    self._config["num_train_epochs"])
 
                 t_total = num_train_steps
                 if self._config["local_rank"] != -1:
@@ -265,7 +276,8 @@ class BertBaseline:
                                     for param in self._model.parameters():
                                         if param.grad is not None:
                                             param.grad.data = param.grad.data / loss_scale
-                                is_nan = set_optimizer_params_grad(param_optimizer, self._model.named_parameters(), test_nan=True)
+                                is_nan = set_optimizer_params_grad(param_optimizer, self._model.named_parameters(),
+                                                                   test_nan=True)
                                 if is_nan:
                                     logger.info("FP16 TRAINING: Nan in gradients, reducing loss scaling")
                                     loss_scale = loss_scale / 2
@@ -308,7 +320,7 @@ class BertBaseline:
         tokenizer = self._tokenizer
 
         test_features = convert_examples_to_features(test_examples, label_list,
-                                                      self._config["max_seq_length"], tokenizer)
+                                                     self._config["max_seq_length"], tokenizer)
 
         all_input_ids = torch.tensor([f.input_ids for f in test_features], dtype=torch.long)
         all_input_mask = torch.tensor([f.input_mask for f in test_features], dtype=torch.long)
@@ -317,7 +329,6 @@ class BertBaseline:
 
         test_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
         return self._evaluate(test_data)
-
 
     def _evaluate(self, eval_data):
         logger.info("***** Running evaluation *****")
@@ -375,40 +386,47 @@ class BertBaseline:
         eval_macro_r = eval_macro_r / nb_eval_steps
         eval_macro_f1 = 2 * eval_macro_p * eval_macro_r / (eval_macro_p + eval_macro_r)
 
-
         logger.info("  Micro Precision = {}".format(eval_micro_p))
         logger.info("  Micro Recall = {}".format(eval_micro_r))
         logger.info("  Micro F1 = {}".format(eval_micro_f1))
 
         return eval_micro_p, eval_micro_r, eval_micro_f1
 
-
     def predict(self, sent1, sent2):
         """
-        Predict on a single sentence pair
+        Predict on a single sentence pair (sent1, sent2); the choice of the inputs depends on the task at hand:
+         - Relevance (claim, perspective)
+         - Stance (claim, perspective)
+         - Equivalence (claim + perspective1, perspective2)
+         - Evidence (claim + perspective, evidence)
         :param example:
-        :return: label (1 or 0)
+        :param sent1
+        :param sent2
+        :return the confidence value of the output label
         """
         label_list = self._processor.get_labels()
         example = InputExample(guid="dummy", text_a=sent1, text_b=sent2, label=label_list[0])
         feature = convert_examples_to_features([example], label_list,
-                                                     self._config["max_seq_length"], self._tokenizer)[0]
+                                               self._config["max_seq_length"], self._tokenizer)[0]
 
         self._model.eval()
 
         with torch.no_grad():
-            output = self._model(feature)
+            input_ids_tensor = torch.tensor([feature.input_ids])
+            segment_ids_tensor = torch.tensor([feature.segment_ids])
+            input_mask_tensor = torch.tensor([feature.input_mask])
 
-
-
+            output = self._model(input_ids_tensor, segment_ids_tensor, input_mask_tensor)
+            # print(output)
+            return output.detach().cpu().numpy()[0]
 
 
 def stance_train():
     data_dir = FILE_PATH['stance_data']
     model_dir = FILE_PATH['stance_model_dir']
-
     bb = BertBaseline(task_name="perspectrum_stance", saved_model=None)
     bb.train(data_dir, model_dir)
+
 
 def stance_evaluation(model_path):
     data_dir = FILE_PATH['stance_data']
@@ -424,11 +442,13 @@ def equivalence_train():
     bb = BertBaseline(task_name="perspectrum_equivalence", saved_model=None)
     bb.train(data_dir, model_dir)
 
+
 def equivalence_evaluation(model_path):
     data_dir = FILE_PATH['equivalence_data']
 
     bb = BertBaseline(task_name="perspectrum_equivalence", saved_model=model_path)
     bb.evaluate(data_dir)
+
 
 def relevance_train():
     data_dir = FILE_PATH['relevance_data']
@@ -437,17 +457,18 @@ def relevance_train():
     bb = BertBaseline(task_name="perspectrum_relevance", saved_model=None)
     bb.train(data_dir, model_dir)
 
+
 def relevance_evaluation(model_path):
     data_dir = FILE_PATH['relevance_data']
 
     bb = BertBaseline(task_name="perspectrum_relevance", saved_model=model_path)
     bb.evaluate(data_dir)
 
-def evidence_train():
 
+def evidence_train():
     # Since evidence is usually long, we need to lift the max sequence length and lower the batch size.
     _config = {
-        "bert_model": "bert-base-uncased",
+        "bert_model": bert_model,
         "max_seq_length": 512,
         "do_lower_case": False,
         "train_batch_size": [4, 8],
@@ -471,11 +492,19 @@ def evidence_train():
     bb = BertBaseline(None, **_config)
     bb.train(data_dir, model_dir)
 
+
+def test_models():
+    bb = BertBaseline(task_name="perspectrum_relevane",
+                      saved_model="/Users/daniel/ideaProjects/perspective/model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth",
+                      no_cuda=True)
+    print(bb.predict("123", "345"))
+
+
 if __name__ == "__main__":
+    test_models()
     # stance_train()
     # stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
     # equivalence_train()
     # equivalence_evaluation("/scratch/sihaoc/project/perspective/model/equivalence/lr2e-05_bs16/perspectrum_equivalence_epoch-0.pth")
     # relevance_train()
-    evidence_train()
-
+    # evidence_train()
