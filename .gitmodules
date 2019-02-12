@@ -1,3 +1,0 @@
-[submodule "experiment/bert-tf"]
-	path = experiment/bert_tf
-	url = https://github.com/schen149/bert.git
