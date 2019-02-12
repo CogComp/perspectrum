@@ -6,4 +6,4 @@ django-mathfilters>=0.4.0
 matplotlib
 sklearn
 PuLP
-pytorch-pretrained-bert
+pytorch-pretrained-bert>=0.5.0

@@ -3,151 +3,161 @@
 
 <!DOCTYPE html>
 <html lang="en">
-<script src="https://code.jquery.com/jquery-3.3.1.min.js"
-        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
-        crossorigin="anonymous"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
-        integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
-        crossorigin="anonymous"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
-        integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
-        crossorigin="anonymous"></script>
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
-      integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
-      integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous"/>
-<link rel="stylesheet" href="{% static "css/style.css" %}">
-<script type="text/javascript" src="{% static "js/vis.js" %}"></script>
-<link href="{% static "css/vis-network.min.css" %}" rel="stylesheet" type="text/css"/>
+<head>
+    <script src="https://code.jquery.com/jquery-3.3.1.min.js"
+            integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flat-ui/2.3.0/css/flat-ui.min.css"
+          integrity="sha256-7bYJaNviFZlH+bKqZlshmYKeyvkp+fXBQuerWp2AXlA=" crossorigin="anonymous"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="{% static "css/style.css" %}">
+    <script type="text/javascript" src="{% static "js/vis.js" %}"></script>
+    <link href="{% static "css/vis-network.min.css" %}" rel="stylesheet" type="text/css"/>
 
 
-<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Perspective Annotation Interface</title>
-<script src="{% static "js/persp.js" %}"></script>
+    <title>Perspectrum - Demo</title>
+</head>
+<body>
 
 <style type="text/css">
     #mynetwork {
         width: 100%;
         height: 100%;
-        border: 1px solid lightgray;
+        border: 2px solid lightgray;
     }
 
     code {
         font-size: 14px;
         background: #dddddd;
     }
-
-    .indented {
-        margin-left: 00px;
-    }
-
-    .sep {
-        height: 1px;
-        width: 30%;
-        margin-left: 40px;
-        background-color: #dddddd;
-    }
 </style>
 
-</head>
-<body>
-{#<div class="container-fluid">#}
-{#    <h4 class="persp-claim-title pallete pallete-peter-river">#}
-{#        {{ claim }}#}
-{#    </h4>#}
-{#    <div class="row">#}
-{#        <div class="col persps-container tile">#}
-{#            <h6>#}
-{#                Perspectives For#}
-{#            </h6>#}
-{#            {% for cluster in persp_sup %}#}
-{#                <a class="persp-title btn btn-block btn-lg btn-default palette-turquoise">#}
-{#                    {% for p in cluster %}#}
-{#                        {{ p }} <br>#}
-{#                    {% endfor %}#}
-{#                </a>#}
-{#            {% endfor %}#}
-{#        </div>#}
-{#        <div class="col persps-container tile">#}
-{#            <h6>#}
-{#                Perspectives Against#}
-{#            </h6>#}
-{#            {% for cluster in persp_und %}#}
-{#                <a class="persp-title btn btn-block btn-lg btn-default palette-carrot">#}
-{#                    {% for p in cluster %}#}
-{#                        {{ p }} <br>#}
-{#                    {% endfor %}#}
-{#                </a>#}
-{#            {% endfor %}#}
-{#        </div>#}
-{#    </div>#}
-{#</div>#}
-
-<div class="container" style="margin-left: 5%; width: 90%; ">
-    <div class="input-group mb-3" style="margin-top: 5%; margin-left: 30%; text-align: center">
-        <div class="input-group-prepend">
-            <button id="search-claim" type="button" class="btn btn-primary">Search</button>
-        </div>
-        <input id="claim-box" type="text" class="form-control" aria-label="Text input with segmented dropdown button">
-    </div>
-
-
-<div class="form-check">
-  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios1" value="option1" >
-  <label class="form-check-label" for="exampleRadios1">
-    Default radio
-  </label>
-</div>
-<div class="form-check">
-  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios2" value="option2" checked>
-  <label class="form-check-label" for="exampleRadios2">
-    Second default radio
-  </label>
-</div>
-<div class="form-check disabled">
-  <input class="form-check-input" type="radio" name="exampleRadios" id="exampleRadios3" value="option3">
-  <label class="form-check-label" for="exampleRadios3">
-    Disabled radio
-  </label>
-</div>
-
-    <div style="margin: 2%; margin-left: 50%; text-align: center">
-        <div class="btn-group btn-group-toggle" data-toggle="buttons">
-            <label class="btn btn-primary active">
-{#                <input type="radio" name="options" id="option-simple-viz" autocomplete="off" {% if vis_type == "simple-viz" %} checked {% endif %}> Simple Visualization#}
-            <input type="radio" name="options" id="option-simple-viz" autocomplete="off"> Simple Visualization
-            </label>
-        <label class="btn btn-primary">
-                <input type="radio" name="options" id="option-graph-viz" autocomplete="off" checked> Graphical Visualization
-            </label>
-
-
-            {#        <label class="btn btn-secondary">#}
-            {#            <input type="radio" name="options" id="option3" autocomplete="off"> Radio#}
-            {#        </label>#}
-        </div>
-
-        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="margin: 10px">
-            <label class="btn btn-primary active">
-                <input type="radio" name="options" id="option-bert" autocomplete="off" checked> BERT
-            </label>
-            <label class="btn btn-primary">
-                <input type="radio" name="options" id="option-lucene" autocomplete="off"> Lucene
-            </label>
-            {#            <label class="btn btn-secondary">#}
-            {#                <input type="radio" name="options" id="option3" autocomplete="off"> Radio#}
-            {#            </label>#}
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <h1 class="display-4">Perspectrum</h1>
+                <p class="lead">A dataset of claims, perspectives and evidences</p>
+            </div>
         </div>
     </div>
+</div>
 
-    <div class="row" style="width: 100%; align-content: center; margin-left: 30%;">
-        {% include "/Users/daniel/ideaProjects/perspective/webapp/templates/persp.html" %}
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <input id="claim-box" type="text" value="" placeholder="Write a claim here" class="form-control">
+                {#                <input id="claim-box" type="text" class="form-control" aria-label="Text input with segmented dropdown button">#}
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <input id="demo_persp_0" type="text" value=""
+                       placeholder="Write a perspective in response to the claim above" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="form-group">
+                <input id="demo_persp_1" type="text" value=""
+                       placeholder="Another perspective in response to the claim above" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <div class="btn-group">
+                <button data-toggle="dropdown" class="btn btn-info dropdown-toggle" type="button" aria-expanded="false">
+                    Load Pre-defined Examples
+                </button>
+                <ul role="menu" class="dropdown-menu" x-placement="bottom-start"
+                    style="position: absolute; transform: translate3d(0px, 41px, 0px); top: 0px; left: 0px; will-change: transform;">
+                    <li><a href="#">Example #1</a></li>
+                    <li><a href="#">Example #2</a></li>
+                    <li><a href="#">Example #3</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="col-6">
+            {#            <a href="#fakelink" class="btn btn-block btn-lg btn-primary">Demo!</a>#}
+            <div class="input-group-prepend">
+                <button id="search-claim" type="button" class="btn btn-block btn-lg btn-primary">Search</button>
+            </div>
+            {#            <div class="input-group mb-3" style="margin-top: 5%; margin-left: 30%; text-align: center">#}
+            {#                <div class="input-group-prepend">#}
+            {#                    <button id="search-claim" type="button" class="btn btn-primary">Search</button>#}
+            {#                </div>#}
+            {#                <input id="claim-box" type="text" class="form-control"#}
+            {#                       aria-label="Text input with segmented dropdown button">#}
+            {#            </div>#}
+        </div>
+    </div>
+    <div class="col-md-7" style="margin: 20px">
+        Visualizations to include:
+        <label class="checkbox" for="checkbox1">
+            <input type="checkbox" value="" id="checkbox1" checked="checked" data-toggle="checkbox"
+                   class="custom-checkbox"><span class="icons"><span class="icon-unchecked"></span><span
+                class="icon-checked"></span></span>
+            Simple visualization
+        </label>
+        <label class="checkbox" for="checkbox2">
+            <input type="checkbox" value="" id="checkbox2" data-toggle="checkbox"
+                   class="custom-checkbox"><span class="icons"><span class="icon-unchecked"></span><span
+                class="icon-checked"></span></span>
+            Graphical visualization
+        </label>
+    </div>
+    <hr>
+
+    <div class="demo_result">
+        <div class="row">
+            <h6>Perspective relevance to the claim: </h6>
+        </div>
+        <table class="table table-sm">
+            <thead>
+            <tr>
+                <th scope="col">pId</th>
+                <th scope="col">Perspective</th>
+                <th scope="col">Score (Lucene, Bert)</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in perspectives_sorted %}
+                <tr>
+                    <th scope="row">{{ item.1 }}</th>
+                    <td>{{ item.0 }}</td>
+                    <td>({{ item.2 }}, {{ item.3 }})</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        <br>
+        <div class="row">
+            <div class="col-8">
+                <h6>What stance (<span style="color:green">support</span>/<span style="color:red">undermine</span>) does
+                    the perspective hold?</h6>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row" style="width: 100%; align-content: center; ">
+        {% include "persp.html" %}
     </div>
 
     <div class="row" style="width: 100%;">
-        <div class="tile">
-            <div id="mynetwork" style="width: 1800px;"></div>
-        </div>
+        <div id="mynetwork" style="width: 1400px; height: 700px"></div>
     </div>
 </div>
 
@@ -306,6 +316,7 @@
     $('#search-claim').click(function () {
         var claimText = $("#claim-box").val();
 
+        /*
         var visualization = 'graphical-viz';
         if (document.getElementById('option-simple-viz').checked) {
             visualization = 'simple-viz'
@@ -314,9 +325,11 @@
         var solver = 'lucene-solver';
         if (document.getElementById('option-bert').checked) {
             solver = 'bert-solver'
-        }
+        }*/
+        solver = " ";
+        visualization = " ";
 
-        let url = '/baseline/' + claimText + "/" + solver + "/" + visualization + "/";
+        let url = '/baseline/' + claimText + "/" + visualization + "/";
         console.log(url);
         window.location.href = url;
     });

@@ -1,4 +1,5 @@
 import json
+import math
 import zipfile
 from io import BytesIO
 
@@ -15,6 +16,7 @@ from experiment.query_elasticsearch import get_perspective_from_pool
 from experiment.query_elasticsearch import get_evidence_from_pool
 from pulp import LpVariable, LpProblem, LpMaximize, LpStatus, value, os
 
+from experiment.run_bert_on_perspectrum import BertBaseline
 from .forms import ContactForm
 
 from webapp.models import *
@@ -1283,8 +1285,11 @@ def bert_baseline(request, claim_text=""):
     return render(request, "vis_dataset_js.html", context)
 
 
+### loading the BERT solvers
+bb = BertBaseline(task_name="perspectrum_relevane", saved_model="/Users/daniel/ideaProjects/perspective/model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth", no_cuda=True)
+
 @login_required
-def perspectrum_solver(request, claim_text="", baseline_name="", vis_type=""):
+def perspectrum_solver(request, claim_text="", vis_type=""):
     """
     solves a given instances with one of the baselines.
     :param request: the default request argument.
@@ -1303,6 +1308,11 @@ def perspectrum_solver(request, claim_text="", baseline_name="", vis_type=""):
         perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
                                    get_perspective_from_pool(claim, 30)]
 
+        perspectives_sorted = [(p_text, pId, normalize(luceneScore), normalize(bb.predict(claim, p_text)[0])) for (p_text, pId, luceneScore) in
+                               perspective_given_claim]
+
+        perspectives_sorted = sorted(perspectives_sorted, key=lambda x: -x[3])
+
         # create binary variables per perspective
         perspective_variables = []
         perspective_weights = []
@@ -1317,8 +1327,6 @@ def perspectrum_solver(request, claim_text="", baseline_name="", vis_type=""):
                 perspective_ids.append(pId)
                 perspective_given_claim_subset.append((p_text, pId, pScore))
                 # print(pScore)
-
-        # print(len(perspective_variables))
 
         total_obj = sum(x * obj for x, obj in zip(perspective_variables, perspective_weights))
 
@@ -1432,7 +1440,7 @@ def perspectrum_solver(request, claim_text="", baseline_name="", vis_type=""):
         context = {
             "claim_text": claim_text,
             "vis_type": vis_type,
-            "baseline_name": baseline_name,
+            "perspectives_sorted": perspectives_sorted,
             "claim_persp_bundled": claim_persp_bundled,
             "used_evidences_and_texts": used_evidences_and_texts,
             # "claim": "",
@@ -1628,6 +1636,10 @@ def retrieve_evidence_candidates(request, cid, pid):
     return JsonResponse({
         'evi_candidates': cands
     })
+
+
+def normalize(num):
+    return math.floor(num * 100) / 100.0
 
 
 @login_required
