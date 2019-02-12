@@ -309,7 +309,7 @@ class BertBaseline:
                 # Reinitialize model weights
                 self._init_model()
 
-    def evaluate(self, data_dir):
+    def evaluate(self, data_dir, save_score_path=None):
         """
         Directory that contains a "test.tsv"
         :param data_dir:
@@ -328,12 +328,17 @@ class BertBaseline:
         all_label_ids = torch.tensor([f.label_id for f in test_features], dtype=torch.long)
 
         test_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
-        return self._evaluate(test_data)
+        return self._evaluate(test_data, save_score_path)
 
-    def _evaluate(self, eval_data):
+
+    def _evaluate(self, eval_data, save_score_path=None):
         logger.info("***** Running evaluation *****")
         logger.info("  Num examples = %d", len(eval_data))
         logger.info("  Batch size = %d", self._config["eval_batch_size"])
+
+        score_fout = None
+        if save_score_path:
+            score_fout = open(save_score_path, 'w')
 
         eval_sampler = SequentialSampler(eval_data)
         eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=self._config["eval_batch_size"])
@@ -342,8 +347,6 @@ class BertBaseline:
 
         eval_tp, eval_pred_c, eval_gold_c = 0, 0, 0
         eval_loss, eval_macro_p, eval_macro_r = 0, 0, 0
-
-        raw_score = []
 
         nb_eval_steps, nb_eval_examples = 0, 0
         for input_ids, input_mask, segment_ids, label_ids in eval_dataloader:
@@ -359,13 +362,17 @@ class BertBaseline:
             logits = logits.detach().cpu().numpy()
             label_ids = label_ids.to('cpu').numpy()
 
+            if score_fout:
+                batch_logits_str = "\n".join(",".join('%0.3f' %x for x in y) for y in logits)
+                score_fout.write(batch_logits_str)
+                score_fout.write("\n")
+
             # Micro F1 (aggregated tp, fp, fn counts across all examples)
             tmp_tp, tmp_pred_c, tmp_gold_c = tp_pcount_gcount(logits, label_ids)
             eval_tp += tmp_tp
             eval_pred_c += tmp_pred_c
             eval_gold_c += tmp_gold_c
 
-            raw_score += zip(logits, label_ids)
             # Macro F1 (averaged P, R across mini batches)
             tmp_eval_p, tmp_eval_r, tmp_eval_f1 = p_r_f1(logits, label_ids)
 
@@ -389,6 +396,9 @@ class BertBaseline:
         logger.info("  Micro Precision = {}".format(eval_micro_p))
         logger.info("  Micro Recall = {}".format(eval_micro_r))
         logger.info("  Micro F1 = {}".format(eval_micro_f1))
+
+        if score_fout:
+            score_fout.close()
 
         return eval_micro_p, eval_micro_r, eval_micro_f1
 
@@ -503,8 +513,9 @@ def test_models():
 if __name__ == "__main__":
     test_models()
     # stance_train()
-    # stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
+    stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
     # equivalence_train()
     # equivalence_evaluation("/scratch/sihaoc/project/perspective/model/equivalence/lr2e-05_bs16/perspectrum_equivalence_epoch-0.pth")
     # relevance_train()
     # evidence_train()
+
