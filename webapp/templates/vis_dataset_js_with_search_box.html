@@ -55,8 +55,8 @@
     <div class="row">
         <div class="col">
             <div class="form-group">
-                <input id="claim-box" type="text" value="" placeholder="Write a claim here" class="form-control">
-                {#                <input id="claim-box" type="text" class="form-control" aria-label="Text input with segmented dropdown button">#}
+                <input id="claim-box" type="text" placeholder="Write a claim here" class="form-control"
+                       value="{{ claim_text }}">
             </div>
         </div>
     </div>
@@ -121,44 +121,51 @@
     </div>
     <hr>
 
-    <div class="demo_result">
-        <div class="row">
-            <h6>Perspective relevance to the claim: </h6>
-        </div>
-        <table class="table table-sm">
-            <thead>
-            <tr>
-                <th scope="col">pId</th>
-                <th scope="col">Perspective</th>
-                <th scope="col">Score (Lucene, Bert)</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for item in perspectives_sorted %}
+    {% if claim_text %}
+
+        <div class="demo_result">
+            <div class="row">
+                <h6>Perspective relevance to the claim: </h6>
+            </div>
+            <table class="table table-sm">
+                <thead>
                 <tr>
-                    <th scope="row">{{ item.1 }}</th>
-                    <td>{{ item.0 }}</td>
-                    <td>({{ item.2 }}, {{ item.3 }})</td>
+                    <th scope="col">pId</th>
+                    <th scope="col">Perspective</th>
+                    <th scope="col">Relevance score (Lucene, Bert)</th>
+                    <th scope="col">Stance (Support)</th>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-        <br>
-        <div class="row">
-            <div class="col-8">
-                <h6>What stance (<span style="color:green">support</span>/<span style="color:red">undermine</span>) does
-                    the perspective hold?</h6>
+                </thead>
+                <tbody>
+                {% for item in perspectives_sorted %}
+                    <tr>
+                        <th scope="row">{{ item.1 }}</th>
+                        <td>{{ item.0 }}</td>
+                        <td>({{ item.2 }}, {{ item.3 }})</td>
+                        <td>{{ item.4 }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            <br>
+            <div class="row">
+                <div class="col-8">
+                    <h6>What stance (<span style="color:green">support</span>/<span style="color:red">undermine</span>)
+                        does
+                        the perspective hold?</h6>
+                </div>
             </div>
         </div>
-    </div>
-    <hr>
-    <div class="row" style="width: 100%; align-content: center; ">
-        {% include "persp.html" %}
-    </div>
+        <hr>
+        <div class="row" style="width: 100%; align-content: center; ">
+            {% include "persp.html" %}
+        </div>
 
-    <div class="row" style="width: 100%;">
-        <div id="mynetwork" style="width: 1400px; height: 700px"></div>
-    </div>
+        <div class="row" style="width: 100%;">
+            <div id="mynetwork" style="width: 1400px; height: 700px"></div>
+        </div>
+
+    {% endif %}
 </div>
 
 <script type="text/javascript">

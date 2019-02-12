@@ -416,7 +416,7 @@ class BertBaseline:
             segment_ids_tensor = torch.tensor([feature.segment_ids])
             input_mask_tensor = torch.tensor([feature.input_mask])
 
-            output = self._model(input_ids_tensor, segment_ids_tensor, input_mask_tensor)
+            output = self._model(input_ids_tensor, segment_ids_tensor) # , input_mask_tensor
             # print(output)
             return output.detach().cpu().numpy()[0]
 
