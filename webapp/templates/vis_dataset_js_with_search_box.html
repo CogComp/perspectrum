@@ -31,13 +31,16 @@
         height: 100%;
         border: 1px solid lightgray;
     }
+
     code {
         font-size: 14px;
         background: #dddddd;
     }
+
     .indented {
         margin-left: 00px;
     }
+
     .sep {
         height: 1px;
         width: 30%;
@@ -84,21 +87,39 @@
     <div class="input-group mb-3" style="margin-top: 5%; margin-left: 30%; text-align: center">
         <div class="input-group-prepend">
             <button id="search-claim" type="button" class="btn btn-primary">Search</button>
-            <button type="button" class="btn btn-primary dropdown-toggle dropdown-toggle-split"
-                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                <span class="sr-only">Toggle Dropdown</span>
-            </button>
-            <div class="dropdown-menu">
-                <a class="dropdown-item" href="#">Lucene</a>
-                <a class="dropdown-item" href="#">Another action</a>
-                <a class="dropdown-item" href="#">Something else here</a>
-                <div role="separator" class="dropdown-divider"></div>
-                <a class="dropdown-item" href="#">Separated link</a>
-            </div>
         </div>
         <input id="claim-box" type="text" class="form-control" aria-label="Text input with segmented dropdown button">
     </div>
 
+    <div style="margin: 2%; margin-left: 50%; text-align: center">
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+            <label class="btn btn-primary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> Simple Visualization
+            </label>
+            <label class="btn btn-primary">
+                <input type="radio" name="options" id="option2" autocomplete="off"> Graphical Visualization
+            </label>
+            {#        <label class="btn btn-secondary">#}
+            {#            <input type="radio" name="options" id="option3" autocomplete="off"> Radio#}
+            {#        </label>#}
+        </div>
+
+        <div class="btn-group btn-group-toggle" data-toggle="buttons" style="margin: 10px">
+            <label class="btn btn-primary active">
+                <input type="radio" name="options" id="option1" autocomplete="off" checked> BERT
+            </label>
+            <label class="btn btn-primary">
+                <input type="radio" name="options" id="option2" autocomplete="off"> Lucene
+            </label>
+            {#            <label class="btn btn-secondary">#}
+            {#                <input type="radio" name="options" id="option3" autocomplete="off"> Radio#}
+            {#            </label>#}
+        </div>
+    </div>
+
+    <div class="row" style="width: 100%; align-content: center; margin-left: 30%;">
+        {% include "/Users/daniel/ideaProjects/perspective/webapp/templates/persp.html" %}
+    </div>
 
     <div class="row" style="width: 100%;">
         <div class="tile">
@@ -167,22 +188,22 @@
             }
         {% endfor %}
         // evidence nodes
-                {% for eId, evidences in used_evidences_and_texts %}
-                    if (!evidenceIds.includes(offset + {{ eId }})) {
-                        nodes.push({
-                            id: (offset + {{ eId }}),
-                            widthConstraint: {maximum: 300},
-                            label: `<b>Evidence:</b> {{ evidences }}`,
-                            group: -1,
-                            font: {multi: 'html', size: 7}
-                        });
-                        evidenceIds.push(offset + {{ eId }});
-                    }
-                {% endfor %}
+        {% for eId, evidences in used_evidences_and_texts %}
+            if (!evidenceIds.includes(offset + {{ eId }})) {
+                nodes.push({
+                    id: (offset + {{ eId }}),
+                    widthConstraint: {maximum: 300},
+                    label: `<b>Evidence:</b> {{ evidences }}`,
+                    group: -1,
+                    font: {multi: 'html', size: 7}
+                });
+                evidenceIds.push(offset + {{ eId }});
+            }
+        {% endfor %}
         // adding claim to perspective edges: undermine
         {% for p, pid, cluster_id, evidences, score in persp_und %}
             var pScore = {{ score }};
-            pScore = Math.floor(pScore* 10)/10;
+            pScore = Math.floor(pScore * 10) / 10;
             edges.push({
                 from: claimID,
                 to: {{ pid }},
@@ -193,7 +214,7 @@
         // adding claim to perspective edges: support
         {% for p, pid, cluster_id, evidences, score in persp_sup %}
             var pScore = {{ score }};
-            pScore = Math.floor(pScore* 10)/10;
+            pScore = Math.floor(pScore * 10) / 10;
             edges.push({
                 from: claimID,
                 to: {{ pid }},

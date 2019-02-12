@@ -1406,9 +1406,20 @@ def lucene_baseline(request, claim_text=""):
 
         claim_persp_bundled = [(claim, persp_sup, [])]
 
+        persp_sup = [([(7584, 'It will cause less re-offenders.'), (26958, 'Adequate punishment reduces future offenses.'),
+           (26959, 'Just punishment will lead to less criminals re-offending. ')], [3, 0, 0, 0, 0],
+          [367, 368, 2628, 2629, 7862, 6549])]
+        persp_und = [([(7587, 'The onus should not be on punishing the criminal.'),
+           (26962, 'Punishment should not be the primary focus.'),
+           (26963, 'Our  main goal should not be punishing the criminal. ')], [0, 0, 0, 3, 0], [7574, 7872])]
+
         context = {
             "claim_persp_bundled": claim_persp_bundled,
-            "used_evidences_and_texts": used_evidences_and_texts
+            "used_evidences_and_texts": used_evidences_and_texts,
+            "claim": "",
+            # "claim_id": claim_id,
+            "persp_sup": persp_sup,
+            "persp_und": persp_und,
         }
     else:
         context = {}
