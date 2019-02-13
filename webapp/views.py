@@ -1683,4 +1683,4 @@ def submit_human_anno(request):
 
 
 def render_demo(request):
-    return render(request, "demo/demo_home.html", {})
+    return render(request, "vis_dataset_js_with_search_box.html", {})
