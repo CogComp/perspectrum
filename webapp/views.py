@@ -1477,7 +1477,9 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
         #
 
         persp_sup = []
+        persp_sup_flash = []
         persp_und = []
+        persp_und_flash = []
 
         perspective_clusters = {}
         for i, (p_text, pId, luceneScore, relevance_score, stance_score) in enumerate(perspectives_sorted):
@@ -1490,21 +1492,27 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
         for cluster_id in perspective_clusters.keys():
             stance_list = []
             perspectives = []
+            persp_flash_tmp = []
             for (p_text, pId, stance_score) in perspective_clusters[cluster_id]:
                 stance_list.append(stance_score)
                 perspectives.append((pId, p_text))
+                persp_flash_tmp.append((p_text, pId, cluster_id + 1, [], stance_score))
+                # persp_sup.append((p[0], p[1], 1, [evidences], pScore))
 
             avg_stance = sum(stance_list) / len(stance_list)
             if avg_stance > 0.0:
                 persp_sup.append((perspectives, [avg_stance, 0, 0, 0, 0], []))
+                persp_sup_flash.extend(persp_flash_tmp)
             else:
                 persp_und.append((perspectives, [avg_stance, 0, 0, 0, 0], []))
+                persp_und_flash.extend(persp_flash_tmp)
 
+        # if vis_type == "graphical-viz":
+        #     claim_persp_bundled = [(claim, persp_sup, [])]
+        # else:
+        #     claim_persp_bundled = []
 
-        if vis_type == "graphical-viz":
-            claim_persp_bundled = [(claim, persp_sup + persp_und, [])]
-        else:
-            claim_persp_bundled = []
+        claim_persp_bundled = [(claim, persp_sup_flash, persp_und_flash)]
 
         # persp_sup = [
         #     ([(7584, 'It will cause less re-offenders.'), (26958, 'Adequate punishment reduces future offenses.'),
@@ -1521,7 +1529,7 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
             "perspectives_sorted": perspectives_sorted,
             "perspectives_equivalences": perspectives_equivalences,
             "claim_persp_bundled": claim_persp_bundled,
-            "used_evidences_and_texts": [], # used_evidences_and_texts,
+            "used_evidences_and_texts": [],  # used_evidences_and_texts,
             # "claim": "",
             # "claim_id": claim_id,
             "persp_sup": persp_sup,
