@@ -1,5 +1,7 @@
 import json
+import logging
 import math
+import sys
 import zipfile
 from io import BytesIO
 
@@ -1291,7 +1293,10 @@ bb_relevance = BertBaseline(task_name="perspectrum_relevance",
 bb_stance = BertBaseline(task_name="perspectrum_stance",
                          saved_model="model/stance/perspectrum_stance_lr2e-05_bs16_epoch-4.pth", no_cuda=True)
 bb_equivalence = BertBaseline(task_name="perspectrum_equivalence",
-                              saved_model="model/stance/perspectrum_stance_lr2e-05_bs16_epoch-4.pth", no_cuda=True)
+                              saved_model="model/equivalence/perspectrum_equivalence_lr3e-05_bs32_epoch-2.pth",
+                              no_cuda=True)
+
+logging.disable(sys.maxsize)  # Python 3
 
 
 @login_required
@@ -1314,18 +1319,24 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
         perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
                                    get_perspective_from_pool(claim, 30)]
 
-        perspectives_sorted = [(p_text, pId, normalize(luceneScore), normalize(bb_relevance.predict(claim, p_text)[1]),
-                                normalize(bb_stance.predict(claim, p_text)[1])) for (p_text, pId, luceneScore) in
-                               perspective_given_claim]
+        perspective_relevance_score = bb_relevance.predict_batch(
+            [(claim, p_text) for (p_text, pId, _) in perspective_given_claim])
+
+        perspective_stance_score = bb_stance.predict_batch(
+            [(claim, p_text) for (p_text, pId, _) in perspective_given_claim])
+
+        perspectives_sorted = [(p_text, pId, normalize(luceneScore), normalize(perspective_relevance_score[i]),
+                                normalize(perspective_stance_score[i])) for i, (p_text, pId, luceneScore) in
+                               enumerate(perspective_given_claim)]
 
         perspectives_sorted = sorted(perspectives_sorted, key=lambda x: -x[3])
 
         perspectives_equivalences = []
-        for (p_text1, _, _) in perspective_given_claim:
-            for (p_text2, _, _) in perspective_given_claim:
-                score1 = normalize(bb_stance.predict(claim + " " + p_text1, p_text2)[1])
-                score2 = normalize(bb_stance.predict(claim + " " + p_text2, p_text1)[1])
-                perspectives_equivalences.append((p_text1, p_text2, score1, score2))
+        # for (p_text1, _, _) in perspective_given_claim:
+        #     for (p_text2, _, _) in perspective_given_claim:
+        #         score1 = normalize(bb_equivalence.predict(claim + " . " + p_text1, p_text2)[1])
+        #         score2 = normalize(bb_equivalence.predict(claim + " . " + p_text2, p_text1)[1])
+        #         perspectives_equivalences.append((p_text1, p_text2, score1, score2))
 
         # create binary variables per perspective
         perspective_variables = []

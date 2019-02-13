@@ -1,5 +1,7 @@
 import os
 import random
+from typing import List
+
 from tqdm import tqdm, trange
 
 import numpy as np
@@ -113,7 +115,8 @@ class BertBaseline:
             # if loading on a cpu:
             model_state_dict = torch.load(saved_model, map_location='cpu')
             # model_state_dict = torch.load(saved_model)
-            self._model = BertForSequenceClassification.from_pretrained(bert_model, state_dict=model_state_dict, num_labels=2)
+            self._model = BertForSequenceClassification.from_pretrained(bert_model, state_dict=model_state_dict,
+                                                                        num_labels=2)
         else:
             cache_dir = os.path.join(PYTORCH_PRETRAINED_BERT_CACHE, 'distributed_{}'.format(self._config["local_rank"]))
             self._model = BertForSequenceClassification.from_pretrained(self._config["bert_model"],
@@ -416,9 +419,42 @@ class BertBaseline:
             segment_ids_tensor = torch.tensor([feature.segment_ids])
             input_mask_tensor = torch.tensor([feature.input_mask])
 
-            output = self._model(input_ids_tensor, segment_ids_tensor) # , input_mask_tensor
+            output = self._model(input_ids_tensor, segment_ids_tensor)  # , input_mask_tensor
             # print(output)
             return output.detach().cpu().numpy()[0]
+
+    def predict_batch(self, sent_list: List, batch_size=20):
+        """
+        Batched version of the `predict` function.
+        """
+        self._model.eval()
+
+        label_list = self._processor.get_labels()
+        list_of_examples = []
+        predictions = []
+        for i, (sent1, sent2) in enumerate(sent_list):
+            # sent1 = sent1_list[i]
+            # sent2 = sent2_list[i]
+            example = InputExample(guid="dummy", text_a=sent1, text_b=sent2, label=label_list[0])
+            list_of_examples.append(example)
+
+            if len(list_of_examples) > batch_size or i + 1 == len(sent_list):
+                features = convert_examples_to_features(list_of_examples, label_list,
+                                                        self._config["max_seq_length"], self._tokenizer)
+
+                with torch.no_grad():
+                    input_ids_tensor = torch.tensor([f.input_ids for f in features])
+                    segment_ids_tensor = torch.tensor([f.segment_ids for f in features])
+                    input_mask_tensor = torch.tensor([f.input_mask for f in features])
+
+                    output = self._model(input_ids_tensor, segment_ids_tensor, input_mask_tensor)  # , input_mask_tensor
+                    # print(output)
+                    logits = [x[1] for x in output.detach().cpu().numpy()]
+                    # print("ssjdkah ")
+                    predictions.extend(logits)
+
+                list_of_examples = []
+        return predictions
 
 
 def stance_train():
@@ -500,8 +536,16 @@ def test_models():
     print(bb.predict("123", "345"))
 
 
+def test_models_with_batch():
+    bb = BertBaseline(task_name="perspectrum_relevane",
+                      saved_model="/Users/daniel/ideaProjects/perspective/model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth",
+                      no_cuda=True)
+    print(bb.predict_batch(["12dfhkjg kdhfg k dgkjhdg f3", "123LREULU YS LDJKHF LSJ"],
+                           ["34lu  luet sULDUASDT FASDUT L5", "345 sdflaksjhf lasjhdf lah lkasj"]), 20)
+
+
 if __name__ == "__main__":
-    test_models()
+    test_models_with_batch()
     # stance_train()
     # stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
     # equivalence_train()
