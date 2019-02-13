@@ -1290,6 +1290,8 @@ bb_relevance = BertBaseline(task_name="perspectrum_relevance",
                             saved_model="model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth", no_cuda=True)
 bb_stance = BertBaseline(task_name="perspectrum_stance",
                          saved_model="model/stance/perspectrum_stance_lr2e-05_bs16_epoch-4.pth", no_cuda=True)
+bb_equivalence = BertBaseline(task_name="perspectrum_equivalence",
+                              saved_model="model/stance/perspectrum_stance_lr2e-05_bs16_epoch-4.pth", no_cuda=True)
 
 
 @login_required
@@ -1317,6 +1319,13 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
                                perspective_given_claim]
 
         perspectives_sorted = sorted(perspectives_sorted, key=lambda x: -x[3])
+
+        perspectives_equivalences = []
+        for (p_text1, _, _) in perspective_given_claim:
+            for (p_text2, _, _) in perspective_given_claim:
+                score1 = normalize(bb_stance.predict(claim + " " + p_text1, p_text2)[1])
+                score2 = normalize(bb_stance.predict(claim + " " + p_text2, p_text1)[1])
+                perspectives_equivalences.append((p_text1, p_text2, score1, score2))
 
         # create binary variables per perspective
         perspective_variables = []

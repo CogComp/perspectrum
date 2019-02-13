@@ -150,10 +150,26 @@
             <br>
             <div class="row">
                 <div class="col-8">
-                    <h6>What stance (<span style="color:green">support</span>/<span style="color:red">undermine</span>)
-                        does
-                        the perspective hold?</h6>
+                    <h6>Perspective equivalences</h6>
                 </div>
+                <table class="table table-sm">
+                <thead>
+                <tr>
+                    <th scope="col">Perspective 1</th>
+                    <th scope="col">Perspective 2</th>
+                    <th scope="col">score (Bert)</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for item in perspectives_equivalences %}
+                    <tr>
+                        <td>{{ item.0 }}</td>
+                        <td>{{ item.1 }}</td>
+                        <td>({{ item.2 }}, {{ item.3 }})</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
             </div>
         </div>
         <hr>
