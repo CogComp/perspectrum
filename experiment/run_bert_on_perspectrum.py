@@ -55,6 +55,7 @@ DEFAULT_CONFIG = {
     "fp16": False,
     "loss_scale": 128,
     "task_name": "",
+    "quotechar": None,
 }
 
 """
@@ -152,8 +153,8 @@ class BertBaseline:
         __log_path = os.path.join(output_dir, "{}_train.log".format(self._config["task_name"]))
 
         # Prepare training examples
-        train_examples = self._processor.get_train_examples(train_data_dir)
-        dev_examples = self._processor.get_dev_examples(train_data_dir)
+        train_examples = self._processor.get_train_examples(train_data_dir, quotechar=self._config["quotechar"])
+        dev_examples = self._processor.get_dev_examples(train_data_dir, quotechar=self._config["quotechar"])
 
         label_list = self._processor.get_labels()
         tokenizer = self._tokenizer
@@ -297,7 +298,6 @@ class BertBaseline:
                     with open(__log_path, 'a+') as fout:
                         fout.write("Epoch #{}\n".format(_epoch))
                         fout.write("\tMicro Precision = {}\n".format(p))
-                        fout.write("\tMicro Precision = {}\n".format(p))
                         fout.write("\tMicro Recall = {}\n".format(r))
                         fout.write("\tMicro F1 = {}\n".format(f1))
                         fout.write("\n")
@@ -315,7 +315,7 @@ class BertBaseline:
         :param data_dir:
         :return:
         """
-        test_examples = self._processor.get_test_examples(data_dir)
+        test_examples = self._processor.get_test_examples(data_dir, quotechar=self._config["quotechar"])
         label_list = self._processor.get_labels()
         tokenizer = self._tokenizer
 
@@ -468,22 +468,21 @@ def relevance_train():
     bb.train(data_dir, model_dir)
 
 
-def relevance_evaluation(model_path):
+def relevance_evaluation(model_path, save_score_path=None):
     data_dir = FILE_PATH['relevance_data']
 
     bb = BertBaseline(task_name="perspectrum_relevance", saved_model=model_path)
-    bb.evaluate(data_dir)
-
+    bb.evaluate(data_dir, save_score_path=save_score_path)
 
 def evidence_train():
     # Since evidence is usually long, we need to lift the max sequence length and lower the batch size.
     _config = {
         "bert_model": bert_model,
-        "max_seq_length": 512,
+        "max_seq_length": 256,
         "do_lower_case": False,
-        "train_batch_size": [4, 8],
+        "train_batch_size": [16],
         "eval_batch_size": 8,
-        "learning_rate": [3e-5, 2e-5],
+        "learning_rate": [1e-5],
         "num_train_epochs": 5,
         "warmup_proportion": 0.1,
         "no_cuda": False,
@@ -494,6 +493,7 @@ def evidence_train():
         "fp16": False,
         "loss_scale": 128,
         "task_name": "perspectrum_evidence",
+        "quotechar": "\"",
     }
 
     data_dir = FILE_PATH['evidence_data']
@@ -502,20 +502,30 @@ def evidence_train():
     bb = BertBaseline(None, **_config)
     bb.train(data_dir, model_dir)
 
+def evidence_evaluation(model_path, save_score_path=None):
+    data_dir = FILE_PATH['evidence_data']
+
+    bb = BertBaseline(task_name="perspectrum_evidence", saved_model=model_path)
+    bb.evaluate(data_dir, save_score_path=save_score_path)
+
 
 def test_models():
     bb = BertBaseline(task_name="perspectrum_relevane",
-                      saved_model="/Users/daniel/ideaProjects/perspective/model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth",
+                      saved_model="/scratch/sihaoc/project/perspective/model/evidence/lr2e-05_bs4/perspectrum_evidence_epoch-1.pth",
                       no_cuda=True)
-    print(bb.predict("123", "345"))
+    print(bb.predict("Vaccination must be made compulsory. It is the state’s duty to protect its community", "The role of the state is to protect its people and to create the conditions for its people’s prosperity. The Church does not share these objectives. The Church’s objectives are, instead, to either convert as many people as possible to its own religion, and to ‘save souls’ brining people into its own perceived afterlife."))
 
 
 if __name__ == "__main__":
-    test_models()
+    # test_models()
     # stance_train()
-    stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
+    # stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
     # equivalence_train()
     # equivalence_evaluation("/scratch/sihaoc/project/perspective/model/equivalence/lr2e-05_bs16/perspectrum_equivalence_epoch-0.pth")
     # relevance_train()
-    # evidence_train()
+    # relevance_evaluation("/scratch/sihaoc/project/perspective/model/relevance/lr2e-05_bs32/perspectrum_relevance_epoch-0.pth",
+    #                      save_score_path="/scratch/sihaoc/project/perspective/model/relevance/lr5e-05_bs32/eval_logits.out")
+    # evidence_evaluation("/scratch/sihaoc/project/perspective/model/evidence/lr2e-05_bs4/perspectrum_evidence_epoch-0.pth",
+    #                         save_score_path = "/scratch/sihaoc/project/perspective/model/evidence/lr2e-05_bs4_eval_logits.out")
+    evidence_train()
 
