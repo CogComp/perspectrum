@@ -1319,7 +1319,7 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
 
         # given a claim, extract perspectives
         perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
-                                   get_perspective_from_pool(claim, 10)]
+                                   get_perspective_from_pool(claim, 25)]
 
         perspective_relevance_score = bb_relevance.predict_batch(
             [(claim, p_text) for (p_text, pId, _) in perspective_given_claim])
