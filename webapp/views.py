@@ -1,6 +1,7 @@
 import json
 import logging
 import math
+import numpy as np
 import sys
 import zipfile
 from io import BytesIO
@@ -13,6 +14,7 @@ from django.views.decorators.csrf import csrf_protect
 from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render, redirect
 from django.core.files import File
+from sklearn.cluster import DBSCAN
 
 from experiment.query_elasticsearch import get_perspective_from_pool
 from experiment.query_elasticsearch import get_evidence_from_pool
@@ -1317,7 +1319,7 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
 
         # given a claim, extract perspectives
         perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
-                                   get_perspective_from_pool(claim, 30)]
+                                   get_perspective_from_pool(claim, 10)]
 
         perspective_relevance_score = bb_relevance.predict_batch(
             [(claim, p_text) for (p_text, pId, _) in perspective_given_claim])
@@ -1331,37 +1333,62 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
 
         perspectives_sorted = sorted(perspectives_sorted, key=lambda x: -x[3])
 
+        similarity_score = np.zeros((len(perspective_given_claim), len(perspective_given_claim)))
         perspectives_equivalences = []
-        # for (p_text1, _, _) in perspective_given_claim:
-        #     for (p_text2, _, _) in perspective_given_claim:
-        #         score1 = normalize(bb_equivalence.predict(claim + " . " + p_text1, p_text2)[1])
-        #         score2 = normalize(bb_equivalence.predict(claim + " . " + p_text2, p_text1)[1])
-        #         perspectives_equivalences.append((p_text1, p_text2, score1, score2))
+        for i, (p_text1, _, _) in enumerate(perspective_given_claim):
+            list1 = []
+            # list2 = []
+            for j, (p_text2, _, _) in enumerate(perspective_given_claim):
+                # if i != j:
+                list1.append((claim + " . " + p_text1, p_text2))
+                # list2.append((claim + " . " + p_text2, p_text1))
+
+            predictions1 = bb_equivalence.predict_batch(list1)
+            # predictions2 = bb_equivalence.predict_batch(list2)
+
+            for j, (p_text2, _, _) in enumerate(perspective_given_claim):
+                if i != j:
+                    perspectives_equivalences.append((p_text1, p_text2, predictions1[j], predictions1[j]))
+                    similarity_score[i, j] = predictions1[j]
+                    similarity_score[j, i] = predictions1[j]
+
+        distance_scores = -similarity_score
+
+        clustering = DBSCAN(eps=3, metric='precomputed')
+        cluster_labels = clustering.fit_predict(distance_scores)
+        max_val = max(cluster_labels)
+        for i, _ in enumerate(cluster_labels):
+            max_val += 1
+            cluster_labels[i] = max_val
+
+            # print(similarity_score)
+        # print(perspective_given_claim)
+        # print(perspectives_equivalences)
 
         # create binary variables per perspective
-        perspective_variables = []
-        perspective_weights = []
-        perspective_ids = []
-        perspective_given_claim_subset = []
-
-        for (pIdx, (p_text, pId, pScore)) in enumerate(perspective_given_claim):
-            if pScore > 1.55:
-                x = LpVariable("p" + str(pIdx), 0, 1)
-                perspective_variables.append(x)
-                perspective_weights.append(pScore)
-                perspective_ids.append(pId)
-                perspective_given_claim_subset.append((p_text, pId, pScore))
-                # print(pScore)
-
-        total_obj = sum(x * obj for x, obj in zip(perspective_variables, perspective_weights))
+        # perspective_variables = []
+        # perspective_weights = []
+        # perspective_ids = []
+        # perspective_given_claim_subset = []
+        #
+        # for (pIdx, (p_text, pId, pScore)) in enumerate(perspective_given_claim):
+        #     if pScore > 1.55:
+        #         x = LpVariable("p" + str(pIdx), 0, 1)
+        #         perspective_variables.append(x)
+        #         perspective_weights.append(pScore)
+        #         perspective_ids.append(pId)
+        #         perspective_given_claim_subset.append((p_text, pId, pScore))
+        #         # print(pScore)
+        #
+        # total_obj = sum(x * obj for x, obj in zip(perspective_variables, perspective_weights))
 
         # maximum and minimum number of perspectives selected
-        total_weight = sum(x * 1.0 for x in perspective_variables)
-        prob += total_weight <= 10
-        # prob += total_weight >= 5
+        # total_weight = sum(x * 1.0 for x in perspective_variables)
+        # prob += total_weight <= 10
+        # # prob += total_weight >= 5
 
-        assert (len(perspective_variables) == len(perspective_weights))
-
+        # assert (len(perspective_variables) == len(perspective_weights))
+        #
         # given a perspective, retrieve relevant perspectives
         # create a map of clustering similarity
         # offset = 7
@@ -1423,51 +1450,78 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
         # if a perspective is active, it should be connected to at least one evidence
         # evidence is not active, unless it is connected to sth
 
-        prob += total_obj
-        status = prob.solve()
-        print(LpStatus[status])
+        # prob += total_obj
+        # status = prob.solve()
+        # print(LpStatus[status])
+        #
+        # # extract active variables
+        # used_evidences_and_texts = []
+        # persp_sup = []
+        # for pVar, p in zip(perspective_variables, perspective_given_claim_subset):
+        #     pScore = p[2]
+        #     p_text = p[0]
+        #     # print(pVar)
+        #     # print(value(pVar))
+        #     if value(pVar) != None:
+        #         if value(pVar) > 0.5:
+        #             lucene_evidences = get_evidence_from_pool(claim + p_text, 2)
+        #             evidences = []
+        #             if len(lucene_evidences) > 0:
+        #                 (e_text, eId, eScore) = lucene_evidences[0]
+        #                 evidences = eId
+        #                 used_evidences_and_texts.append([eId, e_text.replace("`", "'")])
+        #             persp_sup.append((p[0], p[1], 1, [evidences], pScore))
+        #
+        #     else:
+        #         print("value is none")
+        #
 
-        # extract active variables
-        used_evidences_and_texts = []
         persp_sup = []
-        for pVar, p in zip(perspective_variables, perspective_given_claim_subset):
-            pScore = p[2]
-            p_text = p[0]
-            # print(pVar)
-            # print(value(pVar))
-            if value(pVar) != None:
-                if value(pVar) > 0.5:
-                    lucene_evidences = get_evidence_from_pool(claim + p_text, 2)
-                    evidences = []
-                    if len(lucene_evidences) > 0:
-                        (e_text, eId, eScore) = lucene_evidences[0]
-                        evidences = eId
-                        used_evidences_and_texts.append([eId, e_text.replace("`", "'")])
-                    persp_sup.append((p[0], p[1], 1, [evidences], pScore))
+        persp_und = []
 
+        perspective_clusters = {}
+        for i, (p_text, pId, luceneScore, relevance_score, stance_score) in enumerate(perspectives_sorted):
+            if relevance_score > 0.0:
+                id = cluster_labels[i]
+                if id not in perspective_clusters:
+                    perspective_clusters[id] = []
+                perspective_clusters[id].append((p_text, pId, stance_score))
+
+        for cluster_id in perspective_clusters.keys():
+            stance_list = []
+            perspectives = []
+            for (p_text, pId, stance_score) in perspective_clusters[cluster_id]:
+                stance_list.append(stance_score)
+                perspectives.append((pId, p_text))
+
+            avg_stance = sum(stance_list) / len(stance_list)
+            if avg_stance > 0.0:
+                persp_sup.append((perspectives, [avg_stance, 0, 0, 0, 0], []))
             else:
-                print("value is none")
+                persp_und.append((perspectives, [avg_stance, 0, 0, 0, 0], []))
+
 
         if vis_type == "graphical-viz":
-            claim_persp_bundled = [(claim, persp_sup, [])]
+            claim_persp_bundled = [(claim, persp_sup + persp_und, [])]
         else:
             claim_persp_bundled = []
 
-        persp_sup = [
-            ([(7584, 'It will cause less re-offenders.'), (26958, 'Adequate punishment reduces future offenses.'),
-              (26959, 'Just punishment will lead to less criminals re-offending. ')], [3, 0, 0, 0, 0],
-             [367, 368, 2628, 2629, 7862, 6549])]
-        persp_und = [([(7587, 'The onus should not be on punishing the criminal.'),
-                       (26962, 'Punishment should not be the primary focus.'),
-                       (26963, 'Our  main goal should not be punishing the criminal. ')], [0, 0, 0, 3, 0],
-                      [7574, 7872])]
+        # persp_sup = [
+        #     ([(7584, 'It will cause less re-offenders.'), (26958, 'Adequate punishment reduces future offenses.'),
+        #       (26959, 'Just punishment will lead to less criminals re-offending. ')], [3, 0, 0, 0, 0],
+        #      [367, 368, 2628, 2629, 7862, 6549])]
+        # persp_und = [([(7587, 'The onus should not be on punishing the criminal.'),
+        #                (26962, 'Punishment should not be the primary focus.'),
+        #                (26963, 'Our  main goal should not be punishing the criminal. ')], [0, 0, 0, 3, 0],
+        #               [7574, 7872])]
 
         context = {
             "claim_text": claim_text,
             "vis_type": vis_type,
             "perspectives_sorted": perspectives_sorted,
+            "perspectives_equivalences": perspectives_equivalences,
             "claim_persp_bundled": claim_persp_bundled,
-            "used_evidences_and_texts": used_evidences_and_texts,
+            "used_evidences_and_texts": [], # used_evidences_and_texts,
             # "claim": "",
             # "claim_id": claim_id,
             "persp_sup": persp_sup,
