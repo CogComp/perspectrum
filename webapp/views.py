@@ -1354,12 +1354,18 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
 
         distance_scores = -similarity_score
 
-        clustering = DBSCAN(eps=3, metric='precomputed')
+        # rescale distance score to [0, 1]
+        distance_scores -= np.min(distance_scores)
+        distance_scores /= np.max(distance_scores)
+
+        clustering = DBSCAN(eps=0.3, min_samples=1, metric='precomputed')
         cluster_labels = clustering.fit_predict(distance_scores)
+        print(cluster_labels)
         max_val = max(cluster_labels)
         for i, _ in enumerate(cluster_labels):
             max_val += 1
-            cluster_labels[i] = max_val
+            if cluster_labels[i] == -1:
+                cluster_labels[i] = max_val
 
             # print(similarity_score)
         # print(perspective_given_claim)
