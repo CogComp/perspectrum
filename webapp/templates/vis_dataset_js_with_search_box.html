@@ -61,22 +61,6 @@
         </div>
     </div>
     <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <input id="demo_persp_0" type="text" value=""
-                       placeholder="Write a perspective in response to the claim above" class="form-control">
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col">
-            <div class="form-group">
-                <input id="demo_persp_1" type="text" value=""
-                       placeholder="Another perspective in response to the claim above" class="form-control">
-            </div>
-        </div>
-    </div>
-    <div class="row">
         <div class="col-6">
             <div class="btn-group">
                 <button data-toggle="dropdown" class="btn btn-info dropdown-toggle" type="button" aria-expanded="false">
@@ -84,9 +68,9 @@
                 </button>
                 <ul role="menu" class="dropdown-menu" x-placement="bottom-start"
                     style="position: absolute; transform: translate3d(0px, 41px, 0px); top: 0px; left: 0px; will-change: transform;">
-                    <li><a href="#">Example #1</a></li>
-                    <li><a href="#">Example #2</a></li>
-                    <li><a href="#">Example #3</a></li>
+                    <li><a href="JavaScript:load_example_1()">Example #1</a></li>
+                    <li><a href="JavaScript:load_example_2()">Example #2</a></li>
+                    <li><a href="JavaScript:load_example_3()">Example #3</a></li>
                 </ul>
             </div>
         </div>
@@ -354,6 +338,19 @@
         console.log(url);
         window.location.href = url;
     });
+</script>
+<script type="application/javascript">
+    function load_example_1(){
+        $('#claim-box').val("Animal testing for medical research should be allowed.")
+    }
+
+    function load_example_2(){
+        $('#claim-box').val("University education should be free.")
+    }
+
+    function load_example_3(){
+        $('#claim-box').val("The drinking age should be lowered from 21.")
+    }
 </script>
 </body>
 </html>
