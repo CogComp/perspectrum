@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+            integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+            crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.3/umd/popper.min.js"
+            integrity="sha384-vFJXuSJphROIrBnz7yo7oB41mKfc8JzQZiCq4NCceLEaO4IHwicKwpJf9c9IpFgh"
+            crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"
+            integrity="sha384-alpBpkh1PFOepccYVYDB4do5UnbKysX5WZXm3XxPqe5iKTfUKjNkCk9SaVuEZflJ"
+            crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css"
+          integrity="sha384-PsH8R72JQ3SOdhVi3uxftmaW6Vc51MKb0q5P2rRUpPvrszuE4W1povHYgTpBfshb" crossorigin="anonymous">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <style>
+        html {
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <div class="row">
+            <div class="col-sm">
+                <h1 class="display-4">Perspectrum</h1>
+                <p class="lead">A dataset of claims, perspectives and evidences</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-sm">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Introduction</h2>
+                    With an increasing "information pollution" presence in our daily lives, there is a significant demand for better organization and access to information.
+                    <br>
+                    In order to facilitate research and progress on this problem, we built Perspectrum, a dataset of claims, perspectives and evidences.
+                    We hope that  this dataset would bring more attention to this important problem and would speed of progress in this important direction.
+                    <br>
+                </div>
+            </div>
+            <br>
+        </div>
+        <div class="col-sm">
+            <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Releases and Downloads</h2>
+                    The entire dataset contains 1k claims, accompanied with pools of 10k and 8k perspective sentences
+                    and evidence paragraphs, respectively.
+                    <br>
+                    <div class="container" style="text-align: center" id="releases">
+                        <a class="btn btn-primary" href="https://github.com/CogComp/perspectrum/tree/master/data/dataset" role="button" style="text-align: center">Download
+                            the data</a>
+                    </div>
+                    <br>
+                    To find some details on the structure of the dataset conventions, check out <a
+                        href="https://github.com/CogComp/perspectrum/tree/master/data/dataset">this link</a>.
+                </div>
+            </div>
+            <br>
+        </div>
+    </div>
+    <div class="card">
+                <div class="card-body">
+                    <h2 class="card-title">Example</h2>
+                    Given a natural language claim, a hypothetical system is expected to discover various perspectives that are substantiated with evidence and their stance with respect to the claim.
+                    The supporting and opposing perspectives are indicated with green and red colors, respectively.
+                    <br>
+                    <br>
+                    <img src="dataset_example.png" class="card-img-top" alt="...">
+                </div>
+            </div>
+</div>
+<div class="container">
+    <hr/>
+    <h1>Paper</h1>
+    Work is published under <b><a href="https://creativecommons.org/licenses/">the Creative Commons (BY-SA)</a></b> license.
+    <br>
+
+    If you find this data helpful in your work, please cite <a href="http://cogcomp.org/page/publication_view/833">this
+    paper</a>:
+
+
+    <pre><div class="alert alert-primary" role="alert">@inproceedings{chen2018perspectives,
+  title={Seeing Things from a Different Angle: Discovering Diverse Perspectives about Claims},
+  author={Chen, Sihao and Khashabi, Daniel and Yin, Wenpeng and Callison-Burch, Chris and Roth, Dan},
+  book={NAACL},
+  year={2019}
+}</div></pre>
+</div>
+<script>window.twttr = (function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0],
+        t = window.twttr || {};
+    if (d.getElementById(id)) return t;
+    js = d.createElement(s);
+    js.id = id;
+    js.src = "https://platform.twitter.com/widgets.js";
+    fjs.parentNode.insertBefore(js, fjs);
+
+    t._e = [];
+    t.ready = function (f) {
+        t._e.push(f);
+    };
+
+    return t;
+}(document, "script", "twitter-wjs"));</script>
+</body>
+</html>
