@@ -20,7 +20,7 @@ from webapp import views
 
 urlpatterns = [
     # commmon urls
-    path('', views.render_login_page, name="render_login"),
+    path('', views.dataset_page),
     path('logout/', views.logout_request, name="logout"),
     path('success/', views.successView, name='success'),
     path('admin/', admin.site.urls),
