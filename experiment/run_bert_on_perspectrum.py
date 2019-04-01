@@ -529,6 +529,13 @@ def evidence_evaluation(model_path, raw_score_path):
 
     bb.evaluate(data_dir, raw_score_path)
 
+def evidence_dev_evaluation(model_path, raw_score_path):
+    data_dir = FILE_PATH['evidence_data']
+
+    bb = BertBaseline(task_name="perspectrum_evidence", saved_model=model_path)
+
+    bb.evaluate(data_dir, raw_score_path)
+
 def test_models():
     bb = BertBaseline(task_name="perspectrum_relevane",
                       saved_model="/Users/daniel/ideaProjects/perspective/model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth",
@@ -553,6 +560,6 @@ if __name__ == "__main__":
     # equivalence_train()
     # equivalence_evaluation("/scratch/sihaoc/project/perspective/model/equivalence/lr2e-05_bs16/perspectrum_equivalence_epoch-0.pth")
     # relevance_train()
-    evidence_train()
-    # evidence_evaluation("/scratch/sihaoc/project/perspective/model/evidence/lr3e-05_bs16/perspectrum_evidence_epoch-0.pth",
-    #                     raw_score_path="/scratch/sihaoc/project/perspective/model/evidence/lr3e-05_bs16/epoch-0.score")
+    # evidence_train()
+    evidence_evaluation("/scratch/sihaoc/project/perspective/model/evidence/lr3e-05_bs32/perspectrum_evidence_epoch-4.pth",
+                        raw_score_path="/scratch/sihaoc/project/perspective/model/evidence/lr3e-05_bs32/epoch-4.score")
