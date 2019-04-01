@@ -6,7 +6,6 @@ import sys
 import zipfile
 from io import BytesIO
 
-from io import StringIO
 from django.http import HttpResponse
 from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
@@ -15,27 +14,18 @@ from django.core.mail import send_mail, BadHeaderError
 from django.shortcuts import render, redirect
 from django.core.files import File
 from sklearn.cluster import DBSCAN
+from django.contrib.auth import logout
 
-from experiment.query_elasticsearch import get_perspective_from_pool
-from experiment.query_elasticsearch import get_evidence_from_pool
+# from experiment.query_elasticsearch import get_perspective_from_pool
+# from experiment.query_elasticsearch import get_evidence_from_pool
 from pulp import LpVariable, LpProblem, LpMaximize, LpStatus, value, os
 
-from experiment.run_bert_on_perspectrum import BertBaseline
-from .forms import ContactForm
+# from experiment.run_bert_on_perspectrum import BertBaseline
 
 from webapp.models import *
-from webapp.util.step1.persp_verification_auth import get_persp_hit_session
-from webapp.util.step2b.equivalence_auth import get_equivalence_hit_session
-from webapp.util.step2a.paraphrase_auth import get_paraphrase_hit_session
-from webapp.util.step3.evidence_auth import get_evidence_hit_session
-from webapp.util.step4.topic_auth import get_topic_hit_session
 
-from collections import OrderedDict
-import datetime
 import random
 from copy import deepcopy
-
-import experiment.query_elasticsearch as es
 
 file_names = {
     'evidence': 'data/dataset/evidence_pool_v0.2.json',
@@ -563,88 +553,6 @@ def vis_evidence(request, evidence_ids):
     return render(request, 'evidence.html', context)
 
 
-@login_required
-def vis_neg_anno(request, claim_id):
-    return render(request, 'step1/claim_neg_anno.html', {})
-
-
-@login_required
-def vis_relation(request, claim_id):
-    try:
-        claim = Claim.objects.get(id=claim_id)
-    except Claim.DoesNotExist:
-        pass  # TODO: Do something? 404?
-
-    perspective_pool = get_pool_from_claim_id(claim_id)
-
-    return render(request, 'step1/claim_relation.html', {
-        "claim": "",
-        "perspective_pool": perspective_pool
-    })
-
-
-@login_required
-@csrf_protect
-def submit_instr(request):
-    if request.method != 'POST':
-        raise ValueError("submit_instr API only supports POST request")
-        # TODO: Actaully not sure what to do here..
-    else:
-        username = request.user.username
-        session = get_persp_hit_session(username)
-
-        session.instruction_complete = True
-        session.save()
-        return HttpResponse("Submission Success!", status=200)
-
-
-@login_required
-@csrf_protect
-def submit_rel_anno(request):
-    """
-    Accepts POST requests and update the annotations
-    """
-    if request.method != 'POST':
-        raise ValueError("submit_rel_anno API only supports POST request")
-        # TODO: Actaully not sure what to do here..
-    else:
-        claim_id = request.POST.get('claim_id')
-        annos = request.POST.getlist('annotations[]')
-
-        username = request.user.username
-        session = get_persp_hit_session(username)
-
-        if claim_id and annos:
-            for a in annos:
-                parts = a.split(',')
-                if len(parts) != 2:
-                    return HttpResponse("Submission Failed! Annotation not valid.", status=400)
-
-                persp_id = parts[0]
-                rel = parts[1]
-                anno_entry = PerspectiveRelation.objects.create(author=username, claim_id=claim_id,
-                                                                perspective_id=persp_id, rel=rel, comment="turk_google")
-                anno_entry.save()
-
-        # Update finished jobs in user session
-        fj = set(json.loads(session.finished_jobs))
-        fj.add(int(claim_id))
-        session.finished_jobs = json.dumps(list(fj))
-
-        # increment duration in database
-        delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
-        session.duration = session.duration + delta
-        session.save()
-
-        # Increment finished counts in claim table
-        if username != 'TEST':
-            claim = Claim.objects.get(id=claim_id)
-            claim.finished_counts += 1
-            claim.save()
-
-        return HttpResponse("Submission Success!", status=200)
-
-
 def render_login_page(request):
     """
     Renderer for login page
@@ -652,656 +560,102 @@ def render_login_page(request):
     return render(request, "login.html", {})
 
 
-from django.contrib.auth import logout
-
-
 def logout_request(request):
     logout(request)
     return render_login_page(request)
 
-
-@login_required
-def render_list_page(request):
-    """
-    Renderer the list of task
-    """
-    username = request.user.username
-    session = get_persp_hit_session(username)
-    instr_complete = session.instruction_complete
-    jobs = json.loads(session.jobs)
-    finished = json.loads(session.finished_jobs)
-
-    task_list = []
-    for job in jobs:
-        task_list.append({
-            "id": job,
-            "done": job in finished
-        })
-
-    tasks_are_done = all(item["done"] for item in task_list)
-
-    task_id = -1
-    if tasks_are_done:  # TODO: change this condition to if the user has completed the task
-        task_id = session.id
-        session.job_complete = True
-        session.save()
-
-    context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
-    return render(request, "step1/list_tasks.html", context)
-
-
-def render_instructions(request):
-    return render(request, "step1/instructions.html", {})
-
-
-def render_contact(request):
-    if request.method == 'GET':
-        form = ContactForm()
-    else:
-        form = ContactForm(request.POST)
-        if form.is_valid():
-            subject = form.cleaned_data['subject']
-            from_email = form.cleaned_data['from_email']
-            message = form.cleaned_data['message']
-            try:
-                send_mail(subject, message, from_email, ['sihaoc@seas.upenn.edu', 'danielkh@cis.upenn.edu'])
-            except BadHeaderError:
-                return HttpResponse('Invalid header found.')
-            return redirect('success')
-    return render(request, "contact.html", {'form': form})
 
 
 def successView(request):
     return HttpResponse('Success! Thank you for your message.')
 
 
-@login_required
-def vis_normalize_persp(request, claim_id):
-    username = request.user.username
-    session = get_persp_hit_session(username)
-    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
-    session.save()
-    try:
-        claim = Claim.objects.get(id=claim_id)
-    except Claim.DoesNotExist:
-        pass  # TODO: Do something? 404?
+# def bert_baseline(request, claim_text=""):
+#     print(claim_text)
+#     if claim_text != "":
+#         claim = claim_text  #
+#
+#         prob = LpProblem("perspectiveOptimization", LpMaximize)
+#
+#         # given a claim, extract perspectives
+#         perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
+#                                    get_perspective_from_pool(claim, 30)]
+#
+#         # create binary variables per perspective
+#         perspective_variables = []
+#         perspective_weights = []
+#         perspective_ids = []
+#         perspective_given_claim_subset = []
+#
+#         for (pIdx, (p_text, pId, pScore)) in enumerate(perspective_given_claim):
+#             if pScore > 1.55:
+#                 x = LpVariable("p" + str(pIdx), 0, 1)
+#                 perspective_variables.append(x)
+#                 perspective_weights.append(pScore)
+#                 perspective_ids.append(pId)
+#                 perspective_given_claim_subset.append((p_text, pId, pScore))
+#                 # print(pScore)
+#
+#         # print(len(perspective_variables))
+#
+#         total_obj = sum(x * obj for x, obj in zip(perspective_variables, perspective_weights))
+#
+#         # maximum and minimum number of perspectives selected
+#         total_weight = sum(x * 1.0 for x in perspective_variables)
+#         prob += total_weight <= 10
+#         # prob += total_weight >= 5
+#
+#         assert (len(perspective_variables) == len(perspective_weights))
+#
+#         prob += total_obj
+#         status = prob.solve()
+#         print(LpStatus[status])
+#
+#         # extract active variables
+#         used_evidences_and_texts = []
+#         persp_sup = []
+#         for pVar, p in zip(perspective_variables, perspective_given_claim_subset):
+#             pScore = p[2]
+#             p_text = p[0]
+#             # print(pVar)
+#             # print(value(pVar))
+#             if value(pVar) != None:
+#                 if value(pVar) > 0.5:
+#                     lucene_evidences = get_evidence_from_pool(claim + p_text, 2)
+#                     evidences = []
+#                     if len(lucene_evidences) > 0:
+#                         (e_text, eId, eScore) = lucene_evidences[0]
+#                         evidences = eId
+#                         used_evidences_and_texts.append([eId, e_text.replace("`", "'")])
+#                     persp_sup.append((p[0], p[1], 1, [evidences], pScore))
+#
+#             else:
+#                 print("value is none")
+#
+#         claim_persp_bundled = [(claim, persp_sup, [])]
+#
+#         context = {
+#             "claim_persp_bundled": claim_persp_bundled,
+#             "used_evidences_and_texts": used_evidences_and_texts
+#         }
+#     else:
+#         context = {}
+#
+#     return render(request, "vis_dataset_js.html", context)
+
+
+# ### loading the BERT solvers
+# bb_relevance = BertBaseline(task_name="perspectrum_relevance",
+#                             saved_model="model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth", no_cuda=True)
+# bb_stance = BertBaseline(task_name="perspectrum_stance",
+#                          saved_model="model/stance/perspectrum_stance_lr2e-05_bs16_epoch-4.pth", no_cuda=True)
+# bb_equivalence = BertBaseline(task_name="perspectrum_equivalence",
+#                               saved_model="model/equivalence/perspectrum_equivalence_lr3e-05_bs32_epoch-2.pth",
+#                               no_cuda=True)
+#
+# logging.disable(sys.maxsize)  # Python 3
 
-    perspective_pool = get_all_persp(claim_id)
 
-    return render(request, 'step1/normalize_persp.html', {
-        "claim": claim,
-        "perspective_pool": perspective_pool
-    })
-
-
-###############################################
-#     STEP 2a APIs
-#     Perspective Paraphrase
-###############################################
-@login_required
-def render_step2a_instructions(request):
-    return render(request, "step2a/instructions.html", {})
-
-
-@login_required
-def render_step2a_task_list(request):
-    username = request.user.username
-    session = get_paraphrase_hit_session(username)
-
-    instr_complete = session.instruction_complete
-    jobs = json.loads(session.jobs)
-    finished = json.loads(session.finished_jobs)
-
-    task_list = []
-    for job in jobs:
-        task_list.append({
-            "id": job,
-            "done": job in finished
-        })
-
-    tasks_are_done = all(item["done"] for item in task_list)
-
-    task_id = -1
-    if tasks_are_done:  # TODO: change this condition to if the user has completed the task
-        task_id = session.id
-        session.job_complete = True
-        session.save()
-
-    context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
-
-    return render(request, 'step2a/task_list.html', context)
-
-
-@login_required
-def vis_perspective_paraphrase(request, batch_id):
-    username = request.user.username
-    session = get_paraphrase_hit_session(username)
-    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
-    session.save()
-    try:
-        pb = ParaphraseBatch.objects.get(id=batch_id)
-    except ParaphraseBatch.DoesNotExist:
-        return HttpResponse(content="Batch_Id = {} Not found in the database!".format(batch_id), status=404)
-
-    ppids = json.loads(pb.paraphrase_ids)
-
-    paraphrases = [PerspectiveParaphrase.objects.get(id=i) for i in ppids]
-    perspectives = []
-    hints = {}
-    claims = {}
-
-    for pp in paraphrases:
-        pid = pp.perspective_id
-        perspectives.append(Perspective.objects.get(id=pid))
-        cid = PerspectiveRelation.objects.filter(author="GOLD").exclude(comment="google").get(
-            perspective_id=pid).claim_id
-        c = Claim.objects.get(id=cid)
-
-        _h = json.loads(pp.hints)
-        random.shuffle(_h)
-        hints[pid] = _h
-        claims[pid] = c.title
-
-    return render(request, 'step2a/paraphrase_perspectives.html', {
-        "perspectives": perspectives,
-        "hints": hints,
-        "claims": claims
-    })
-
-
-@login_required
-@csrf_protect
-def step2a_submit_instr(request):
-    if request.method != 'POST':
-        raise ValueError("submit_instr API only supports POST request")
-    else:
-        username = request.user.username
-        session = get_paraphrase_hit_session(username)
-
-        session.instruction_complete = True
-        session.save()
-        return HttpResponse("Submission Success!", status=200)
-
-
-@login_required
-@csrf_protect
-def submit_paraphrase_annotation(request):
-    if request.method != 'POST':
-        raise ValueError("submit_rel_anno API only supports POST request")
-    else:
-        batch_id = request.POST.get('batch_id')
-        annos = json.loads(request.POST.get('annotations'))
-        username = request.user.username
-        session = get_paraphrase_hit_session(username)
-
-        # Update annotation in EquivalenceAnnotation table
-        for pid, paras in annos.items():
-            p = PerspectiveParaphrase.objects.get(perspective_id=pid)
-            user_para_str = p.user_generated.replace('"', '\\"').replace('[\'', '["').replace('\']', '"]').replace(
-                '\', \'', '", "') \
-                .replace('\', "', '", "').replace('", \'', '", "')
-            print(user_para_str)
-            user_para = json.loads(user_para_str)
-            sid_str = p.session_ids.replace('[\'', '["').replace('\']', '"]').replace('\', \'', '", "')
-            session_ids = json.loads(sid_str)
-
-            for pp in paras:
-                user_para.append(pp)
-                session_ids.append(session.id)
-
-            p.user_generated = json.dumps(user_para)
-            p.session_ids = json.dumps(session_ids)
-            p.save()
-
-        # Update finished jobs in user session
-        fj = set(json.loads(session.finished_jobs))
-        fj.add(int(batch_id))
-        session.finished_jobs = json.dumps(list(fj))
-
-        # increment duration in database
-        delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
-        session.duration = session.duration + delta
-        session.save()
-
-        # Increment finished assignment count in claim table, if not using test acc
-        if username != 'TEST':
-            c = ParaphraseBatch.objects.get(id=batch_id)
-            c.finished_counts += 1
-            c.save()
-
-        return HttpResponse("Submission Success!", status=200)
-
-
-###############################################
-#     STEP 2b APIs
-#     Perspective Equivalence
-###############################################
-@login_required
-def render_step2b_instructions(request):
-    return render(request, "step2b/instructions.html", {})
-
-
-@login_required
-def render_step2b_task_list(request):
-    username = request.user.username
-    session = get_equivalence_hit_session(username)
-
-    instr_complete = session.instruction_complete
-    jobs = json.loads(session.jobs)
-    finished = json.loads(session.finished_jobs)
-
-    task_list = []
-    for job in jobs:
-        task_list.append({
-            "id": job,
-            "done": job in finished
-        })
-
-    tasks_are_done = all(item["done"] for item in task_list)
-
-    task_id = -1
-    if tasks_are_done:  # TODO: change this condition to if the user has completed the task
-        task_id = session.id
-        session.job_complete = True
-        session.save()
-
-    context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
-
-    return render(request, 'step2b/task_list.html', context)
-
-
-@login_required
-def vis_persp_equivalence(request, batch_id):
-    username = request.user.username
-    session = get_equivalence_hit_session(username)
-    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
-    session.save()
-
-    try:
-        eb = EquivalenceBatch.objects.get(id=batch_id)
-    except EquivalenceBatch.DoesNotExist:
-        return HttpResponse(content="Batch_Id = {} Not found in the database!".format(batch_id), status=404)
-
-    persp_ids = json.loads(eb.perspective_ids)
-
-    persps = []
-    claims = {}
-    candidates = {}
-
-    for cid, pid in persp_ids:
-        persp = Perspective.objects.get(id=pid)
-        persps.append(persp)
-
-        claims[pid] = Claim.objects.get(id=cid).title
-
-        cand_ids = set(json.loads(Perspective.objects.get(id=pid).similar_persps))
-        cand_persps = Perspective.objects.filter(id__in=cand_ids)
-        candidates[pid] = cand_persps
-
-    return render(request, 'step2b/persp_equivalence.html', {
-        "claims": claims,
-        "perspective_pool": persps,
-        "candidates": candidates
-    })
-
-
-@login_required
-@csrf_protect
-def submit_equivalence_annotation(request):
-    if request.method != 'POST':
-        raise ValueError("submit_rel_anno API only supports POST request")
-    else:
-        claim_id = request.POST.get('claim_id')
-        annos = json.loads(request.POST.get('annotations'))
-        username = request.user.username
-        session = get_equivalence_hit_session(username)
-
-        # Update annotation in EquivalenceAnnotation table
-        for p, cands in annos.items():
-            EquivalenceAnnotation.objects.create(session_id=session.id, author=username,
-                                                 perspective_id=p, user_choice=json.dumps(annos[p]))
-
-        # Update finished jobs in user session
-        fj = set(json.loads(session.finished_jobs))
-        fj.add(int(claim_id))
-        session.finished_jobs = json.dumps(list(fj))
-
-        # increment duration in database
-        delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
-        session.duration = session.duration + delta
-        session.save()
-
-        # Increment finished assignment count in claim table, if not using test acc
-        if username != 'TEST':
-            eb = EquivalenceBatch.objects.get(id=claim_id)
-            eb.finished_counts += 1
-            eb.save()
-
-        return HttpResponse("Submission Success!", status=200)
-
-
-@login_required
-@csrf_protect
-def step2b_submit_instr(request):
-    if request.method != 'POST':
-        raise ValueError("submit_instr API only supports POST request")
-    else:
-        username = request.user.username
-        session = get_equivalence_hit_session(username)
-
-        session.instruction_complete = True
-        session.save()
-        return HttpResponse("Submission Success!", status=200)
-
-
-###############################################
-#     STEP 3 APIs
-#     Evidence verification
-###############################################
-
-PERSP_NUM = 8
-
-
-@login_required
-def render_evidence_verification(request, batch_id):
-    username = request.user.username
-    session = get_evidence_hit_session(username)
-    session.last_start_time = datetime.datetime.now(datetime.timezone.utc)
-    session.save()
-    try:
-        eb = EvidenceBatch.objects.get(id=batch_id)
-    except EvidenceBatch.DoesNotExist:
-        pass  # TODO: Do something? 404?
-
-    eids = json.loads(eb.evidence_ids)
-
-    valid_persp_ids = ReStep1Results.objects.filter(label_3__in=["S", "U"], p_i_3__gt=0.5).values_list(
-        'perspective_id').distinct()
-
-    evidences = [Evidence.objects.get(id=i) for i in eids]
-    keywords = {}
-    candidates = {}
-    for evi in evidences:
-        origin_cands = json.loads(evi.origin_candidates)
-        google_cands = json.loads(evi.google_candidates)
-
-        same_claim_cands = []
-
-        # Get Keywords
-        try:
-            _er = EvidenceRelation.objects.filter(author="GOLD").get(evidence_id=evi.id)
-            pid = _er.perspective_id
-            _pr = PerspectiveRelation.objects.filter(author="GOLD").get(perspective_id=pid)
-            cid = _pr.claim_id
-            _c = Claim.objects.get(id=cid)
-            same_claim_cands = list(PerspectiveRelation.objects.filter(author="GOLD", claim_id=cid).
-                                    exclude(comment="google").values_list("perspective_id", flat=True))
-
-            same_claim_cands = [scc for scc in same_claim_cands if scc in valid_persp_ids]
-
-            _keywords = json.loads(_c.keywords)
-        except EvidenceRelation.DoesNotExist:
-            _keywords = []
-        except PerspectiveRelation.DoesNotExist:
-            _keywords = []
-        except Claim.DoesNotExist:
-            _keywords = []
-
-        keywords[evi.id] = _keywords
-
-        all_cands = origin_cands + same_claim_cands + google_cands
-        cands = list(OrderedDict.fromkeys(all_cands))[:PERSP_NUM]
-
-        persps = [Perspective.objects.get(id=i) for i in cands]
-
-        # shuffle the order of perspectives
-        candidates[evi.id] = persps
-
-    return render(request, 'step3/evidence_verification.html', {
-        "evidences": evidences,
-        "candidates": candidates,
-        "keywords": keywords
-    })
-
-
-def render_step3_task_list(request):
-    username = request.user.username
-    session = get_evidence_hit_session(username)
-
-    instr_complete = session.instruction_complete
-    jobs = json.loads(session.jobs)
-    finished = json.loads(session.finished_jobs)
-
-    task_list = []
-    for job in jobs:
-        task_list.append({
-            "id": job,
-            "done": job in finished
-        })
-
-    tasks_are_done = all(item["done"] for item in task_list)
-
-    task_id = -1
-    if tasks_are_done and len(jobs) > 0:  # TODO: change this condition to if the user has completed the task
-        task_id = session.id
-        session.job_complete = True
-        session.save()
-
-    context = {"task_id": task_id, "instr_complete": instr_complete, "task_list": task_list}
-
-    return render(request, 'step3/task_list.html', context)
-
-
-def render_step3_instructions(request):
-    return render(request, "step3/instructions.html", {})
-
-
-evidence_label_mapping = {
-    "sup": "S",
-    "nsup": "N"
-}
-
-
-@login_required
-@csrf_protect
-def submit_evidence_annotation(request):
-    if request.method != 'POST':
-        raise ValueError("submit_rel_anno API only supports POST request")
-    else:
-        batch_id = request.POST.get('batch_id')
-        annos = json.loads(request.POST.get('annotations'))
-        username = request.user.username
-        session = get_evidence_hit_session(username)
-
-        # Update annotation in EquivalenceAnnotation table
-        for anno in annos:
-            label = anno[2]
-            if label in evidence_label_mapping:
-                EvidenceRelation.objects.create(author=username, evidence_id=anno[0], perspective_id=anno[1],
-                                                anno=evidence_label_mapping[label], comment="step3")
-
-        # Update finished jobs in user session
-        fj = set(json.loads(session.finished_jobs))
-        fj.add(int(batch_id))
-        session.finished_jobs = json.dumps(list(fj))
-
-        # increment duration in database
-        delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
-        session.duration = session.duration + delta
-        session.save()
-
-        # Increment finished assignment count in claim table, if not using test acc
-        if username != 'TEST':
-            c = EvidenceBatch.objects.get(id=batch_id)
-            c.finished_counts += 1
-            c.save()
-
-        return HttpResponse("Submission Success!", status=200)
-
-
-@login_required
-@csrf_protect
-def step3_submit_instr(request):
-    if request.method != 'POST':
-        raise ValueError("submit_instr API only supports POST request")
-    else:
-        username = request.user.username
-        session = get_evidence_hit_session(username)
-
-        session.instruction_complete = True
-        session.save()
-        return HttpResponse("Submission Success!", status=200)
-
-
-@login_required
-def bert_baseline(request, claim_text=""):
-    print(claim_text)
-    if claim_text != "":
-        claim = claim_text  #
-
-        prob = LpProblem("perspectiveOptimization", LpMaximize)
-
-        # given a claim, extract perspectives
-        perspective_given_claim = [(p_text, pId, pScore / len(p_text.split(" "))) for p_text, pId, pScore in
-                                   get_perspective_from_pool(claim, 30)]
-
-        # create binary variables per perspective
-        perspective_variables = []
-        perspective_weights = []
-        perspective_ids = []
-        perspective_given_claim_subset = []
-
-        for (pIdx, (p_text, pId, pScore)) in enumerate(perspective_given_claim):
-            if pScore > 1.55:
-                x = LpVariable("p" + str(pIdx), 0, 1)
-                perspective_variables.append(x)
-                perspective_weights.append(pScore)
-                perspective_ids.append(pId)
-                perspective_given_claim_subset.append((p_text, pId, pScore))
-                # print(pScore)
-
-        # print(len(perspective_variables))
-
-        total_obj = sum(x * obj for x, obj in zip(perspective_variables, perspective_weights))
-
-        # maximum and minimum number of perspectives selected
-        total_weight = sum(x * 1.0 for x in perspective_variables)
-        prob += total_weight <= 10
-        # prob += total_weight >= 5
-
-        assert (len(perspective_variables) == len(perspective_weights))
-
-        # given a perspective, retrieve relevant perspectives
-        # create a map of clustering similarity
-        # offset = 7
-        # pp_threshold = 10
-        # lucene_perspective_pair_cache = {}
-        # for p_text1, pId1, _ in perspective_given_claim:
-        #     lucene_perspectives = get_perspective_from_pool(p_text1, 30)
-        #     for p_text2, pId2, pScore2 in lucene_perspectives:
-        #         # print(f"text1: {p_text1} - text2: {p_text2}:  {pScore2}")
-        #         lucene_perspective_pair_cache[(pId1, pId2)] = pScore2 # / (1.0 * len(p_text2.split(" ")))
-
-        # print(lucene_perspective_pair_cache)
-
-        # perspective_pair_variables = []
-        # perspective_pair_weights = []
-        # # perspective_pair_variables_map = {}
-        # for i1, (_, pId1, _) in enumerate(perspective_given_claim):
-        #     # perspective_pair_variables_map[pId1] = []
-        #     for i2, (_, pId2, _) in enumerate(perspective_given_claim):
-        #         if pId1 == pId2 or (pId1, pId2) not in lucene_perspective_pair_cache:
-        #             continue
-        #         y = LpVariable("p" + str(pId1) + "-" + str(pId2), 0, 1)
-        #         if (pId1, pId2) in lucene_perspective_pair_cache:
-        #             # print("negative . . . ")
-        #             score = lucene_perspective_pair_cache[(pId1, pId2)]
-        #             if score > pp_threshold:
-        #                 perspective_pair_variables.append(y)
-        #                 perspective_pair_weights.append(7- 0.0001 * score)
-        #                 # perspective_pair_variables_map[(pId1, pId2)] = score
-        #                 prob += perspective_variables[i1] >= y
-        #                 prob += perspective_variables[i2] >= y
-        #                 prob += y >= (perspective_variables[i2] + perspective_variables[i1] - 1)
-        #
-        # total_obj += sum(x * obj for x, obj in zip(perspective_pair_variables, perspective_pair_weights))
-
-        # print(perspective_pair_variables)
-
-        # assert len(perspective_pair_variables) == len(perspective_pair_weights)
-
-        # given perspectives, retrieve relevant evidences
-        # evidence_variables = []
-        # evidence_weights = []
-        # evidence_ids = []
-        # threshold = 10
-        # perspective_to_evidence_variables = {}
-        evidence_to_perspective_variables = {}
-        # for p_text1, pId1, _ in perspective_given_claim:
-        # perspective_to_evidence_variables[pId1] = []
-        # lucene_evidences = get_evidence_from_pool(p_text1, 1)
-        # for (eIdx, (e_text, eId, eScore)) in enumerate(lucene_evidences):
-        # if pScore > threshold:
-        #     x = LpVariable("pe" + str(pId1) + "-" + str(eId), 0, 1)
-        # evidence_variables.append(x)
-        # evidence_weights.append(pScore)
-        # evidence_ids.append(eId)
-        # perspective_to_evidence_variables[pId1].append((x, pScore, eId))
-        # print(pScore)
-
-        # if a perspective is active, it should be connected to at least one evidence
-        # evidence is not active, unless it is connected to sth
-
-        prob += total_obj
-        status = prob.solve()
-        print(LpStatus[status])
-
-        # extract active variables
-        used_evidences_and_texts = []
-        persp_sup = []
-        for pVar, p in zip(perspective_variables, perspective_given_claim_subset):
-            pScore = p[2]
-            p_text = p[0]
-            # print(pVar)
-            # print(value(pVar))
-            if value(pVar) != None:
-                if value(pVar) > 0.5:
-                    lucene_evidences = get_evidence_from_pool(claim + p_text, 2)
-                    evidences = []
-                    if len(lucene_evidences) > 0:
-                        (e_text, eId, eScore) = lucene_evidences[0]
-                        evidences = eId
-                        used_evidences_and_texts.append([eId, e_text.replace("`", "'")])
-                    persp_sup.append((p[0], p[1], 1, [evidences], pScore))
-
-            else:
-                print("value is none")
-
-        claim_persp_bundled = [(claim, persp_sup, [])]
-
-        context = {
-            "claim_persp_bundled": claim_persp_bundled,
-            "used_evidences_and_texts": used_evidences_and_texts
-        }
-    else:
-        context = {}
-
-    return render(request, "vis_dataset_js.html", context)
-
-
-### loading the BERT solvers
-bb_relevance = BertBaseline(task_name="perspectrum_relevance",
-                            saved_model="model/relevance/perspectrum_relevance_lr2e-05_bs32_epoch-0.pth", no_cuda=True)
-bb_stance = BertBaseline(task_name="perspectrum_stance",
-                         saved_model="model/stance/perspectrum_stance_lr2e-05_bs16_epoch-4.pth", no_cuda=True)
-bb_equivalence = BertBaseline(task_name="perspectrum_equivalence",
-                              saved_model="model/equivalence/perspectrum_equivalence_lr3e-05_bs32_epoch-2.pth",
-                              no_cuda=True)
-
-logging.disable(sys.maxsize)  # Python 3
-
-
-@login_required
 def perspectrum_solver(request, claim_text="", vis_type=""):
     """
     solves a given instances with one of the baselines.
@@ -1366,121 +720,6 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
             max_val += 1
             if cluster_labels[i] == -1:
                 cluster_labels[i] = max_val
-
-            # print(similarity_score)
-        # print(perspective_given_claim)
-        # print(perspectives_equivalences)
-
-        # create binary variables per perspective
-        # perspective_variables = []
-        # perspective_weights = []
-        # perspective_ids = []
-        # perspective_given_claim_subset = []
-        #
-        # for (pIdx, (p_text, pId, pScore)) in enumerate(perspective_given_claim):
-        #     if pScore > 1.55:
-        #         x = LpVariable("p" + str(pIdx), 0, 1)
-        #         perspective_variables.append(x)
-        #         perspective_weights.append(pScore)
-        #         perspective_ids.append(pId)
-        #         perspective_given_claim_subset.append((p_text, pId, pScore))
-        #         # print(pScore)
-        #
-        # total_obj = sum(x * obj for x, obj in zip(perspective_variables, perspective_weights))
-
-        # maximum and minimum number of perspectives selected
-        # total_weight = sum(x * 1.0 for x in perspective_variables)
-        # prob += total_weight <= 10
-        # # prob += total_weight >= 5
-
-        # assert (len(perspective_variables) == len(perspective_weights))
-        #
-        # given a perspective, retrieve relevant perspectives
-        # create a map of clustering similarity
-        # offset = 7
-        # pp_threshold = 10
-        # lucene_perspective_pair_cache = {}
-        # for p_text1, pId1, _ in perspective_given_claim:
-        #     lucene_perspectives = get_perspective_from_pool(p_text1, 30)
-        #     for p_text2, pId2, pScore2 in lucene_perspectives:
-        #         # print(f"text1: {p_text1} - text2: {p_text2}:  {pScore2}")
-        #         lucene_perspective_pair_cache[(pId1, pId2)] = pScore2 # / (1.0 * len(p_text2.split(" ")))
-
-        # print(lucene_perspective_pair_cache)
-
-        # perspective_pair_variables = []
-        # perspective_pair_weights = []
-        # # perspective_pair_variables_map = {}
-        # for i1, (_, pId1, _) in enumerate(perspective_given_claim):
-        #     # perspective_pair_variables_map[pId1] = []
-        #     for i2, (_, pId2, _) in enumerate(perspective_given_claim):
-        #         if pId1 == pId2 or (pId1, pId2) not in lucene_perspective_pair_cache:
-        #             continue
-        #         y = LpVariable("p" + str(pId1) + "-" + str(pId2), 0, 1)
-        #         if (pId1, pId2) in lucene_perspective_pair_cache:
-        #             # print("negative . . . ")
-        #             score = lucene_perspective_pair_cache[(pId1, pId2)]
-        #             if score > pp_threshold:
-        #                 perspective_pair_variables.append(y)
-        #                 perspective_pair_weights.append(7- 0.0001 * score)
-        #                 # perspective_pair_variables_map[(pId1, pId2)] = score
-        #                 prob += perspective_variables[i1] >= y
-        #                 prob += perspective_variables[i2] >= y
-        #                 prob += y >= (perspective_variables[i2] + perspective_variables[i1] - 1)
-        #
-        # total_obj += sum(x * obj for x, obj in zip(perspective_pair_variables, perspective_pair_weights))
-
-        # print(perspective_pair_variables)
-
-        # assert len(perspective_pair_variables) == len(perspective_pair_weights)
-
-        # given perspectives, retrieve relevant evidences
-        # evidence_variables = []
-        # evidence_weights = []
-        # evidence_ids = []
-        # threshold = 10
-        # perspective_to_evidence_variables = {}
-        evidence_to_perspective_variables = {}
-        # for p_text1, pId1, _ in perspective_given_claim:
-        # perspective_to_evidence_variables[pId1] = []
-        # lucene_evidences = get_evidence_from_pool(p_text1, 1)
-        # for (eIdx, (e_text, eId, eScore)) in enumerate(lucene_evidences):
-        # if pScore > threshold:
-        #     x = LpVariable("pe" + str(pId1) + "-" + str(eId), 0, 1)
-        # evidence_variables.append(x)
-        # evidence_weights.append(pScore)
-        # evidence_ids.append(eId)
-        # perspective_to_evidence_variables[pId1].append((x, pScore, eId))
-        # print(pScore)
-
-        # if a perspective is active, it should be connected to at least one evidence
-        # evidence is not active, unless it is connected to sth
-
-        # prob += total_obj
-        # status = prob.solve()
-        # print(LpStatus[status])
-        #
-        # # extract active variables
-        # used_evidences_and_texts = []
-        # persp_sup = []
-        # for pVar, p in zip(perspective_variables, perspective_given_claim_subset):
-        #     pScore = p[2]
-        #     p_text = p[0]
-        #     # print(pVar)
-        #     # print(value(pVar))
-        #     if value(pVar) != None:
-        #         if value(pVar) > 0.5:
-        #             lucene_evidences = get_evidence_from_pool(claim + p_text, 2)
-        #             evidences = []
-        #             if len(lucene_evidences) > 0:
-        #                 (e_text, eId, eScore) = lucene_evidences[0]
-        #                 evidences = eId
-        #                 used_evidences_and_texts.append([eId, e_text.replace("`", "'")])
-        #             persp_sup.append((p[0], p[1], 1, [evidences], pScore))
-        #
-        #     else:
-        #         print("value is none")
-        #
 
         persp_sup = []
         persp_sup_flash = []
@@ -1549,61 +788,6 @@ def perspectrum_solver(request, claim_text="", vis_type=""):
 
     return render(request, "vis_dataset_js_with_search_box.html", context)
 
-
-###############################################
-#     STEP 4 APIs
-#     Topic
-###############################################
-
-def render_topic_annotation(request):
-    username = request.user.username
-    session = get_topic_hit_session(username)
-
-    jobs = json.loads(session.jobs)
-    finished = json.loads(session.finished_jobs)
-
-    claims = [Claim.objects.get(id=cid) for cid in jobs]
-
-    context = {
-        'claims': claims
-    }
-
-    return render(request, "step4_topics/topic_interface.html", context)
-
-
-def submit_topic_annotation(request):
-    if request.method != 'POST':
-        raise ValueError("submit_topic_annotation API only supports POST request")
-
-    annos = json.loads(request.POST.get('annotations'))
-    username = request.user.username
-    session = get_topic_hit_session(username)
-
-    # Update annotation in EquivalenceAnnotation table
-    finished_cid_set = set()
-    for anno in annos:
-        cid = anno[0]
-        label = anno[1]
-
-        t = TopicAnnotation.objects.create(author=username, claim_id=cid, topics=label)
-        t.save()
-
-        if username != 'TEST':
-            finished_cid_set.add(cid)
-
-    for cid in finished_cid_set:
-        c = Claim.objects.get(id=cid)
-        c.topic_finished_counts += 1
-        c.save()
-
-    # increment duration in database
-    delta = datetime.datetime.now(datetime.timezone.utc) - session.last_start_time
-    session.duration = session.duration + delta
-    session.job_complete = True
-    session.save()
-
-    res = HttpResponse(str(session.id), status=200)
-    return res
 
 
 def sunburst(request):
@@ -1700,23 +884,6 @@ def sunburst(request):
     return render(request, "topics-sunburst/sunburst2.html", context)
 
 
-@login_required
-def render_human_eval(request, claim_id):
-    if claim_id not in claim_dict:
-        return HttpResponse("Claim with id = {} doesn't exist in our database. ".format(claim_id), status=404)
-
-    claim_title = claim_dict[claim_id]['text']
-
-    cands = es.get_perspective_from_pool(claim_title, 50)
-
-    context = {
-        'claim_id': claim_id,
-        'claim_title': claim_title,
-        'persp_candidates': cands
-    }
-    return render(request, 'human_eval.html', context)
-
-
 def retrieve_evidence_candidates(request, cid, pid):
     if (cid not in claim_dict) or (pid not in persp_dict):
         return HttpResponse("Claim with id = {} doesn't exist in our database. ".format(cid), status=404)
@@ -1734,20 +901,6 @@ def retrieve_evidence_candidates(request, cid, pid):
 def normalize(num):
     return math.floor(num * 100) / 100.0
 
-
-@login_required
-@csrf_protect
-def submit_human_anno(request):
-    if request.method != 'POST':
-        raise ValueError("submit_topic_annotation API only supports POST request")
-
-    claim_id = request.POST.get('claim_id')
-    annos = json.loads(request.POST.get('annotations'))
-    username = request.user.username
-
-    HumanAnnotation.objects.create(author=username, claim_id=claim_id, annotation=json.dumps(annos))
-
-    return HttpResponse("Submission success!", status=200)
 
 
 def render_demo(request):
