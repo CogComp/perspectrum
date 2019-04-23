@@ -1,7 +1,7 @@
 import os
 import random
 from typing import List
-
+import csv
 from tqdm import tqdm, trange
 
 import numpy as np
@@ -14,7 +14,7 @@ from pytorch_pretrained_bert.modeling import BertForSequenceClassification
 from pytorch_pretrained_bert.optimization import BertAdam
 from pytorch_pretrained_bert.file_utils import PYTORCH_PRETRAINED_BERT_CACHE
 
-from experiment.bert.run_classifier import MrpcProcessor, logger, convert_examples_to_features, \
+from bert.run_classifier import MrpcProcessor, logger, convert_examples_to_features, \
     set_optimizer_params_grad, copy_optimizer_params_to_model, accuracy, p_r_f1, tp_pcount_gcount, \
     InputExample
 
@@ -312,7 +312,7 @@ class BertBaseline:
                 # Reinitialize model weights
                 self._init_model()
 
-    def evaluate(self, data_dir):
+    def evaluate(self, data_dir, raw_score_output_dir=None):
         """
         Directory that contains a "test.tsv"
         :param data_dir:
@@ -331,9 +331,10 @@ class BertBaseline:
         all_label_ids = torch.tensor([f.label_id for f in test_features], dtype=torch.long)
 
         test_data = TensorDataset(all_input_ids, all_input_mask, all_segment_ids, all_label_ids)
-        return self._evaluate(test_data)
 
-    def _evaluate(self, eval_data):
+        return self._evaluate(test_data, raw_score_output_dir)
+
+    def _evaluate(self, eval_data, raw_score_output_dir=None):
         logger.info("***** Running evaluation *****")
         logger.info("  Num examples = %d", len(eval_data))
         logger.info("  Batch size = %d", self._config["eval_batch_size"])
@@ -392,6 +393,18 @@ class BertBaseline:
         logger.info("  Micro Precision = {}".format(eval_micro_p))
         logger.info("  Micro Recall = {}".format(eval_micro_r))
         logger.info("  Micro F1 = {}".format(eval_micro_f1))
+
+        if raw_score_output_dir:
+            with open(raw_score_output_dir, 'w') as fout:
+                fields = ["undermine_score", "support_score", "gold"]
+                writer = csv.DictWriter(fout, fieldnames=fields)
+                writer.writeheader()
+                for score, gold in raw_score:
+                    writer.writerow({
+                        "undermine_score": str(score[0]),
+                        "support_score": str(score[1]),
+                        "gold": str(gold)
+                    })
 
         return eval_micro_p, eval_micro_r, eval_micro_f1
 
@@ -502,32 +515,26 @@ def relevance_evaluation(model_path):
 
 
 def evidence_train():
-    # Since evidence is usually long, we need to lift the max sequence length and lower the batch size.
-    _config = {
-        "bert_model": bert_model,
-        "max_seq_length": 512,
-        "do_lower_case": False,
-        "train_batch_size": [4, 8],
-        "eval_batch_size": 8,
-        "learning_rate": [3e-5, 2e-5],
-        "num_train_epochs": 5,
-        "warmup_proportion": 0.1,
-        "no_cuda": False,
-        "local_rank": -1,
-        "seed": 42,
-        "gradient_accumulation_steps": 1,
-        "optimize_on_cpu": False,
-        "fp16": False,
-        "loss_scale": 128,
-        "task_name": "perspectrum_evidence",
-    }
-
     data_dir = FILE_PATH['evidence_data']
     model_dir = FILE_PATH['evidence_model_dir']
 
-    bb = BertBaseline(None, **_config)
+    bb = BertBaseline(task_name="perspectrum_evidence", saved_model=None, learning_rate=[2e-5], train_batch_size=[16])
     bb.train(data_dir, model_dir)
 
+
+def evidence_evaluation(model_path, raw_score_path):
+    data_dir = FILE_PATH['evidence_data']
+
+    bb = BertBaseline(task_name="perspectrum_evidence", saved_model=model_path)
+
+    bb.evaluate(data_dir, raw_score_path)
+
+def evidence_dev_evaluation(model_path, raw_score_path):
+    data_dir = FILE_PATH['evidence_data']
+
+    bb = BertBaseline(task_name="perspectrum_evidence", saved_model=model_path)
+
+    bb.evaluate(data_dir, raw_score_path)
 
 def test_models():
     bb = BertBaseline(task_name="perspectrum_relevane",
@@ -545,10 +552,14 @@ def test_models_with_batch():
 
 
 if __name__ == "__main__":
-    test_models_with_batch()
-    # stance_train()
+    import sys
+    sys.path.append("/scratch/sihaoc/project/perspective/")
+    # test_models_with_batch()
+    # stance_train()w
     # stance_evaluation("/scratch/sihaoc/project/perspective/model/stance/lr2e-05_bs16/perspectrum_stance_epoch-0.pth")
     # equivalence_train()
     # equivalence_evaluation("/scratch/sihaoc/project/perspective/model/equivalence/lr2e-05_bs16/perspectrum_equivalence_epoch-0.pth")
     # relevance_train()
     # evidence_train()
+    evidence_evaluation("/scratch/sihaoc/project/perspective/model/evidence/lr3e-05_bs32/perspectrum_evidence_epoch-4.pth",
+                        raw_score_path="/scratch/sihaoc/project/perspective/model/evidence/lr3e-05_bs32/epoch-4.score")
