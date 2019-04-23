@@ -7,7 +7,7 @@ import requests
 import sys
 import json
 
-subscription_key = "e7ef54c352ed46809bb38c6db1017448"
+subscription_key = "" # Your key here
 customConfigId = "mysearch"
 search_url = "https://api.cognitive.microsoft.com/bing/v7.0/search"
 headers = {"Ocp-Apim-Subscription-Key": subscription_key}
