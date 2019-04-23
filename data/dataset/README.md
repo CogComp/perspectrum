@@ -2,7 +2,7 @@
 
 ### Dataset Format
 There dataset consists of 5 json files
-`perspectrum_with_answers_v0.2.json`: Contains all claims and all gold annotations (perspective clusters with their evidence paragraphs) to the claim.
+`perspectrum_with_answers_v1.0.json`: Contains all claims and all gold annotations (perspective clusters with their evidence paragraphs) to the claim.
 ```python
   {
     "cId": 0,
@@ -27,7 +27,7 @@ There dataset consists of 5 json files
   }
 ```
 
-`perspective_pool_v0.2.json`: Contains all perspectives
+`perspective_pool_v1.0.json`: Contains all perspectives
 ```json
   {
     "pId": 0,
@@ -37,7 +37,7 @@ There dataset consists of 5 json files
 
 ```
 
-`evidence_pool_v0.2.json`: Contains all evidence paragraphs
+`evidence_pool_v1.0.json`: Contains all evidence paragraphs
 ```json
   {
     "eId": 0,
@@ -47,7 +47,7 @@ There dataset consists of 5 json files
 
 ```
 
-`dataset_split_v0.2.json`: Contains the dataset split
+`dataset_split_v1.0.json`: Contains the dataset split
 ```python
 {
     "1": "train", # claim with id = 1 is in the training set
